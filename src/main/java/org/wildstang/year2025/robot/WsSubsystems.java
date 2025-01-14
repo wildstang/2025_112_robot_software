@@ -1,4 +1,4 @@
-package org.wildstang.sample.robot;
+package org.wildstang.year2025.robot;
 
 import org.wildstang.framework.core.Subsystems;
 import org.wildstang.sample.subsystems.LED.LedController;
@@ -12,7 +12,9 @@ import org.wildstang.sample.subsystems.targeting.WsVision;
 public enum WsSubsystems implements Subsystems {
 
     // enumerate subsystems
-    
+    WS_VISION("Ws Vision", WsVision.class),
+    SWERVE_DRIVE("Swerve Drive", SwerveDrive.class),
+    LED("Led Controller", LedController.class),
     ;
 
     /**
