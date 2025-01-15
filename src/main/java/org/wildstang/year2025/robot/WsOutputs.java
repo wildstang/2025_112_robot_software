@@ -19,12 +19,12 @@ public enum WsOutputs implements Outputs {
     // ---------------------------------
     // Drive Motors
     // ---------------------------------
-    
-    // ---------------------------------
+
+    // ---------------------------------    // ---------------------------------
     // Other Motors
     // ---------------------------------
-
-    // ---------------------------------
+    LIFTONE("First Lift Motor", new WsSparkConfig(CANConstants.LIFTONE, WsMotorControllers.SPARK_FLEX_BRUSHLESS)),
+    LIFTTWO("Second Lift Motor", new WsSparkConfig(CANConstants.LIFTTWO, WsMotorControllers.SPARK_FLEX_BRUSHLESS));    // ---------------------------------
     // Solenoids
     // ---------------------------------
 
