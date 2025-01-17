@@ -1,6 +1,7 @@
 package org.wildstang.year2025.subsystems.ArmLift;
 
-import org.wildstang.hardware.roborio.inputs.WsAnalogInput;
+import org.wildstang.framework.io.inputs.AnalogInput;
+import org.wildstang.framework.io.inputs.DigitalInput;
 import org.wildstang.hardware.roborio.outputs.WsSpark;
 import org.wildstang.framework.core.Core;
 import org.wildstang.framework.io.inputs.Input;
@@ -10,7 +11,6 @@ import org.wildstang.hardware.roborio.outputs.WsSpark;
 import org.wildstang.year2025.robot.WsInputs;
 import org.wildstang.year2025.robot.WsOutputs;
 
-import edu.wpi.first.wpilibj.AnalogInput;
 
 
 /**
@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.AnalogInput;
  */
 public class ArmLift implements Subsystem {
 
+    /* Lift Variables */
     private WsSpark liftMotor1;
     private WsSpark liftMotor2;
     public DigitalInput leftBumper;
@@ -30,6 +31,20 @@ public class ArmLift implements Subsystem {
     public AnalogInput rightTrigger;
     public double leftTriggerValue;
     public double rightTriggerValue;
+
+    /* Arm Variables */
+
+    public double maxArmRotation;
+    public double minArmRotation;
+    public double restArmRotation;
+    private WsSpark armMotor;
+    private DigitalInput dpadLeft;
+    private DigitalInput dpadRight;
+    private DigitalInput dpadUp;
+    private boolean activateArm = false;
+
+    
+
     
 
 
@@ -42,10 +57,20 @@ public class ArmLift implements Subsystem {
         liftSpeed = 0.5;
         liftMotor1.setBrake();
         liftMotor2.setBrake();
-        rightTrigger = (AnalogInput) Core.getInputManager().getInput(WsInputs.DRIVER_RIGHT_TRIGGER);
+        rightTrigger = (AnalogInput) WsInputs.DRIVER_RIGHT_TRIGGER.get();
         rightTrigger.addInputListener(this);
-        leftTrigger = (AnalogInput) Core.getInputManager().getInput(WsInputs.DRIVER_LEFT_TRIGGER);
+        leftTrigger = (AnalogInput) WsInputs.DRIVER_LEFT_TRIGGER.get();
         leftTrigger.addInputListener(this);
+        dpadUp = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_DPAD_UP);
+        dpadUp.addInputListener(this);
+        dpadLeft = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_DPAD_LEFT);
+        dpadLeft.addInputListener(this);
+        dpadRight = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_DPAD_RIGHT);
+        dpadRight.addInputListener(this);
+
+
+
+        armMotor = (WsSpark) Core.getOutputManager().getOutput(WsOutputs.ARMMOTOR);
         
     }
     public void inputUpdate(){
@@ -56,30 +81,24 @@ public class ArmLift implements Subsystem {
         }else{
             liftDirection =0;
         }
+
+        if(dpadUp.getValue()){
+            activateArm = true;
+        }
          leftTriggerValue = leftTrigger.getValue();
          rightTriggerValue = rightTrigger.getValue();
 
     }
 
     public void update(){
-        testSubsystem();
+        testLift();
     }
 
     // Press sensetive lift (not done)
-    public void testAnalogSybsystem(){
-        switch (){
-            case -1:
-                liftMotor1.setSpeed(leftTriggerValue);
-                liftMotor2.setSpeed(leftTriggerValue);
-            case 1:
-                liftMotor1.setSpeed(rightTriggerValue);
-                liftMotor2.setSpeed(rightTriggerValue);
-            default:
-                liftMotor1.stop();
-                liftMotor2.stop();
-        }
+    public void testAnalogLift(){
+        
     }
-    public void testSubsystem(){
+    public void testLift(){
         switch (liftDirection){
             case -1:
                 liftMotor1.setSpeed(-liftSpeed);
@@ -90,6 +109,19 @@ public class ArmLift implements Subsystem {
             default:
                 liftMotor1.stop();
                 liftMotor2.stop();
+        }
+    }
+
+    public void testArm(){
+        if(activateArm){
+            /* Increase Lift Position 
+             * Keep lift in that position
+            */
+
+            /* Pivot arm out 
+             * move lift back down
+             * Fine tune arm position if needed
+             */
         }
     }
     public void selfTest(){
