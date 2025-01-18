@@ -1,4 +1,4 @@
-package org.wildstang.year2025.subsystems.ArmLift;
+package org.wildstang.year2025.subsystems.arm_lift;
 
 public final class ArmLiftConstants {
     public final double potentioMultiplier = 2;
