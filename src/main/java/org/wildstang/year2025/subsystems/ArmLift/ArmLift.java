@@ -1,5 +1,12 @@
 package org.wildstang.year2025.subsystems.ArmLift;
 
+
+import com.revrobotics.jni.CANSparkJNI;
+
+import com.revrobotics.AbsoluteEncoder;
+import com.revrobotics.CANSparkLowLevel.PeriodicFrame;
+import com.revrobotics.SparkAbsoluteEncoder.Type;
+
 import org.wildstang.framework.io.inputs.AnalogInput;
 import org.wildstang.framework.io.inputs.DigitalInput;
 import org.wildstang.hardware.roborio.outputs.WsSpark;
@@ -10,6 +17,11 @@ import org.wildstang.framework.subsystems.Subsystem;
 import org.wildstang.hardware.roborio.outputs.WsSpark;
 import org.wildstang.year2025.robot.WsInputs;
 import org.wildstang.year2025.robot.WsOutputs;
+import org.wildstang.year2025.subsystems.ArmLift.ArmLiftConstants;
+
+
+
+
 
 
 
@@ -31,6 +43,7 @@ public class ArmLift implements Subsystem {
     public AnalogInput rightTrigger;
     public double leftTriggerValue;
     public double rightTriggerValue;
+    private double potentioVal;
 
     /* Arm Variables */
 
@@ -42,6 +55,9 @@ public class ArmLift implements Subsystem {
     private DigitalInput dpadRight;
     private DigitalInput dpadUp;
     private boolean activateArm = false;
+    private AbsoluteEncoder armEncoder;
+
+
 
     
 
@@ -67,6 +83,8 @@ public class ArmLift implements Subsystem {
         dpadLeft.addInputListener(this);
         dpadRight = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_DPAD_RIGHT);
         dpadRight.addInputListener(this);
+        armEncoder = armMotor.getController().getAbsoluteEncoder(Type.kDutyCycle);
+        armEncoder.setPositionConversionFactor(2.0 * Math.PI);
 
 
 
@@ -122,6 +140,7 @@ public class ArmLift implements Subsystem {
              * move lift back down
              * Fine tune arm position if needed
              */
+            
         }
     }
     public void selfTest(){
