@@ -2,7 +2,7 @@ package org.wildstang.year2025.subsystems.arm_lift;
 
 
 import com.revrobotics.spark.SparkAbsoluteEncoder;
-import edu.wpi.first.wpilibj;
+
 
 import org.wildstang.framework.io.inputs.Input;
 import org.wildstang.framework.io.inputs.AnalogInput;
@@ -28,7 +28,6 @@ import org.wildstang.year2025.subsystems.arm_lift.ArmLiftConstants;
 public class ArmLift implements Subsystem {
 
 
-    public static double P = 0, I = 0, D = 0;
 
     private double armPosition;
     private double targetPosition;
@@ -127,10 +126,10 @@ public class ArmLift implements Subsystem {
         switch (liftDirection){
             case -1:
                 liftMotor1.setSpeed(-liftSpeed);
-                liftMotor2.setSpeed(-liftSpeed);
+                liftMotor2.setSpeed(liftSpeed);
             case 1:
                 liftMotor1.setSpeed(liftSpeed);
-                liftMotor2.setSpeed(liftSpeed);
+                liftMotor2.setSpeed(-liftSpeed);
             default:
                 liftMotor1.stop();
                 liftMotor2.stop();
@@ -145,17 +144,6 @@ public class ArmLift implements Subsystem {
     }
     public void selfTest(){
         
-    }
-
-    public double PController(double kP, double setPoint, double currentPos){
-        double error = setPoint - currentPos;
-        double controlInput = error*kP;
-        return controlInput;
-    }
-    public double PDController(double kP, double kD, double setPoint, double currentPos){
-        double error = setPoint - currentPos;
-        double controlInput = (kP * error) + (kD*)
-        return controlInput;
     }
 
     @Override
