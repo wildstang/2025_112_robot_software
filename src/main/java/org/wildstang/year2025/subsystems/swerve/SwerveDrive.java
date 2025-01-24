@@ -105,8 +105,8 @@ public class SwerveDrive extends SwerveDriveTemplate {
         if (driveState == driveType.AUTO) driveState = driveType.TELEOP;
 
         //get x and y speeds
-        xPower = swerveHelper.scaleDeadband(leftStickX.getValue(), DriveConstants.DEADBAND);
-        yPower = swerveHelper.scaleDeadband(leftStickY.getValue(), DriveConstants.DEADBAND);
+        // xPower = swerveHelper.scaleDeadband(leftStickX.getValue(), DriveConstants.DEADBAND);
+        // yPower = swerveHelper.scaleDeadband(leftStickY.getValue(), DriveConstants.DEADBAND);
         
         
         //reset gyro
@@ -152,9 +152,9 @@ public class SwerveDrive extends SwerveDriveTemplate {
         }
 
         //get rotational joystick
-        rotSpeed = rightStickX.getValue()*Math.abs(rightStickX.getValue());
-        rotSpeed = swerveHelper.scaleDeadband(rotSpeed, DriveConstants.DEADBAND);
-        // if (rotSpeed == 0 && rotLocked == false){
+        // rotSpeed = rightStickX.getValue()*Math.abs(rightStickX.getValue());
+        // rotSpeed = swerveHelper.scaleDeadband(rotSpeed, DriveConstants.DEADBAND);
+        // // if (rotSpeed == 0 && rotLocked == false){
         //     if (Math.abs(getGyroAngle() - rotTarget) < 1.0) rotLocked = true;
         //     rotTarget = getGyroAngle();
         // }
