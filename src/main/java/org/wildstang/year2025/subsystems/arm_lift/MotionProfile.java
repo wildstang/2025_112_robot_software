@@ -43,7 +43,7 @@ public class MotionProfile {
             samples = (int)(totalTime/sampleTime);
             triangleSampleIndex = (int)(totalTime / (2*sampleTime));
             setArrayLengths();
-            setTriangularArrays();
+            setTriangularArrays(dP);
          }
          else{
             //Trapezoidal Profile
@@ -55,7 +55,7 @@ public class MotionProfile {
             totalTime =  cruiseTime + 2*maxAccelerationTime;
             samples = (int)(totalTime/sampleTime);
             setArrayLengths();
-            setTrapezoidArrays();
+            setTrapezoidArrays(dP);
             
          }
 
@@ -70,7 +70,7 @@ public class MotionProfile {
          }else if(i< triangleSampleIndex + cruiseSampleIndex){
             accelArray[i] = 0;
          }else{
-            accelArray[i] = -maxAccel;
+            accelArray[i] = -maxAccel * Math.signum(dP);
          }
          accelSum += accelArray[i];
          velArray[i] = accelSum * sampleTime;
@@ -81,14 +81,14 @@ public class MotionProfile {
       }
     }
 
-    private void setTriangularArrays(){
+    private void setTriangularArrays(double dP){
       double accelSum = 0;
       double velSum = 0;
       for(int i = 0; i < accelArray.length; i++){
          if(i < triangleSampleIndex){
-            accelArray[i]= maxAccel;
+            accelArray[i]= maxAccel * Math.signum(dP);
          }else{
-            accelArray[i] = -maxAccel;
+            accelArray[i] = -maxAccel * Math.signum(dP);
          }
          accelSum += accelArray[i];
          velArray[i] = accelSum * sampleTime;

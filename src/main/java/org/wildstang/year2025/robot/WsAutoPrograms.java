@@ -1,9 +1,9 @@
 package org.wildstang.year2025.robot;
 
 import org.wildstang.framework.core.AutoPrograms;
-import org.wildstang.sample.auto.Programs.Jubilee;
-import org.wildstang.sample.auto.Programs.Line;
-import org.wildstang.sample.auto.Programs.TestProgram;
+import org.wildstang.year2025.auto.Programs.Jubilee;
+import org.wildstang.year2025.auto.Programs.Line;
+import org.wildstang.year2025.auto.Programs.TestProgram;
 
 
 /**

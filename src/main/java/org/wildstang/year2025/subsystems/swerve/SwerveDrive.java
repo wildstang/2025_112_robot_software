@@ -10,12 +10,12 @@ import org.wildstang.framework.io.inputs.AnalogInput;
 import org.wildstang.framework.io.inputs.DigitalInput;
 import org.wildstang.framework.subsystems.swerve.SwerveDriveTemplate;
 import org.wildstang.hardware.roborio.outputs.WsSpark;
-import org.wildstang.sample.robot.CANConstants;
-import org.wildstang.sample.robot.WsInputs;
-import org.wildstang.sample.robot.WsOutputs;
-import org.wildstang.sample.robot.WsSubsystems;
-import org.wildstang.sample.subsystems.targeting.VisionConsts;
-import org.wildstang.sample.subsystems.targeting.WsVision;
+import org.wildstang.year2025.robot.CANConstants;
+import org.wildstang.year2025.robot.WsInputs;
+import org.wildstang.year2025.robot.WsOutputs;
+import org.wildstang.year2025.robot.WsSubsystems;
+import org.wildstang.year2025.subsystems.localization.VisionConsts;
+import org.wildstang.year2025.subsystems.localization.WsVision;
 
 import edu.wpi.first.math.estimator.KalmanFilter;
 import edu.wpi.first.math.geometry.Pose2d;

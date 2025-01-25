@@ -1,7 +1,7 @@
-package org.wildstang.sample.robot;
+package org.wildstang.year2025.robot;
 import org.ejml.simple.SimpleMatrix;
 import org.wildstang.framework.core.Core;
-import org.wildstang.sample.subsystems.swerve.SwerveDrive;
+import org.wildstang.year2025.subsystems.swerve.SwerveDrive;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
 

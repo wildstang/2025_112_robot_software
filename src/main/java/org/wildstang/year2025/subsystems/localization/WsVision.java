@@ -1,10 +1,10 @@
-package org.wildstang.year2025.subsystems.locolization;
+package org.wildstang.year2025.subsystems.localization;
 
 // ton of imports
 import org.wildstang.framework.subsystems.Subsystem;
-import org.wildstang.sample.robot.WsInputs;
-import org.wildstang.sample.robot.WsSubsystems;
-import org.wildstang.sample.subsystems.swerve.SwerveDrive;
+import org.wildstang.year2025.robot.WsInputs;
+import org.wildstang.year2025.robot.WsSubsystems;
+import org.wildstang.year2025.subsystems.swerve.SwerveDrive;
 import org.wildstang.framework.core.Core;
 
 import org.wildstang.framework.io.inputs.DigitalInput;

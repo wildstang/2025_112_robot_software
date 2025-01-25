@@ -1,14 +1,10 @@
 package org.wildstang.year2025.subsystems.LED;
 
 import org.wildstang.framework.core.Core;
-import org.wildstang.framework.io.inputs.AnalogInput;
-import org.wildstang.framework.io.inputs.DigitalInput;
 import org.wildstang.framework.io.inputs.Input;
 import org.wildstang.framework.subsystems.Subsystem;
-import org.wildstang.sample.robot.Robot;
-import org.wildstang.sample.robot.WsInputs;
-import org.wildstang.sample.robot.WsSubsystems;
-import org.wildstang.sample.subsystems.targeting.WsVision;
+import org.wildstang.year2025.robot.WsSubsystems;
+import org.wildstang.year2025.subsystems.localization.WsVision;
 
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;

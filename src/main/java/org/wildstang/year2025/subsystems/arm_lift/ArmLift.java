@@ -90,7 +90,7 @@ public class ArmLift implements Subsystem {
         dpadDown.addInputListener(this);
         driverFaceLeft = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_FACE_LEFT);
         driverFaceLeft.addInputListener(this);
-        
+    
     }
 
     public void inputUpdate(Input source){
@@ -113,21 +113,12 @@ public class ArmLift implements Subsystem {
             liftState = liftDirection.STORAGE;
             armDirection = 0;
         }
-        if(source == leftTrigger){
-            liftSpeed = leftTrigger.getValue();
-            liftSpeed = Math.min(Math.max(liftSpeed, -1.0), 1.0);
-        }
-        
+    
     }
 
     public void update(){
         testLift();
     }
-
-   
-    
-    
-
 
     // Press sensetive lift (not done)
     public void testAnalogLift(){

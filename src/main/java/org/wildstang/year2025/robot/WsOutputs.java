@@ -23,10 +23,18 @@ public enum WsOutputs implements Outputs {
     // ---------------------------------    // ---------------------------------
     // Other Motors
     // ---------------------------------
+    DRIVE1("Module 1 Drive Motor", new WsSparkConfig(CANConstants.DRIVE1, WsMotorControllers.SPARK_FLEX_BRUSHLESS)),
+    ANGLE1("Module 1 Angle Motor", new WsSparkConfig(CANConstants.ANGLE1, WsMotorControllers.SPARK_MAX_BRUSHLESS)),
+    DRIVE2("Module 2 Drive Motor", new WsSparkConfig(CANConstants.DRIVE2, WsMotorControllers.SPARK_FLEX_BRUSHLESS)),
+    ANGLE2("Module 2 Angle Motor", new WsSparkConfig(CANConstants.ANGLE2, WsMotorControllers.SPARK_MAX_BRUSHLESS)),
+    DRIVE3("Module 3 Drive Motor", new WsSparkConfig(CANConstants.DRIVE3, WsMotorControllers.SPARK_FLEX_BRUSHLESS)),
+    ANGLE3("Module 3 Angle Motor", new WsSparkConfig(CANConstants.ANGLE3, WsMotorControllers.SPARK_MAX_BRUSHLESS)),
+    DRIVE4("Module 4 Drive Motor", new WsSparkConfig(CANConstants.DRIVE4, WsMotorControllers.SPARK_FLEX_BRUSHLESS)),
+    ANGLE4("Module 4 Angle Motor", new WsSparkConfig(CANConstants.ANGLE4, WsMotorControllers.SPARK_MAX_BRUSHLESS)),   
     LIFTONE("First Lift Motor", new WsSparkConfig(CANConstants.LIFTONE, WsMotorControllers.SPARK_FLEX_BRUSHLESS)),
     LIFTTWO("Second Lift Motor", new WsSparkConfig(CANConstants.LIFTTWO, WsMotorControllers.SPARK_FLEX_BRUSHLESS)),    // ---------------------------------
     ARMMOTOR("Arm Motor", new WsSparkConfig(CANConstants.ARMMOTOR, WsMotorControllers.SPARK_FLEX_BRUSHLESS));
-    
+
     // Solenoids
     // ---------------------------------
 

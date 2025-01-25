@@ -3,66 +3,68 @@ package org.wildstang.year2025.subsystems.arm_lift;
 import edu.wpi.first.wpilibj.Timer;
 
 public class PIDController {
-    public static double P = 0, I = 0, D = 0; 
-    public static double kP = 0, kI = 0, kD = 0;
-
-    
-
-    public static double dt;
-    public static double tPrevious;
-    public static double errorPrevious = 0;
-    private double t = Timer.getFPGATimestamp();
-    private double de;
+    public double kP = 0, kI = 0, kD = 0;
+    public  double P = 0,I = 0,D = 0;
+    public  double tPrevious;
+    public double errorPrevious;
 
 
-    public PIDController(double p, double i, double d){
-        P = p;
-        I = i;
-        D = d;
-        
+    public PIDController(double kP, double kI, double kD, double P, double I, double D){
+       this.kP = kP;
+       this.kI = kI;
+       this.kD = kD;
+       this.P = P;
+       this.I = I;
+       this.D = D;
+       this.tPrevious = Timer.getFPGATimestamp();
+       this.errorPrevious = 0;
     }
 
-    public void PVal(double setPoint, double currentPos){
+    private double getDeltaT(){
+        double t = Timer.getFPGATimestamp();
+        double dt = t - tPrevious;
+        tPrevious = t;
+        return dt;
+    }
+
+    public double PVal(double setPoint, double currentPos){
         double error = setPoint - currentPos;
         double controlInput = error*kP;
-        P = controlInput;
+        return controlInput;
     }
-    public double IVal(double setPoint, double currentPos){
-        tPrevious = t;
-        t = Timer.getFPGATimestamp();
-        double error = setPoint - currentPos;
-        I += kI*error * (t-tPrevious);
-        tPrevious = t;
 
+    public double IVal(double setPoint, double currentPos){
+        double dt = getDeltaT();
+        double error = setPoint - currentPos;
+        I += kI*error * (dt);
         return I;
     }
-    public void DVal(double setPoint, double currentPos){
-        tPrevious = t;
-        t = Timer.getFPGATimestamp();
+
+    public double DVal(double setPoint, double currentPos){
+        double dt = getDeltaT();
         double error = setPoint - currentPos;
-        dt = t-tPrevious;
-        de = error-errorPrevious;
-        double controlInput =  (kD*(de/dt));
+        double de = error-errorPrevious;
+        double controlInput = (kD*(de/dt));
         errorPrevious = error;
-        D = controlInput;
-        
+        return controlInput;
+
+    }
+
+    public double PIDController(double setPoint, double currentPos){
+        double pTerm = PVal(setPoint, currentPos);
+        double iTerm = IVal(setPoint, currentPos);
+        double dTerm = IVal(setPoint, currentPos);
+        return pTerm + iTerm + dTerm;
     }
     public double PDController(double setPoint, double currentPos){
-        tPrevious = t;
-        t = Timer.getFPGATimestamp();
-        double error = setPoint - currentPos;
-        double dt = t-tPrevious;
-        double de = error-errorPrevious;
-
-        double controlInput = 
-        errorPrevious = error;
-        return controlInput;
+        double pTerm = PVal(setPoint, currentPos);
+        double dTerm = DVal(setPoint, currentPos);
+        return pTerm + dTerm;
     }
     
-    public double PIController(double SetPoint, double currentPos){
-        tPrevious = t;
-        t = Timer.getFPGATimestamp();
-        IVal()
-        return controlInput;
+    public double PIController(double setPoint, double currentPos){
+        double pTerm = PVal(setPoint, currentPos);
+        double iTerm = IVal(setPoint, currentPos);
+        return pTerm + iTerm;
     }
 }

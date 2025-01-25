@@ -1,4 +1,4 @@
-package org.wildstang.year2025.subsystems.locolization;
+package org.wildstang.year2025.subsystems.localization;
 
 import java.lang.annotation.Target;
 import java.util.OptionalDouble;
