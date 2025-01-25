@@ -24,6 +24,7 @@ import org.wildstang.year2025.subsystems.arm_lift.ArmLiftConstants;
 public class ArmLift implements Subsystem {
 
     PIDController controller;
+    MotionProfile profileController;
 
     private double armPosition;
     private double targetPosition;
@@ -165,8 +166,11 @@ public class ArmLift implements Subsystem {
         }
     }
     public void armSystem(double start_pos, double end_pos){
-        double armGain = 0;
-        
+        //profileController.calculate(0, 0, Math.PI, 0);
+        double goalPos = profileController.getSamples()[0];
+        double goalVel = profileController.getSamples()[1];
+        double goalAcc = profileController.getSamples()[2];
+
         
     }
     public void selfTest(){

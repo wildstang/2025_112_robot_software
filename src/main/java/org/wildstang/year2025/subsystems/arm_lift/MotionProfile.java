@@ -19,48 +19,58 @@ public class MotionProfile {
     private int triangleSampleIndex;
     private int cruiseSampleIndex;
 
-    public void calculate(double maxAcceleration, double maxVelocity, double curPos, double desPos){
+    private double maxAccel;
+    private double maxVel;
+    private double accelLimitEndpoint; 
+   public MotionProfile(double maxAcceleration, double maxVelocity){
+      this.maxAccel = maxAcceleration;
+      this.maxVel = maxVelocity;
+      this.accelLimitEndpoint = (Math.pow(maxVel,2)) / maxAccel;
+
+   }
+
+    public void calculate(double curPos, double desPos){
         timer.reset();
         //Calculate the point at which acceleration is no more (not limited)
-         double accelLimitEndpoint = (maxVelocity * maxVelocity) / maxAcceleration;
+         
 
          double dP = desPos - curPos;
 
          
          if(dP <= accelLimitEndpoint){
             //Triangular Profile
-            totalTime = Math.sqrt(2*dP/maxAcceleration);
+            totalTime = Math.sqrt(2*dP/maxAccel);
             samples = (int)(totalTime/sampleTime);
             triangleSampleIndex = (int)(totalTime / (2*sampleTime));
             setArrayLengths();
-            setTriangularArrays(maxAcceleration);
+            setTriangularArrays();
          }
          else{
             //Trapezoidal Profile
-            maxAccelerationTime = maxVelocity/maxAcceleration; // time it takes to reach max velocity
-            cruiseTime = (dP - (maxVelocity*maxVelocity)/maxAcceleration)/maxVelocity; //time of crusing at
+            maxAccelerationTime = maxVel/maxAccel; // time it takes to reach max velocity
+            cruiseTime = (dP - accelLimitEndpoint)/maxVel; //time of crusing at
             triangleSampleIndex = (int)(maxAccelerationTime/sampleTime);
             cruiseSampleIndex = (int)(cruiseTime/sampleTime);
 
             totalTime =  cruiseTime + 2*maxAccelerationTime;
             samples = (int)(totalTime/sampleTime);
             setArrayLengths();
-            setTrapezoidArrays(maxAcceleration);
+            setTrapezoidArrays();
             
          }
 
     }
 
-    private void setTrapezoidArrays(double maxAcceleration){
+    private void setTrapezoidArrays(double dP){
       double accelSum = 0;
       double velSum = 0;
       for(int i = 0; i < accelArray.length; i++){
          if(i < triangleSampleIndex){
-            accelArray[i]=maxAcceleration;
+            accelArray[i]=maxAccel * Math.signum(dP);
          }else if(i< triangleSampleIndex + cruiseSampleIndex){
             accelArray[i] = 0;
          }else{
-            accelArray[i] = -maxAcceleration;
+            accelArray[i] = -maxAccel;
          }
          accelSum += accelArray[i];
          velArray[i] = accelSum * sampleTime;
@@ -71,14 +81,14 @@ public class MotionProfile {
       }
     }
 
-    private void setTriangularArrays(double maxAcceleration){
+    private void setTriangularArrays(){
       double accelSum = 0;
       double velSum = 0;
       for(int i = 0; i < accelArray.length; i++){
          if(i < triangleSampleIndex){
-            accelArray[i]= maxAcceleration;
+            accelArray[i]= maxAccel;
          }else{
-            accelArray[i] = -maxAcceleration;
+            accelArray[i] = -maxAccel;
          }
          accelSum += accelArray[i];
          velArray[i] = accelSum * sampleTime;

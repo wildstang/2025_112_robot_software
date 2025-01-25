@@ -53,7 +53,8 @@ public class PIDController {
         double error = setPoint - currentPos;
         double dt = t-tPrevious;
         double de = error-errorPrevious;
-        double controlInput = (P * error) + (D*(de/dt));
+
+        double controlInput = 
         errorPrevious = error;
         return controlInput;
     }
