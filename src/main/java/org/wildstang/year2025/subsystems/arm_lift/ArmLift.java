@@ -27,7 +27,7 @@ import org.wildstang.year2025.subsystems.arm_lift.ArmLiftConstants;
  */
 public class ArmLift implements Subsystem {
 
-
+    PIDController controller;
 
     private double armPosition;
     private double targetPosition;
@@ -118,6 +118,11 @@ public class ArmLift implements Subsystem {
         testLift();
     }
 
+   
+    
+    
+
+
     // Press sensetive lift (not done)
     public void testAnalogLift(){
         
@@ -141,6 +146,11 @@ public class ArmLift implements Subsystem {
 
             
         }
+    }
+    public void armSystem(double start_pos, double end_pos){
+        double armGain = 0;
+        
+        
     }
     public void selfTest(){
         
