@@ -116,7 +116,7 @@ public class ArmLift implements Subsystem {
             liftSpeed = leftTrigger.getValue();
             liftSpeed = Math.min(Math.max(liftSpeed, -1.0), 1.0);
         }
-        else if
+        
     }
 
     public void update(){

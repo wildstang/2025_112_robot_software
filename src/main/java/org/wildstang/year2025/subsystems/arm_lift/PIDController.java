@@ -13,7 +13,7 @@ public class PIDController {
     public static double errorPrevious = 0;
     private double t = Timer.getFPGATimestamp();
     private double de;
-    private double errorSum;
+
 
     public PIDController(double p, double i, double d){
         P = p;
@@ -28,10 +28,10 @@ public class PIDController {
         P = controlInput;
     }
     public double IVal(double setPoint, double currentPos){
+        tPrevious = t;
         t = Timer.getFPGATimestamp();
         double error = setPoint - currentPos;
-        errorSum += error;
-        I = kI*errorSum * (t-tPrevious);
+        I += kI*error * (t-tPrevious);
         tPrevious = t;
 
         return I;
@@ -58,4 +58,10 @@ public class PIDController {
         return controlInput;
     }
     
+    public double PIController(double SetPoint, double currentPos){
+        tPrevious = t;
+        t = Timer.getFPGATimestamp();
+        IVal()
+        return controlInput;
+    }
 }

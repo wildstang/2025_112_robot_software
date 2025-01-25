@@ -1,71 +1,112 @@
 package org.wildstang.year2025.subsystems.arm_lift;
 
+import edu.wpi.first.wpilibj.Timer;
+
+
+
 public class MotionProfile {
 
-    private double acceleration_dt;
-    private double position;
-    private double acceleration;
-    private double velocity;
+    private Timer timer = new Timer();
+    private double totalTime; // Total time to reach desired position
+    private final double sampleTime = 0.02; //seconds
+    private double[] posArray;
+    private double[] velArray;
+    private double[] accelArray;
+    private int samples;
+    
+    private double maxAccelerationTime;
+    private double cruiseTime;
+    private int triangleSampleIndex;
+    private int cruiseSampleIndex;
 
+    public void calculate(double maxAcceleration, double maxVelocity, double curPos, double desPos){
+        timer.reset();
+        //Calculate the point at which acceleration is no more (not limited)
+         double accelLimitEndpoint = (maxVelocity * maxVelocity) / maxAcceleration;
 
-    public double[] calculate(double max_acceleration, double max_velocity, double distance, double elapsed_time){
+         double dP = desPos - curPos;
 
-        //Calculate the time it takes to accelerate to max velocity
-        acceleration_dt = max_velocity / max_acceleration;
-
-        /* If we can't accelerate to max
-        *velocity in the given distance,
-        *we'll accelerate as much as possible
-        *
-        */ 
-        double halfway_distance = distance / 2;
-        double acceleration_distance = 0.5 * max_acceleration * Math.pow(acceleration_dt,2);
-
-        if (acceleration_distance > halfway_distance){
-            acceleration_dt = Math.sqrt(halfway_distance / (0.5 *max_acceleration));
-        }
-
-        /* recalculate max velocity based on
-        * the time we have to accelerate and
-        * decelerate
-         */
-        acceleration_distance = 0.5 * max_acceleration * Math.pow(acceleration_dt, 2);
-         max_velocity = max_acceleration * acceleration_dt;
-
-         // We decelerate at the same rate as we accelerate
-         double deceleration_dt = acceleration_dt;
-
-         // calculate the time that we're at max velocity
-         double cruise_distance = distance - 2 * acceleration_distance;
-         double cruise_dt = cruise_distance / max_velocity;
-         double deceleration_time = acceleration_dt + cruise_dt;
-
-         //check the current motion
-         double entire_dt = acceleration_dt + cruise_dt + deceleration_dt;
-         if(elapsed_time <= acceleration_dt){
-            //Acceleration phase
-            acceleration = max_acceleration;
-            position = 0.5 * max_acceleration * Math.pow(elapsed_time,2);
-            velocity = max_acceleration * elapsed_time;
-         }else if(elapsed_time <= deceleration_time){
-            // cruise phase
-            acceleration = 0;
-            double cruise_elapsed_time = elapsed_time - acceleration_dt;
-            position = acceleration_distance + max_velocity * cruise_elapsed_time;
-            velocity = max_velocity;
-         }else if(elapsed_time >= deceleration_time){
-              //Deceleration phase
-            acceleration = -max_acceleration;
-            double deceleration_elapsed_time = elapsed_time - deceleration_dt;
-            position = acceleration_distance + cruise_distance + max_velocity * deceleration_elapsed_time;
+         
+         if(dP <= accelLimitEndpoint){
+            //Triangular Profile
+            totalTime = Math.sqrt(2*dP/maxAcceleration);
+            samples = (int)(totalTime/sampleTime);
+            triangleSampleIndex = (int)(totalTime / (2*sampleTime));
+            setArrayLengths();
+            setTriangularArrays(maxAcceleration);
          }
-        
-         double goals[] = {position, velocity, acceleration};
-         return goals;
+         else{
+            //Trapezoidal Profile
+            maxAccelerationTime = maxVelocity/maxAcceleration; // time it takes to reach max velocity
+            cruiseTime = (dP - (maxVelocity*maxVelocity)/maxAcceleration)/maxVelocity; //time of crusing at
+            triangleSampleIndex = (int)(maxAccelerationTime/sampleTime);
+            cruiseSampleIndex = (int)(cruiseTime/sampleTime);
 
+            totalTime =  cruiseTime + 2*maxAccelerationTime;
+            samples = (int)(totalTime/sampleTime);
+            setArrayLengths();
+            setTrapezoidArrays(maxAcceleration);
+            
+         }
 
-      
     }
+
+    private void setTrapezoidArrays(double maxAcceleration){
+      double accelSum = 0;
+      double velSum = 0;
+      for(int i = 0; i < accelArray.length; i++){
+         if(i < triangleSampleIndex){
+            accelArray[i]=maxAcceleration;
+         }else if(i< triangleSampleIndex + cruiseSampleIndex){
+            accelArray[i] = 0;
+         }else{
+            accelArray[i] = -maxAcceleration;
+         }
+         accelSum += accelArray[i];
+         velArray[i] = accelSum * sampleTime;
+         velSum += velArray[i];
+         posArray[i] = velSum * sampleTime;
+
+
+      }
+    }
+
+    private void setTriangularArrays(double maxAcceleration){
+      double accelSum = 0;
+      double velSum = 0;
+      for(int i = 0; i < accelArray.length; i++){
+         if(i < triangleSampleIndex){
+            accelArray[i]= maxAcceleration;
+         }else{
+            accelArray[i] = -maxAcceleration;
+         }
+         accelSum += accelArray[i];
+         velArray[i] = accelSum * sampleTime;
+         velSum += velArray[i];
+         posArray[i] = velSum * sampleTime;
+
+
+      }
+    }
+
+    
+    public double[] getSamples(){
+      if(!timer.isRunning()){
+         timer.start();
+      }
+      int currIndex = (int)(timer.get()/sampleTime);
+      double[] sampleArray = new double[3];
+      sampleArray[0] = posArray[currIndex];
+      sampleArray[1] = velArray[currIndex];
+      sampleArray[2] = accelArray[currIndex];
+      return sampleArray;
+    }
+    private void setArrayLengths(){
+      accelArray = new double[samples];
+      velArray = new double[samples];
+      posArray = new double[samples];
+    }
+    
 
     
 }
