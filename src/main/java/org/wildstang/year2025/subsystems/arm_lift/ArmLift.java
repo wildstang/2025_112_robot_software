@@ -158,12 +158,28 @@ public class ArmLift implements Subsystem {
     }
     public void armSystem(double start_pos, double end_pos){
         //profileController.calculate(0, 0, Math.PI, 0);
+
+        PIDController pidController = new PIDController(0,0,0,0,0,0);
+
         double goalPos = profileController.getSamples()[0];
         double goalVel = profileController.getSamples()[1];
         double goalAcc = profileController.getSamples()[2];
 
+        double accelFF = goalAcc * ArmLiftConstants.ACCEL_GAIN;
+        double posFF = Math.cos(end_pos) * ArmLiftConstants.ARM_ANGLE_GAIN;
+        double posPI = pidController.PIController(start_pos, end_pos);
+
+        posPI += goalVel;
+
+        
+
+
+        double controlInputSum = accelFF + posFF;
+
         
     }
+
+    
     public void selfTest(){
         
     }
