@@ -20,8 +20,10 @@ public class MotionProfile {
     private int cruiseSampleIndex;
 
     private double maxAccel;
-    private double maxVel;
-    private double accelLimitEndpoint; 
+    public double maxVel;
+    private double accelLimitEndpoint;
+
+   
    public MotionProfile(double maxAcceleration, double maxVelocity){
       this.maxAccel = maxAcceleration;
       this.maxVel = maxVelocity;
@@ -32,8 +34,6 @@ public class MotionProfile {
     public void calculate(double curPos, double desPos){
         timer.reset();
         //Calculate the point at which acceleration is no more (not limited)
-         
-
          double dP = desPos - curPos;
 
          

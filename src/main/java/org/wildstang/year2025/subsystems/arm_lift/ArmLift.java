@@ -65,6 +65,7 @@ public class ArmLift implements Subsystem {
     public void init(){
         initOutput();
         initInputs();
+
     }
 
     public void initOutput(){
@@ -76,6 +77,9 @@ public class ArmLift implements Subsystem {
         liftMotor2.setBrake();
        
         armMotor = (WsSpark) Core.getOutputManager().getOutput(WsOutputs.ARMMOTOR);
+        liftMotor1.enableVoltageCompensation();
+        liftMotor2.enableVoltageCompensation();
+        armMotor.enableVoltageCompensation();
     }
 
 
@@ -118,6 +122,7 @@ public class ArmLift implements Subsystem {
 
     public void update(){
         testLift();
+        
     }
 
     // Press sensetive lift (not done)
@@ -125,7 +130,7 @@ public class ArmLift implements Subsystem {
         
     }
 
-    private void competitionLift(){
+    private void competitionControlSystem(){
          switch (liftState){
             case GROUND_INTAKE:
                 liftMotor1.setSpeed(-liftSpeed);
@@ -150,32 +155,47 @@ public class ArmLift implements Subsystem {
        
     }
 
-    public void testArm(){
-        if(activateArm){
+    
 
-            
-        }
-    }
-    public void armSystem(double start_pos, double end_pos){
-        //profileController.calculate(0, 0, Math.PI, 0);
-
-        PIDController pidController = new PIDController(0,0,0,0,0,0);
+    
+    public void armSystem(double currentPosition){
+        PIDController pidController = new PIDController(ArmLiftConstants.ARM_POS_P_GAIN, ArmLiftConstants.ARM_POS_I_GAIN,
+        ArmLiftConstants.ARM_VEL_P_GAIN,0);
 
         double goalPos = profileController.getSamples()[0];
         double goalVel = profileController.getSamples()[1];
         double goalAcc = profileController.getSamples()[2];
 
-        double accelFF = goalAcc * ArmLiftConstants.ACCEL_GAIN;
-        double posFF = Math.cos(end_pos) * ArmLiftConstants.ARM_ANGLE_GAIN;
-        double posPI = pidController.PIController(start_pos, end_pos);
+        double accelFF = goalAcc * ArmLiftConstants.ARM_ACCEL_GAIN;
+        double posFF = Math.cos(currentPosition) * ArmLiftConstants.ARM_ANGLE_GAIN;
+        double positionPI = pidController.positionPIController(currentPosition, goalPos);
 
-        posPI += goalVel;
-
+        double velocityP = pidController.velocityPController(positionPI + goalVel, currentPosition);
         
+        double controlInputSum = accelFF + posFF + velocityP;
+        armMotor.setSpeed(controlInputSum);
+      
+        
+    }
 
+    
+    public void liftSystem(double currentPosition){
+        PIDController pidController = new PIDController(ArmLiftConstants.LIFT_POS_P_GAIN, ArmLiftConstants.LIFT_POS_I_GAIN,
+        ArmLiftConstants.LIFT_VEL_P_GAIN,0);
 
-        double controlInputSum = accelFF + posFF;
+        double goalPos = profileController.getSamples()[0];
+        double goalVel = profileController.getSamples()[1];
+        double goalAcc = profileController.getSamples()[2];
 
+        double accelFF = goalAcc * ArmLiftConstants.LIFT_ACCEL_GAIN;
+        double posFF = Math.cos(currentPosition) * ArmLiftConstants.LIFT_POS_GAIN;
+        double positionPI = pidController.positionPIController(currentPosition, goalPos);
+
+        double velocityP = pidController.velocityPController(positionPI + goalVel, currentPosition);
+        
+        double controlInputSum = accelFF + posFF + velocityP;
+        liftMotor1.setSpeed(controlInputSum);
+        liftMotor2.setSpeed(-controlInputSum);
         
     }
 

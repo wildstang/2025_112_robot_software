@@ -3,21 +3,21 @@ package org.wildstang.year2025.subsystems.arm_lift;
 import edu.wpi.first.wpilibj.Timer;
 
 public class PIDController {
-    public double kP = 0, kI = 0, kD = 0;
-    public  double P = 0,I = 0,D = 0;
-    public  double tPrevious;
-    public double errorPrevious;
+    private double kpP, kpI; // Position Gains
+    private double kvP; // Velecity Gains
+
+    private double vP;
+    private double pP, pI;
+    private double tPrevious;
+    private double maxIntegral;
 
 
-    public PIDController(double kP, double kI, double kD, double P, double I, double D){
-       this.kP = kP;
-       this.kI = kI;
-       this.kD = kD;
-       this.P = P;
-       this.I = I;
-       this.D = D;
+    public PIDController(double kpP, double kpI, double kvP, double maxIntegral){
+       this.kpP = kpP;
+       this.kpI = kpI;
+       this.kvP = kvP;
        this.tPrevious = Timer.getFPGATimestamp();
-       this.errorPrevious = 0;
+       this.maxIntegral = maxIntegral; 
     }
 
     private double getDeltaT(){
@@ -27,44 +27,107 @@ public class PIDController {
         return dt;
     }
 
-    public double PVal(double setPoint, double currentPos){
+    public double positionPVal(double setPoint, double currentPos){
         double error = setPoint - currentPos;
-        double controlInput = error*kP;
-        return controlInput;
+        pP = error*kpP;
+        return pP;
     }
 
-    public double IVal(double setPoint, double currentPos){
+    public double positionIVal(double setPoint, double currentPos){
         double dt = getDeltaT();
         double error = setPoint - currentPos;
-        I += kI*error * (dt);
-        return I;
+        pI += kpI*error * (dt);
+
+        if(pI > maxIntegral){
+            pI = maxIntegral;
+        }else if(pI < -maxIntegral){
+            pI = -maxIntegral;
+        }
+
+        return pI;
     }
 
-    public double DVal(double setPoint, double currentPos){
-        double dt = getDeltaT();
-        double error = setPoint - currentPos;
-        double de = error-errorPrevious;
-        double controlInput = (kD*(de/dt));
-        errorPrevious = error;
-        return controlInput;
-
-    }
-
-    public double PIDController(double setPoint, double currentPos){
-        double pTerm = PVal(setPoint, currentPos);
-        double iTerm = IVal(setPoint, currentPos);
-        double dTerm = IVal(setPoint, currentPos);
-        return pTerm + iTerm + dTerm;
-    }
-    public double PDController(double setPoint, double currentPos){
-        double pTerm = PVal(setPoint, currentPos);
-        double dTerm = DVal(setPoint, currentPos);
-        return pTerm + dTerm;
-    }
-    
-    public double PIController(double setPoint, double currentPos){
-        double pTerm = PVal(setPoint, currentPos);
-        double iTerm = IVal(setPoint, currentPos);
+    public double positionPIController(double setPoint, double currentPos){
+        double pTerm = positionPVal(setPoint, currentPos);
+        double iTerm = positionIVal(setPoint, currentPos);
         return pTerm + iTerm;
     }
+
+    public double velocityPController(double setPoint, double currentPos){
+        double pTerm = velocityPController(setPoint, currentPos);
+        return pTerm;
+    }
+
+
+    public double velocityPVal(double setPoint, double currentPos){
+        double error = setPoint - currentPos;
+        vP = error*kvP;
+        return vP;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // public double positionDVal(double setPoint, double currentPos){
+    //     double dt = getDeltaT();
+    //     double error = setPoint - currentPos;
+    //     double de = error-positionErrorPrevious;
+    //     double controlInput = (kpD*(de/dt));
+    //     positionErrorPrevious = error;
+    //     return controlInput;
+
+    // }
+
+   
+
+    // public double velocityIVal(double setPoint, double currentPos){
+    //     double dt = getDeltaT();
+    //     double error = setPoint - currentPos;
+    //     vI += kvI*error * (dt);
+    //     return vI;
+    // }
+
+    // public double velocityDVal(double setPoint, double currentPos){
+    //     double dt = getDeltaT();
+    //     double error = setPoint - currentPos;
+    //     double de = error-errorPrevious;
+    //     double controlInput = (kvD*(de/dt));
+    //     errorPrevious = error;
+    //     return controlInput;
+
+    // }
+    
+    
 }
