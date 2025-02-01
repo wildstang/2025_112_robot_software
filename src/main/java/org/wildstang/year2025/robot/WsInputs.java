@@ -139,6 +139,8 @@ public enum WsInputs implements Inputs {
     // ********************************
     // Others ...
     // ********************************
+
+    LIFTPOTENTIO("Lift Potentiometer", new AnalogPotentiometer())
             
     ; // end of enum
     

@@ -1,6 +1,7 @@
 package org.wildstang.year2025.subsystems.arm_lift;
 
 
+import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.spark.SparkAbsoluteEncoder;
 
 import edu.wpi.first.wpilibj.DigitalGlitchFilter;
@@ -23,13 +24,14 @@ import org.wildstang.year2025.subsystems.arm_lift.ArmLiftConstants;
  */
 public class ArmLift implements Subsystem {
 
-    PIDController controller;
-    MotionProfile profileController;
 
-    private double armPosition;
-    private double targetPosition;
+    /* Control System Variables */
+    PIDController armPIDC;
+    PIDController liftPIDC;
+    MotionProfile armProfile;
+    MotionProfile liftProfile;
 
-    /*Inputs */
+    /*Inputs Variables*/
     private DigitalInput dpadDown; 
     private DigitalInput dpadLeft;
     private DigitalInput dpadRight;
@@ -37,28 +39,30 @@ public class ArmLift implements Subsystem {
     private DigitalInput driverFaceLeft;
     private AnalogInput leftJoyStickY;
     private AnalogInput rightJoyStickX;
+    private AnalogInput liftPotentiometer; // Input for the potentiometer on lift pulley
 
 
     /* Lift Variables */
     private WsSpark liftMotor1;
     private WsSpark liftMotor2;
     private double liftSpeed;
-    private enum liftDirection {GROUND_INTAKE, LOW_ALGAE_REEF, HIGH_ALGAE_REEF, STORAGE, SCORE_PRELOAD, SHOOT_NET};
-    private liftDirection liftState;
-    private double maxLiftPos;
-    private double minLiftPos;
-    private double potentioVal;
+    private double currentLiftPos;
+    private enum gameStates {GROUND_INTAKE, L2_ALGAE_REEF, L3_ALGAE_REEF, STORAGE, SCORE_PRELOAD, SHOOT_NET, START}; // Our Arm/Lift States
+    private gameStates gameState;
+    
+   
 
     /* Arm Variables */
-    public double maxArmRotation;
-    public double minArmRotation;
-    public double restArmRotation;
+    //public double maxArmRotation;
+    //public double minArmRotation;
+    //public double restArmRotation;
+    private double currentArmPos;
     public int armDirection; /* + is clockwise and - is counterclockwise */
     private WsSpark armMotor;
-    private boolean activateArm = false;
+    //private boolean activateArm = false;
 
 
-    private int inputType = 0;
+    //private int inputType = 0;
 
 
      @Override
@@ -80,6 +84,15 @@ public class ArmLift implements Subsystem {
         liftMotor1.enableVoltageCompensation();
         liftMotor2.enableVoltageCompensation();
         armMotor.enableVoltageCompensation();
+
+        armProfile = new MotionProfile(ArmLiftConstants.MAX_ARM_ACCELERATION, ArmLiftConstants.MAX_ARM_VELOCITY);
+        liftProfile = new MotionProfile(ArmLiftConstants.MAX_LIFT_ACCELERATION, ArmLiftConstants.MAX_LIFT_VELOCITY);
+        armPIDC = new PIDController(ArmLiftConstants.ARM_POS_P_GAIN, ArmLiftConstants.ARM_POS_I_GAIN
+        , ArmLiftConstants.ARM_VEL_P_GAIN, ArmLiftConstants.MAX_INTEGRAL);
+        liftPIDC = new PIDController(ArmLiftConstants.LIFT_POS_P_GAIN, ArmLiftConstants.LIFT_POS_I_GAIN
+        , ArmLiftConstants.LIFT_VEL_P_GAIN, ArmLiftConstants.MAX_INTEGRAL);
+    
+    
     }
 
 
@@ -100,21 +113,29 @@ public class ArmLift implements Subsystem {
     public void inputUpdate(Input source){
         if(source == dpadRight || source == dpadLeft || source == dpadDown || source == dpadUp || source == driverFaceLeft){
             if(dpadDown.getValue()){
-                liftState = liftDirection.GROUND_INTAKE;
+                gameState = gameStates.GROUND_INTAKE;
+
+                currentArmPos = armMotor.getController().getAbsoluteEncoder().getPosition() * (2*Math.PI); // multiplies encode value of 0-1 by 2pi for radians
+                currentLiftPos = (liftPotentiometer.getValue() / 5) * 20; // Inch height of lift
+
+                
+                armProfile.calculate(currentArmPos, ArmLiftConstants.GROUND_INTAKE_RIGHT_ANGLE);
+                liftProfile.calculate(currentLiftPos, ArmLiftConstants.MIN_LIFT_HEIGHT);
+
             }else if(dpadLeft.getValue()){
-                liftState = liftDirection.LOW_ALGAE_REEF;
+                liftCase = liftStates.L2_ALGAE_REEF;
             }
             else if(dpadRight.getValue()){
-                liftState = liftDirection.HIGH_ALGAE_REEF;
+                liftCase = liftStates.L3_ALGAE_REEF;
             }
             else if (dpadUp.getValue()){
-                liftState = liftDirection.SHOOT_NET;
+                liftCase = liftStates.SHOOT_NET;
             }
             else if(driverFaceLeft.getValue()){
-                liftState = liftDirection.STORAGE;
+                liftCase = liftStates.STORAGE;
             }
         }else{
-            liftState = liftDirection.STORAGE;
+            liftCase = liftStates.STORAGE;
             armDirection = 0;
         }
     
@@ -131,10 +152,14 @@ public class ArmLift implements Subsystem {
     }
 
     private void competitionControlSystem(){
-         switch (liftState){
+         switch (gameState){
             case GROUND_INTAKE:
-                liftMotor1.setSpeed(-liftSpeed);
-                liftMotor2.setSpeed(liftSpeed);
+                if(no algae){
+                    armSystem(currentArmPos);
+                    liftSystem(currentLiftPos);
+                }
+                
+                
                 break;
             case LOW_ALGAE_REEF:
             break;
@@ -158,44 +183,39 @@ public class ArmLift implements Subsystem {
     
 
     
-    public void armSystem(double currentPosition){
-        PIDController pidController = new PIDController(ArmLiftConstants.ARM_POS_P_GAIN, ArmLiftConstants.ARM_POS_I_GAIN,
-        ArmLiftConstants.ARM_VEL_P_GAIN,0);
-
-        double goalPos = profileController.getSamples()[0];
-        double goalVel = profileController.getSamples()[1];
-        double goalAcc = profileController.getSamples()[2];
+    public double armSystem(double currentPosition){
+        
+        double goalPos = armProfile.getSamples()[0];
+        double goalVel = armProfile.getSamples()[1];
+        double goalAcc = armProfile.getSamples()[2];
 
         double accelFF = goalAcc * ArmLiftConstants.ARM_ACCEL_GAIN;
         double posFF = Math.cos(currentPosition) * ArmLiftConstants.ARM_ANGLE_GAIN;
-        double positionPI = pidController.positionPIController(currentPosition, goalPos);
+        double positionPI = armPIDC.positionPIController(currentPosition, goalPos);
 
-        double velocityP = pidController.velocityPController(positionPI + goalVel, currentPosition);
+        double velocityP = armPIDC.velocityPController(positionPI + goalVel, currentPosition);
         
-        double controlInputSum = accelFF + posFF + velocityP;
-        armMotor.setSpeed(controlInputSum);
+        return accelFF + posFF + velocityP;
+        
       
         
     }
 
     
-    public void liftSystem(double currentPosition){
-        PIDController pidController = new PIDController(ArmLiftConstants.LIFT_POS_P_GAIN, ArmLiftConstants.LIFT_POS_I_GAIN,
-        ArmLiftConstants.LIFT_VEL_P_GAIN,0);
+    public double liftSystem(double currentPosition){
 
-        double goalPos = profileController.getSamples()[0];
-        double goalVel = profileController.getSamples()[1];
-        double goalAcc = profileController.getSamples()[2];
+        double goalPos = liftProfile.getSamples()[0];
+        double goalVel = liftProfile.getSamples()[1];
+        double goalAcc = liftProfile.getSamples()[2];
 
         double accelFF = goalAcc * ArmLiftConstants.LIFT_ACCEL_GAIN;
         double posFF = Math.cos(currentPosition) * ArmLiftConstants.LIFT_POS_GAIN;
-        double positionPI = pidController.positionPIController(currentPosition, goalPos);
+        double positionPI = liftPIDC.positionPIController(currentPosition, goalPos);
 
-        double velocityP = pidController.velocityPController(positionPI + goalVel, currentPosition);
+        double velocityP = liftPIDC.velocityPController(positionPI + goalVel, currentPosition);
         
-        double controlInputSum = accelFF + posFF + velocityP;
-        liftMotor1.setSpeed(controlInputSum);
-        liftMotor2.setSpeed(-controlInputSum);
+        return accelFF + posFF + velocityP;
+       
         
     }
 
@@ -207,7 +227,7 @@ public class ArmLift implements Subsystem {
     @Override
     public void resetState() {
         liftSpeed = 0;
-        liftState = liftDirection.STORAGE;
+        liftCase = liftDirection.STORAGE;
         armDirection = 0;
     }
 

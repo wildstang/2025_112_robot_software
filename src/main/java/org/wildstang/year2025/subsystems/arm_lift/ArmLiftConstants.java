@@ -29,13 +29,30 @@ public final class ArmLiftConstants {
 
     public static final double ARM_POS_P_GAIN = 1;
     public static final double ARM_POS_I_GAIN = 1;
-
     public static final double ARM_VEL_P_GAIN = 1;
 
     public static final double LIFT_POS_P_GAIN = 1;
     public static final double LIFT_POS_I_GAIN = 1;
-
     public static final double LIFT_VEL_P_GAIN = 1;
+
+    public static final double MAX_INTEGRAL = 10;
+    
+
+    /* ------------------------------------------------------- */
+
+    /* -------------------- Game Positions -------------------------------*/
+
+    public static final double MAX_LIFT_HEIGHT = 20;
+    public static final double MIN_LIFT_HEIGHT = 0;//Inches
+    public static final double MAX_ARM_ANGLE = 0;
+    public static final double MIN_MAX_ANGLE = 270;
+
+    public static final double aHeight;
+    public static final double bheight;
+    public static final double cHeight;
+    public static final double dHeight;
+
+    public static final double GROUND_INTAKE_RIGHT_ANGLE = 270/2;
     
 
     /* ------------------------------------------------------- */
