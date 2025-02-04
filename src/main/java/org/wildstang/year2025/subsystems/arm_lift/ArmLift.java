@@ -123,19 +123,19 @@ public class ArmLift implements Subsystem {
                 liftProfile.calculate(currentLiftPos, ArmLiftConstants.MIN_LIFT_HEIGHT);
 
             }else if(dpadLeft.getValue()){
-                liftCase = liftStates.L2_ALGAE_REEF;
+                gameState = gameStates.L2_ALGAE_REEF;
             }
             else if(dpadRight.getValue()){
-                liftCase = liftStates.L3_ALGAE_REEF;
+                gameState = gameStates.L3_ALGAE_REEF;
             }
             else if (dpadUp.getValue()){
-                liftCase = liftStates.SHOOT_NET;
+                gameState = gameStates.SHOOT_NET;
             }
             else if(driverFaceLeft.getValue()){
-                liftCase = liftStates.STORAGE;
+                gameState = gameStates.STORAGE;
             }
         }else{
-            liftCase = liftStates.STORAGE;
+            gameState = gameStates.STORAGE;
             armDirection = 0;
         }
     
@@ -161,9 +161,9 @@ public class ArmLift implements Subsystem {
                 
                 
                 break;
-            case LOW_ALGAE_REEF:
+            case L2_ALGAE_REEF:
             break;
-            case HIGH_ALGAE_REEF:
+            case L3_ALGAE_REEF:
             break;
             case SHOOT_NET:
             break;
@@ -227,7 +227,7 @@ public class ArmLift implements Subsystem {
     @Override
     public void resetState() {
         liftSpeed = 0;
-        liftCase = liftDirection.STORAGE;
+        gameState = gameStates.STORAGE;
         armDirection = 0;
     }
 
