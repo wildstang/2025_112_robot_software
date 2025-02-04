@@ -122,8 +122,16 @@ public class ArmLift implements Subsystem {
                 armProfile.calculate(currentArmPos, ArmLiftConstants.GROUND_INTAKE_RIGHT_ANGLE);
                 liftProfile.calculate(currentLiftPos, ArmLiftConstants.MIN_LIFT_HEIGHT);
 
+
             }else if(dpadLeft.getValue()){
                 gameState = gameStates.L2_ALGAE_REEF;
+
+                currentArmPos = armMotor.getController().getAbsoluteEncoder().getPosition() * (2*Math.PI);
+                currentLiftPos = (liftPotentiometer.getValue() / 5) * 20;
+
+                armProfile.calculate(currentArmPos, ArmLiftConstants.L2_ALGAE_REEF_INTAKE_ANGLE);
+                liftProfile.calculate(currentLiftPos, ArmLiftConstants.D_HEIGHT);
+                
             }
             else if(dpadRight.getValue()){
                 gameState = gameStates.L3_ALGAE_REEF;
@@ -133,33 +141,39 @@ public class ArmLift implements Subsystem {
             }
             else if(driverFaceLeft.getValue()){
                 gameState = gameStates.STORAGE;
-            }
-        }else{
+            
+            } else{
             gameState = gameStates.STORAGE;
             armDirection = 0;
-        }
+            ;}
+    }
     
     }
 
     public void update(){
-        testLift();
+        testAnalogSubsystem();
         
     }
 
     // Press sensetive lift (not done)
-    public void testAnalogLift(){
+    public void testAnalogSubsystem(){
         
+        liftMotor1.setSpeed(leftJoyStickY.getValue());
+        liftMotor2.setSpeed(leftJoyStickY.getValue());
+
+        armMotor.setSpeed(rightJoyStickX.getValue());
     }
 
     private void competitionControlSystem(){
          switch (gameState){
             case GROUND_INTAKE:
-                if(no algae){
-                    armSystem(currentArmPos);
-                    liftSystem(currentLiftPos);
+                if(currentLiftPos == 0){
+                    armMotor.setSpeed(armSystem(currentArmPos));
+                }else if(currentLiftPos > 0){
+                    armMotor.setSpeed(armSystem(currentArmPos));
+                    liftMotor1.setSpeed(liftSystem(currentLiftPos));
+                    liftMotor2.setSpeed(liftSystem(-currentLiftPos));
                 }
-                
-                
                 break;
             case L2_ALGAE_REEF:
             break;
@@ -173,12 +187,7 @@ public class ArmLift implements Subsystem {
                 liftMotor2.stop();
         }
     }
-    public void testLift(){
-
-        liftMotor1.setSpeed(liftSpeed);
-        liftMotor2.setSpeed(-liftSpeed);
-       
-    }
+    
 
     
 

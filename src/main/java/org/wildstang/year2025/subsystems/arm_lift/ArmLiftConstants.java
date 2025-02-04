@@ -50,9 +50,11 @@ public final class ArmLiftConstants {
     public static final double aHeight;
     public static final double bheight;
     public static final double cHeight;
-    public static final double dHeight;
+    public static final double dHeight; //L2 algae intake
 
     public static final double GROUND_INTAKE_RIGHT_ANGLE = 270/2;
+    public static final double L2_ALGAE_REEF_INTAKE_ANGLE = 1;
+  
     
 
     /* ------------------------------------------------------- */

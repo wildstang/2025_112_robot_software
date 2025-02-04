@@ -105,8 +105,8 @@ public class SwerveDrive extends SwerveDriveTemplate {
         if (driveState == driveType.AUTO) driveState = driveType.TELEOP;
 
         //get x and y speeds
-        // xPower = swerveHelper.scaleDeadband(leftStickX.getValue(), DriveConstants.DEADBAND);
-        // yPower = swerveHelper.scaleDeadband(leftStickY.getValue(), DriveConstants.DEADBAND);
+        //xPower = swerveHelper.scaleDeadband(leftStickX.getValue(), DriveConstants.DEADBAND);
+        //yPower = swerveHelper.scaleDeadband(leftStickY.getValue(), DriveConstants.DEADBAND);
         
         
         //reset gyro
