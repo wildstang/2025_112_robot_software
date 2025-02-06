@@ -59,6 +59,8 @@ public class ArmLift implements Subsystem {
     private double currentArmPos;
     public int armDirection; /* + is clockwise and - is counterclockwise */
     private WsSpark armMotor;
+    private double armSetpoint;
+    private double liftSetpoint;
     //private boolean activateArm = false;
 
 
@@ -115,10 +117,12 @@ public class ArmLift implements Subsystem {
             if(dpadDown.getValue()){
                 gameState = gameStates.GROUND_INTAKE;
 
+
+                //get current positions 
                 currentArmPos = armMotor.getController().getAbsoluteEncoder().getPosition() * (2*Math.PI); // multiplies encode value of 0-1 by 2pi for radians
                 currentLiftPos = (liftPotentiometer.getValue() / 5) * 20; // Inch height of lift
 
-                
+                //generate a motion profile for the arm and the lift
                 armProfile.calculate(currentArmPos, ArmLiftConstants.GROUND_INTAKE_RIGHT_ANGLE);
                 liftProfile.calculate(currentLiftPos, ArmLiftConstants.MIN_LIFT_HEIGHT);
 
@@ -167,13 +171,18 @@ public class ArmLift implements Subsystem {
     private void competitionControlSystem(){
          switch (gameState){
             case GROUND_INTAKE:
-                if(currentLiftPos == 0){
-                    armMotor.setSpeed(armSystem(currentArmPos));
-                }else if(currentLiftPos > 0){
-                    armMotor.setSpeed(armSystem(currentArmPos));
-                    liftMotor1.setSpeed(liftSystem(currentLiftPos));
-                    liftMotor2.setSpeed(liftSystem(-currentLiftPos));
+                // if(currentLiftPos == 0){
+                //     armMotor.setSpeed(armControlOutput(currentArmPos));
+                // }else if(currentLiftPos > 0){
+                //     armMotor.setSpeed(armControlOutput(currentArmPos)dd);
+                //     liftMotor1.setSpeed(liftControlOutput(currentLiftPos));
+                //     liftMotor2.setSpeed(liftControlOutput(-currentLiftPos));
+                // }
+
+                if (currentLiftPos < ArmLiftConstants.MIN_LIFT_HEIGHT){
+                    armSetpoint = Math.min(armControlOutput(currentArmPos), ArmLiftConstants.MIN_ARM_ANGLE);
                 }
+                else if (currentArmPos < ArmLiftConstants.MIN_LIFT_HEIGHT)
                 break;
             case L2_ALGAE_REEF:
             break;
@@ -192,7 +201,8 @@ public class ArmLift implements Subsystem {
     
 
     
-    public double armSystem(double currentPosition){
+    //generates an output for the motor with an acceleration feedforward, position feedforward, and PID
+    public double armControlOutput(double currentPosition){
         
         double goalPos = armProfile.getSamples()[0];
         double goalVel = armProfile.getSamples()[1];
@@ -200,18 +210,17 @@ public class ArmLift implements Subsystem {
 
         double accelFF = goalAcc * ArmLiftConstants.ARM_ACCEL_GAIN;
         double posFF = Math.cos(currentPosition) * ArmLiftConstants.ARM_ANGLE_GAIN;
-        double positionPI = armPIDC.positionPIController(currentPosition, goalPos);
 
+        double positionPI = armPIDC.positionPIController(goalPos, currentPosition);
         double velocityP = armPIDC.velocityPController(positionPI + goalVel, currentPosition);
         
         return accelFF + posFF + velocityP;
         
-      
-        
     }
 
-    
-    public double liftSystem(double currentPosition){
+
+    //generates an output for the motor with an acceleration feedforward, position feedforward, and PID
+    public double liftControlOutput(double currentPosition){
 
         double goalPos = liftProfile.getSamples()[0];
         double goalVel = liftProfile.getSamples()[1];
@@ -219,14 +228,15 @@ public class ArmLift implements Subsystem {
 
         double accelFF = goalAcc * ArmLiftConstants.LIFT_ACCEL_GAIN;
         double posFF = Math.cos(currentPosition) * ArmLiftConstants.LIFT_POS_GAIN;
-        double positionPI = liftPIDC.positionPIController(currentPosition, goalPos);
 
+        double positionPI = liftPIDC.positionPIController(currentPosition, goalPos);
         double velocityP = liftPIDC.velocityPController(positionPI + goalVel, currentPosition);
         
         return accelFF + posFF + velocityP;
-       
         
     }
+
+
 
     
     public void selfTest(){
