@@ -117,10 +117,16 @@ public class ArmLift implements Subsystem {
             if(dpadDown.getValue()){
                 gameState = gameStates.GROUND_INTAKE;
 
+
+                //get current positions 
+                currentArmPos = armMotor.getController().getAbsoluteEncoder().getPosition() * (2*Math.PI); // multiplies encode value of 0-1 by 2pi for radians
+                currentLiftPos = (liftMotor1.getController().getAnalog().getVoltage() / 5) * 20; // Inch height of lift
+
                 //preset setpoints
                 armSetpoint = ArmLiftConstants.GROUND_INTAKE_RIGHT_ANGLE;
                 liftSetpoint = ArmLiftConstants.MIN_LIFT_HEIGHT;
                
+
 
                calculateValidProfile();
 

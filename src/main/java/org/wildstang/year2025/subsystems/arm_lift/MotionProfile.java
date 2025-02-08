@@ -6,23 +6,26 @@ import edu.wpi.first.wpilibj.Timer;
 
 public class MotionProfile {
 
-    private Timer timer = new Timer();
+    private Timer timer = new Timer(); // Timer function (Sort of like a stopwatch/clock)
     private double totalTime; // Total time to reach desired position
     private final double sampleTime = 0.02; //seconds
-    private double[] posArray;
-    private double[] velArray;
-    private double[] accelArray;
-    private int samples;
+    private double[] posArray; // The array that stores all of our calculates goal positions of the motion profile
+    private double[] velArray; // Same thing as posArray just for velocity
+    private double[] accelArray; // Same thing as posArray and velArray but for acceleration
+    private int samples; // This is the size of the arrays. Samples is just a number
     
-    private double maxAccelerationTime;
-    private double cruiseTime;
-    private int triangleSampleIndex;
-    private int cruiseSampleIndex;
-    public  boolean profileDone;
 
-    private double maxAccel;
-    public double maxVel;
-    private double accelLimitEndpoint;
+    private double maxAccelerationTime; // The time it takes to reach max velocity (Our highest Velocity)
+    private double cruiseTime; // Stores the time when we do not accelerate or decelerate (We coast at max velocity for curiseTime)
+    private int triangleSampleIndex; // Stores the index that we are on for triangle phase of motion profile
+    private int cruiseSampleIndex; // Stores the index that we are on for the cruise phase of motion profile
+
+    public boolean profileDone;
+
+
+    private final double maxAccel; // The maximum acceleration (Calculated using math, physics, and motor data sheets)
+    private final double maxVel; // Maximum velocity (A value that we pass in)
+    private final double accelLimitEndpoint;
 
    
    public MotionProfile(double maxAcceleration, double maxVelocity){
@@ -96,10 +99,11 @@ public class MotionProfile {
          }else{
             accelArray[i] = -maxAccel * Math.signum(dP);
          }
-         accelSum += accelArray[i];
          velArray[i] = accelSum * sampleTime;
-         velSum += velArray[i];
+         accelSum += accelArray[i];
          posArray[i] = velSum * sampleTime;
+         velSum += velArray[i];
+
 
 
       }
