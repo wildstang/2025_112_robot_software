@@ -81,6 +81,11 @@ public final class ArmLiftConstants {
     //bounds  when the lift is at a low position so the arm doesn't hit bumpers or lift
     public static final double MAX_LOW_ARM_ANGLE = 3*Math.PI/4;
     public static final double MIN_LOW_ARM_ANGLE = Math.PI/4; 
+    /*------------------------------------------------------- */
+    /*-------------------------Other--------------------- */
+
+    public static final double MAX_POTENTIOMETER_VOLTAGE = 7;
+    public static final double MIN_POTENTIOMETER_VOLTAGE = 2;
 
 
 }
