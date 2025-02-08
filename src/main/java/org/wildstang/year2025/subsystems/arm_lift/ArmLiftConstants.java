@@ -56,6 +56,9 @@ public final class ArmLiftConstants {
     public static final double SHOOT_NET_ANGLE = Math.PI;
     public static final double SHOOT_NET_LIFT_HEIGHT = 8;
 
+    public static final double STORAGE_ANGLE = Math.PI/3;
+    public static final double STORAGE_LIFT_HEIGHT = 3;
+
     //Inaking
     public static final double GROUND_INTAKE_RIGHT_ANGLE = 270/2;
     public static final double INTAKE_LIFT_HEIGHT = 5;

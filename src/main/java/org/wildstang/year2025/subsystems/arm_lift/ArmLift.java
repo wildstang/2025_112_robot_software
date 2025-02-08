@@ -46,7 +46,6 @@ public class ArmLift implements Subsystem {
     /* Lift Variables */
     private WsSpark liftMotor1;
     private WsSpark liftMotor2;
-    private double liftSpeed;
     private double currentLiftPos;
     private enum gameStates {GROUND_INTAKE, L2_ALGAE_REEF, L3_ALGAE_REEF, STORAGE, SCORE_PRELOAD, SHOOT_NET, START}; // Our Arm/Lift States
     private gameStates gameState;
@@ -75,14 +74,18 @@ public class ArmLift implements Subsystem {
         initOutput();
         initInputs();
         recalculateFlag = false;
+        armProfile = new MotionProfile(ArmLiftConstants.MAX_ARM_ACCELERATION, ArmLiftConstants.MAX_ARM_VELOCITY);
+        liftProfile = new MotionProfile(ArmLiftConstants.MAX_LIFT_ACCELERATION, ArmLiftConstants.MAX_LIFT_VELOCITY);
+        armPIDC = new PIDController(ArmLiftConstants.ARM_POS_P_GAIN, ArmLiftConstants.ARM_POS_I_GAIN
+        , ArmLiftConstants.ARM_VEL_P_GAIN, ArmLiftConstants.MAX_INTEGRAL);
+        liftPIDC = new PIDController(ArmLiftConstants.LIFT_POS_P_GAIN, ArmLiftConstants.LIFT_POS_I_GAIN
+        , ArmLiftConstants.LIFT_VEL_P_GAIN, ArmLiftConstants.MAX_INTEGRAL);
 
     }
 
     public void initOutput(){
         liftMotor1 = (WsSpark) Core.getOutputManager().getOutput(WsOutputs.LIFTONE);
         liftMotor2 = (WsSpark) Core.getOutputManager().getOutput(WsOutputs.LIFTTWO);
-     
-        liftSpeed = 0.5;
         liftMotor1.setBrake();
         liftMotor2.setBrake();
        
@@ -90,14 +93,6 @@ public class ArmLift implements Subsystem {
         liftMotor1.enableVoltageCompensation();
         liftMotor2.enableVoltageCompensation();
         armMotor.enableVoltageCompensation();
-
-        armProfile = new MotionProfile(ArmLiftConstants.MAX_ARM_ACCELERATION, ArmLiftConstants.MAX_ARM_VELOCITY);
-        liftProfile = new MotionProfile(ArmLiftConstants.MAX_LIFT_ACCELERATION, ArmLiftConstants.MAX_LIFT_VELOCITY);
-        armPIDC = new PIDController(ArmLiftConstants.ARM_POS_P_GAIN, ArmLiftConstants.ARM_POS_I_GAIN
-        , ArmLiftConstants.ARM_VEL_P_GAIN, ArmLiftConstants.MAX_INTEGRAL);
-        liftPIDC = new PIDController(ArmLiftConstants.LIFT_POS_P_GAIN, ArmLiftConstants.LIFT_POS_I_GAIN
-        , ArmLiftConstants.LIFT_VEL_P_GAIN, ArmLiftConstants.MAX_INTEGRAL);
-    
     
     }
 
@@ -136,7 +131,7 @@ public class ArmLift implements Subsystem {
                 armSetpoint = ArmLiftConstants.L2_ANGLE;
                 liftSetpoint = ArmLiftConstants.L2_LIFT_HEIGHT;
 
-               calculateValidProfile();
+                calculateValidProfile();
                 
             }
             else if(dpadRight.getValue()){
@@ -163,6 +158,8 @@ public class ArmLift implements Subsystem {
                 //preset setpoints
                 armSetpoint = ArmLiftConstants.STORAGE_ANGLE;
                 liftSetpoint = ArmLiftConstants.STORAGE_LIFT_HEIGHT;
+
+                calculateValidProfile();
             } 
             ;}
     }
@@ -207,7 +204,7 @@ public class ArmLift implements Subsystem {
 
          if(recalculateFlag){
             double[] validSetpoints = getValidSeptpoints(currentLiftPos, liftSetpoint, currentArmAngle, armSetpoint);
-            if(MotionProfile.profileDone && validSetpoints[0] == armSetpoint && validSetpoints[1] == liftSetpoint){
+            if(armProfile.profileDone && liftProfile.profileDone && validSetpoints[0] == armSetpoint && validSetpoints[1] == liftSetpoint){
                 armProfile.calculate(currentArmAngle,armSetpoint);
                 liftProfile.calculate(currentLiftPos, liftSetpoint);
             }
@@ -303,7 +300,6 @@ public class ArmLift implements Subsystem {
 
     @Override
     public void resetState() {
-        liftSpeed = 0;
         gameState = gameStates.STORAGE;
         armDirection = 0;
     }
