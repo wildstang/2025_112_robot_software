@@ -13,6 +13,7 @@ import org.wildstang.year2025.robot.WsInputs;
 import org.wildstang.year2025.robot.WsOutputs;
 
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Claw implements Subsystem{
 
@@ -92,8 +93,13 @@ public class Claw implements Subsystem{
         break;
 
        }
+       putDashboard();
     }
 
+
+    private void putDashboard(){
+        SmartDashboard.putString("Claw State", currentState.name());
+    }
     @Override
     //reseting everything
     public void resetState() {

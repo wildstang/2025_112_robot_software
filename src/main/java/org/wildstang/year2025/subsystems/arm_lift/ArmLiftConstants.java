@@ -4,15 +4,7 @@ public final class ArmLiftConstants {
     
 
 
-    /* -------------------- Feed Forward ---------------------*/
 
-    public static final double ARM_ACCEL_GAIN = 1;
-    public static final double ARM_POS_GAIN = 1;
-    public static final double LIFT_POS_GAIN = 1;
-    public static final double LIFT_ACCEL_GAIN = 1;
-    public static final double ARM_ANGLE_GAIN = 1;
-
-    /* ------------------------------------------------------- */
 
 
     /* -------------------- Motion Profile -------------------*/
@@ -86,6 +78,17 @@ public final class ArmLiftConstants {
 
     public static final double MAX_POTENTIOMETER_VOLTAGE = 7;
     public static final double MIN_POTENTIOMETER_VOLTAGE = 2;
+    public static final double PULLEY_RADIUS = 24.4/1000; // m
+    public static final double GEAR_RATIO_LIFT = 62/14*58/40; 
+    public static final double FREE_SPEED = 5676 / GEAR_RATIO_LIFT * 2 * Math.PI / 60; // Radians per second
+    public static final double STALL = 2.6 * GEAR_RATIO_LIFT * 2; // Newton Meters
+    public static final double LIFT_ARM_MASS = 12; // in kilograms
+    public static final double LIFT_MASS = 10; //in kilograms
+
+    public static final double GRAVITY = 9.80665; // m/s^2 gravity
+    public static final double ROTATIONAL_MASS = 0000;
+    public static final double MOMEMENT_OF_INERTIA = 0000;
+   
 
 
 }
