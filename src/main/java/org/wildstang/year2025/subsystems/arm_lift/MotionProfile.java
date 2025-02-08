@@ -17,7 +17,7 @@ public class MotionProfile {
 
     private double maxAccelerationTime; // The time it takes to reach max velocity (Our highest Velocity)
     private double cruiseTime; // Stores the time when we do not accelerate or decelerate (We coast at max velocity for curiseTime)
-    private int triangleSampleIndex; // Stores the index that we are on for triangle phase of motion profile
+    private int triangleSampleIndex; // Stores the index of the halfway point of array
     private int cruiseSampleIndex; // Stores the index that we are on for the cruise phase of motion profile
 
     public boolean profileDone;
