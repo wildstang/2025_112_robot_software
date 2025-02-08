@@ -47,7 +47,14 @@ public final class ArmLiftConstants {
     public static final double MIN_ARM_ANGLE = 0;
     public static final double MAX_ARM_ANGLE = 3*Math.PI/2;
 
-    public static final double L2_ALGAE_REEF_ANGLE = 1;
+    public static final double L2_ANGLE = Math.PI/2;
+    public static final double L2_LIFT_HEIGHT = 6;
+
+    public static final double L3_ANGLE = Math.PI/2;
+    public static final double L3_LIFT_HEIGHT = 7;
+    
+    public static final double SHOOT_NET_ANGLE = Math.PI;
+    public static final double SHOOT_NET_LIFT_HEIGHT = 8;
 
     //Inaking
     public static final double GROUND_INTAKE_RIGHT_ANGLE = 270/2;
@@ -61,11 +68,9 @@ public final class ArmLiftConstants {
     public static final double LOW_LIFT_HEIGHT = 5;
     public static final double HIGH_LIFT_HEIGHT = 15;
 
-
-
     //threshold angles where the lift can move down without hitting algae
     public static final double MAX_LIFT_DOWN_ANGLE = 7*Math.PI/6;
-    public static final double MIN_LIFT_DOWN_ANGLE = 5*Math.PI/6;
+    public static final double MIN_LIFT_DOWN_ANGLE = 3*Math.PI/4;
 
     //lowest angle possible without hitting the lift (when the lift is at a high position)
     public final static double MIN_HIGH_ARM_ANGLE = Math.PI/6;
