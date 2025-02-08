@@ -120,7 +120,7 @@ public class ArmLift implements Subsystem {
 
                 //get current positions 
                 currentArmPos = armMotor.getController().getAbsoluteEncoder().getPosition() * (2*Math.PI); // multiplies encode value of 0-1 by 2pi for radians
-                currentLiftPos = (liftPotentiometer.getValue() / 5) * 20; // Inch height of lift
+                currentLiftPos = (liftMotor1.getController().getAnalog().getVoltage() / 5) * 20; // Inch height of lift
 
                 //generate a motion profile for the arm and the lift
                 armProfile.calculate(currentArmPos, ArmLiftConstants.GROUND_INTAKE_RIGHT_ANGLE);
