@@ -18,6 +18,7 @@ public class MotionProfile {
     private double cruiseTime;
     private int triangleSampleIndex;
     private int cruiseSampleIndex;
+    public static boolean profileDone;
 
     private double maxAccel;
     public double maxVel;
@@ -28,11 +29,14 @@ public class MotionProfile {
       this.maxAccel = maxAcceleration;
       this.maxVel = maxVelocity;
       this.accelLimitEndpoint = (Math.pow(maxVel,2)) / maxAccel;
+      profileDone = false;
 
    }
 
     public void calculate(double curPos, double desPos){
         timer.reset();
+        profileDone = false;
+
         //Calculate the point at which acceleration is no more (not limited)
          double dP = desPos - curPos;
 
@@ -105,12 +109,20 @@ public class MotionProfile {
          timer.start();
       }
       int currIndex = (int)(timer.get()/sampleTime);
+
+      if (currIndex >= samples) {
+         currIndex = samples - 1;
+         profileDone = true;
+     }
+
       double[] sampleArray = new double[3];
       sampleArray[0] = posArray[currIndex];
       sampleArray[1] = velArray[currIndex];
       sampleArray[2] = accelArray[currIndex];
       return sampleArray;
     }
+
+   
     private void setArrayLengths(){
       accelArray = new double[samples];
       velArray = new double[samples];
