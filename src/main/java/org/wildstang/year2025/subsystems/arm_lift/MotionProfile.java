@@ -14,10 +14,14 @@ public class MotionProfile {
     private double[] accelArray; // Same thing as posArray and velArray but for acceleration
     private int samples; // This is the size of the arrays. Samples is just a number
     
+
     private double maxAccelerationTime; // The time it takes to reach max velocity (Our highest Velocity)
     private double cruiseTime; // Stores the time when we do not accelerate or decelerate (We coast at max velocity for curiseTime)
     private int triangleSampleIndex; // Stores the index that we are on for triangle phase of motion profile
     private int cruiseSampleIndex; // Stores the index that we are on for the cruise phase of motion profile
+
+    public static boolean profileDone;
+
 
     private final double maxAccel; // The maximum acceleration (Calculated using math, physics, and motor data sheets)
     private final double maxVel; // Maximum velocity (A value that we pass in)
@@ -28,11 +32,14 @@ public class MotionProfile {
       this.maxAccel = maxAcceleration;
       this.maxVel = maxVelocity;
       this.accelLimitEndpoint = (Math.pow(maxVel,2)) / maxAccel;
+      profileDone = false;
 
    }
 
     public void calculate(double curPos, double desPos){
         timer.reset();
+        profileDone = false;
+
         //Calculate the point at which acceleration is no more (not limited)
          double dP = desPos - curPos;
 
@@ -106,12 +113,20 @@ public class MotionProfile {
          timer.start();
       }
       int currIndex = (int)(timer.get()/sampleTime);
+
+      if (currIndex >= samples) {
+         currIndex = samples - 1;
+         profileDone = true;
+     }
+
       double[] sampleArray = new double[3];
       sampleArray[0] = posArray[currIndex];
       sampleArray[1] = velArray[currIndex];
       sampleArray[2] = accelArray[currIndex];
       return sampleArray;
     }
+
+   
     private void setArrayLengths(){
       accelArray = new double[samples];
       velArray = new double[samples];

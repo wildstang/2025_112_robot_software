@@ -16,6 +16,7 @@ import org.wildstang.framework.core.Core;
 import org.wildstang.framework.subsystems.Subsystem;
 import org.wildstang.year2025.robot.WsInputs;
 import org.wildstang.year2025.robot.WsOutputs;
+import org.wildstang.year2025.subsystems.Claw.Claw;
 import org.wildstang.year2025.subsystems.arm_lift.ArmLiftConstants;
 
 
@@ -53,18 +54,16 @@ public class ArmLift implements Subsystem {
    
 
     /* Arm Variables */
-    //public double maxArmRotation;
-    //public double minArmRotation;
-    //public double restArmRotation;
     private double currentArmPos;
     public int armDirection; /* + is clockwise and - is counterclockwise */
     private WsSpark armMotor;
     private double armSetpoint;
     private double liftSetpoint;
     //private boolean activateArm = false;
-
-
     //private int inputType = 0;
+
+
+    
 
 
      @Override
@@ -133,8 +132,8 @@ public class ArmLift implements Subsystem {
                 currentArmPos = armMotor.getController().getAbsoluteEncoder().getPosition() * (2*Math.PI);
                 currentLiftPos = (liftPotentiometer.getValue() / 5) * 20;
 
-                armProfile.calculate(currentArmPos, ArmLiftConstants.L2_ALGAE_REEF_INTAKE_ANGLE);
-                liftProfile.calculate(currentLiftPos, ArmLiftConstants.D_HEIGHT);
+                //armProfile.calculate(currentArmPos, ArmLiftConstants.L2_ALGAE_REEF_INTAKE_ANGLE);
+                //liftProfile.calculate(currentLiftPos, ArmLiftConstants.D_HEIGHT);
                 
             }
             else if(dpadRight.getValue()){
@@ -146,9 +145,7 @@ public class ArmLift implements Subsystem {
             else if(driverFaceLeft.getValue()){
                 gameState = gameStates.STORAGE;
             
-            } else{
-            gameState = gameStates.STORAGE;
-            armDirection = 0;
+            } 
             ;}
     }
     
@@ -169,6 +166,12 @@ public class ArmLift implements Subsystem {
     }
 
     private void competitionControlSystem(){
+
+         //get current positions of arm and lift
+         currentArmPos = armMotor.getController().getAbsoluteEncoder().getPosition() * (2*Math.PI); // multiplies encode value of 0-1 by 2pi for radians
+         currentLiftPos = (liftPotentiometer.getValue() / 5) * 20; // Inch height of lift
+
+
          switch (gameState){
             case GROUND_INTAKE:
                 // if(currentLiftPos == 0){
@@ -237,8 +240,31 @@ public class ArmLift implements Subsystem {
     }
 
 
+    //returns valid positions for the arm and lift based on current positions 
+    public double[] getValidPosition(double goalLiftPos, double curLiftPos, double goalArmAngle, double curArmAngle){
+        armSetpoint = goalArmAngle;
+        liftSetpoint = goalLiftPos;
+        //If Lift is at a low position, make sure arm angle is within a threshold so claw doesn't hit bumpers or lift
+        if (curLiftPos < ArmLiftConstants.LOW_LIFT_HEIGHT){
+            armSetpoint = Math.max(Math.min(goalArmAngle, ArmLiftConstants.MAX_LOW_ARM_ANGLE), ArmLiftConstants.MIN_LOW_ARM_ANGLE);
+        }
 
+        //if lift is at a high position, ensure arm angle doesn't go too low so that claw hits the lift
+        else if (curLiftPos < ArmLiftConstants.HIGH_LIFT_HEIGHT && Claw.algaeInClaw){
+            armSetpoint = Math.max(goalArmAngle,ArmLiftConstants.MIN_HIGH_ARM_ANGLE);
+        }
+
+        //if claw is angled up above the lift, make sure not to bring the lift down too low or it will hit the algae
+        else if(curArmAngle  < ArmLiftConstants.MAX_LIFT_DOWN_ANGLE && curArmAngle > ArmLiftConstants.MIN_LIFT_DOWN_ANGLE){
+            liftSetpoint = Math.max(goalLiftPos, ArmLiftConstants.LOW_LIFT_HEIGHT);
+        }
     
+        return new double[]{armSetpoint, liftSetpoint};
+
+    }
+
+
+
     public void selfTest(){
         
     }
