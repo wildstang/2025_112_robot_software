@@ -4,7 +4,7 @@ public final class ArmLiftConstants {
     
 
 
-
+    
 
 
     /* -------------------- Motion Profile -------------------*/
@@ -54,11 +54,11 @@ public final class ArmLiftConstants {
     //Inaking
     public static final double GROUND_INTAKE_RIGHT_ANGLE = 270/2;
     public static final double INTAKE_LIFT_HEIGHT = 5;
-
+    
 
     /* ------------------------------------------------------- */
-    
-    /* ---------------ARM AND LIFT BOUND CHECKING -------------*/
+
+/* ---------------ARM AND LIFT BOUND CHECKING -------------*/
 
     public static final double LOW_LIFT_HEIGHT = 5;
     public static final double HIGH_LIFT_HEIGHT = 15;
