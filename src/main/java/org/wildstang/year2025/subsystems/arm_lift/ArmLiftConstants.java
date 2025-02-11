@@ -80,7 +80,7 @@ public final class ArmLiftConstants {
     public static final double MAX_CLAW_POWER_CHAIN_ANGLE = 5*Math.PI/6; //max claw angle that the claw can be within without hitting energy chain
 
     public static final double LOWER_BOUND_POWER_CHAIN_ANGLE = 7*Math.PI/8; //lower bound that the claw angle must be above to be in danger of hitting power chain
-    public static final double UPPER_BOUND_POWER_CHAIN_ANGLE = Math.Pi/8; //upper bound that the claw angle must be below to be in danger of hitting power chain
+    public static final double UPPER_BOUND_POWER_CHAIN_ANGLE = Math.PI/8; //upper bound that the claw angle must be below to be in danger of hitting power chain
 
     /*------------------------------------------------------- */
     /*-------------------------Other--------------------- */

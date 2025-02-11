@@ -36,8 +36,6 @@ public class PoPV {
             currentAprilTag = cameraTarget.getBestCameraToTarget();
             
         }
-
-        if()
     }
 
 
