@@ -24,6 +24,7 @@ public class MotionProfile {
     private boolean samplesIsZero;
     private double desPos; //desired position
     private double curPos; //current position
+    private double smallDeltaP;
 
     private final double maxAccel; // The maximum acceleration (Calculated using math, physics, and motor data sheets)
     private final double maxVel; // Maximum velocity (A value that we pass in)
@@ -31,14 +32,14 @@ public class MotionProfile {
 
 
    
-   public MotionProfile(double maxAcceleration, double maxVelocity){
+   public MotionProfile(double maxAcceleration, double maxVelocity, double smallDeltaP){
       this.maxAccel = maxAcceleration;
       this.maxVel = maxVelocity;
-      this.minDistanceForMaxVel = (Math.pow(maxVel,2)) / maxAccel; //
+      this.minDistanceForMaxVel = (Math.pow(maxVel,2)) / maxAccel; //mininum distance required to reach maxVelocity
+      this.smallDeltaP = smallDeltaP;
       profileDone = false;
       samplesIsZero = false;
       desPos = 0.0;
-
    }
 
     public void calculate(double curPos, double desPos){
@@ -51,7 +52,7 @@ public class MotionProfile {
         
          double dP = desPos - curPos;
 
-         if (dP == 0) { // No movement needed
+         if (dP < smallDeltaP) { // No movement needed
             totalTime = 0;
             samples = 0;
             posArray = new double[]{desPos};
