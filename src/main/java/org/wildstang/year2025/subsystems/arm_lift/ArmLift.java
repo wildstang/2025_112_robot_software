@@ -319,7 +319,7 @@ public class ArmLift implements Subsystem {
         }
 
         //if claw is angled up above the lift, make sure not to bring the lift down too low or it will hit the algae
-        if(curArmAngle  < ArmLiftConstants.MAX_LIFT_DOWN_ANGLE && curArmAngle > ArmLiftConstants.MIN_LIFT_DOWN_ANGLE){
+        if(curArmAngle  < ArmLiftConstants.MAX_LIFT_DOWN_ANGLE && curArmAngle > ArmLiftConstants.MIN_LIFT_DOWN_ANGLE && Claw.algaeInClaw){
             validLiftHeight = Math.max(goalLiftPos, ArmLiftConstants.LOW_LIFT_HEIGHT);
         }
         if(curLiftPos > ArmLiftConstants.LOW_LIFT_HEIGHT && (curArmAngle < ArmLiftConstants.UPPER_BOUND_POWER_CHAIN_ANGLE) 

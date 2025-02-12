@@ -267,6 +267,7 @@ public class SwerveDrive extends SwerveDriveTemplate {
                 yOutput = ySpeed * DriveConstants.DRIVE_F_K + pathYErr * DriveConstants.POS_P;
                 break;
         }
+        
         rotOutput = Math.min(Math.max(rotOutput, -1.0), 1.0);
         xOutput = Math.min(Math.max(xOutput, -1.0), 1.0);
         yOutput = Math.min(Math.max(yOutput, -1.0), 1.0);
