@@ -8,7 +8,7 @@ public class SwerveSignal {
 
     /**contains motor speeds, robot relative angles in bearing-degrees 
      * @param i_speed double[] for the speed of each module, in [0,1] signal
-     * @param i_angle double[] for the angle of the module, in robot centric bearing degrees
+     * @param i_angle double[] for the angle of the module, in radians
     */
     public SwerveSignal(double[] i_speed, double[] i_angle) {
         this.speed = i_speed;
@@ -17,12 +17,7 @@ public class SwerveSignal {
 
     /**ensures all speed values are below 1, and scales down if needed */
     public void normalize() {
-        maxSpeed = 1;
-        for (int i = 0; i < speed.length; i++){
-            if (Math.abs(speed[i]) > maxSpeed){
-                maxSpeed = Math.abs(speed[i]);
-            }
-        }
+        maxSpeed = getMaxSpeed();
         if (maxSpeed > 1.0){
             for (int i = 0; i < speed.length; i++){
                 speed[i] /= maxSpeed;
@@ -31,12 +26,7 @@ public class SwerveSignal {
     }
 
     public boolean isNotZeroed() {
-        maxSpeed = 0;
-        for (int i = 0; i < speed.length; i++){
-            if (Math.abs(speed[i]) > maxSpeed){
-                maxSpeed = Math.abs(speed[i]);
-            }
-        }
+        maxSpeed = getMaxSpeed();
         for (int i = 0; i < speed.length; i++){
             if (Math.abs(speed[i]) + 0.01 <= maxSpeed * 0.1){
                 return false;
@@ -54,13 +44,26 @@ public class SwerveSignal {
     }
 
     /**returns speeds from the swerve signal
-     * @return double array of 4 speeds, % output
+     * @return double array of 4 speeds, percent output
      */
     public double[] getSpeeds() {
         return speed;
     }
 
-    /**angle is robot centric, in bearing degrees 
+    /**returns max speed from the swerve signal
+     * @return maximum speed across all four modules
+     */
+    public double getMaxSpeed() {
+        double maxSpeed = 0.0;
+        for (int i = 0; i < speed.length; i++){
+            if (Math.abs(speed[i]) > maxSpeed){
+                maxSpeed = Math.abs(speed[i]);
+            }
+        }
+        return maxSpeed;
+    }
+
+    /**angle is robot centric, in radians
      * @param i_module the module to get the angle from (1 through 4)
      * @return double for the angle to set that module to
     */
@@ -69,7 +72,7 @@ public class SwerveSignal {
     }
 
     /**returns angles from the swerve signal
-     * @return double array of 4 angles, bearing degrees
+     * @return double array of 4 angles, radians
      */
     public double[] getAngles() {
         return angle;

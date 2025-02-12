@@ -33,8 +33,8 @@ public enum WsOutputs implements Outputs {
     ANGLE4("Module 4 Angle Motor", new WsSparkConfig(CANConstants.ANGLE4, WsMotorControllers.SPARK_MAX_BRUSHLESS)),   
     LIFTONE("First Lift Motor", new WsSparkConfig(CANConstants.LIFTONE, WsMotorControllers.SPARK_MAX_BRUSHLESS)),
     LIFTTWO("Second Lift Motor", new WsSparkConfig(CANConstants.LIFTTWO, WsMotorControllers.SPARK_MAX_BRUSHLESS)),
-    ARMMOTOR("Arm Motor", new WsSparkConfig(CANConstants.ARMMOTOR, WsMotorControllers.SPARK_FLEX_BRUSHLESS)),
-    CLAWMOTOR("Claw Motor", new WsSparkConfig(CANConstants.CLAW, WsMotorControllers.SPARK_FLEX_BRUSHLESS));
+    ARMMOTOR("Arm Motor", new WsSparkConfig(CANConstants.ARMMOTOR, WsMotorControllers.SPARK_MAX_BRUSHLESS)),
+    CLAWMOTOR("Claw Motor", new WsSparkConfig(CANConstants.CLAW, WsMotorControllers.SPARK_MAX_BRUSHLESS));
 
     // Solenoids
     // ---------------------------------

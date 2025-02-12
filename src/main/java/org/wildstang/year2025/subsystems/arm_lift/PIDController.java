@@ -54,7 +54,7 @@ public class PIDController {
     }
 
     public double velocityPController(double setPoint, double currentPos){
-        double pTerm = velocityPController(setPoint, currentPos);
+        double pTerm = velocityPVal(setPoint, currentPos);
         return pTerm;
     }
 

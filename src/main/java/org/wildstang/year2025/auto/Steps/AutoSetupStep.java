@@ -22,7 +22,7 @@ public class AutoSetupStep extends AutoStep{
         this.y = y;
         heading = pathHeading;
         Core.setAlliance(alliance);
-        LedController led = (LedController) Core.getSubsystemManager().getSubsystem(WsSubsystems.LED);
+        // LedController led = (LedController) Core.getSubsystemManager().getSubsystem(WsSubsystems.LED);
     }
 
     public void update(){
@@ -30,11 +30,11 @@ public class AutoSetupStep extends AutoStep{
         // Gyro reset and reads within 1 degree of what we told it to
         if (difference < 1) {
             // Sets odometry field relative, flipping for red
-            if (Core.isBlue()){
-                swerve.setOdo(new Pose2d(new Translation2d(x, y), new Rotation2d(Math.toRadians(360.0-heading))));
-            } else {
-                swerve.setOdo(new Pose2d(new Translation2d(x, 8.016-y), new Rotation2d(Math.toRadians(360.0-heading))));
-            }
+            // if (Core.isBlue()){
+            //     swerve.setOdo(new Pose2d(new Translation2d(x, y), new Rotation2d(Math.toRadians(360.0-heading))));
+            // } else {
+            //     swerve.setOdo(new Pose2d(new Translation2d(x, 8.016-y), new Rotation2d(Math.toRadians(360.0-heading))));
+            // }
             this.setFinished();
         }
     }

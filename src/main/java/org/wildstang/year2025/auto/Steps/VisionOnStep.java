@@ -14,7 +14,7 @@ public class VisionOnStep extends AutoStep{
         on = isOn;
     }
     public void update(){
-        swerve.setVisionAuto(on);
+        // swerve.setVisionAuto(on);
         this.setFinished();
     }
     public void initialize(){

@@ -65,9 +65,9 @@ public class KalmanFilterJenny {
     private final int ACCL_Y = 1;
 
     public KalmanFilterJenny() {
-        odometry = swerve.odometry;
+        // odometry = swerve.odometry;
         gyro = swerve.gyro;
-        robotSpeeds = swerve.speeds;
+        // robotSpeeds = swerve.speeds;
         kfInit();
     }
 

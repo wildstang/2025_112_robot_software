@@ -11,8 +11,8 @@ public class CANConstants {
     public static final int DRIVE4 = 17;
     public static final int ANGLE4 = 18;
     public static final int GYRO = 31;
-    public static final int LIFTONE = 1;
-    public static final int LIFTTWO = 1;
-    public static final int ARMMOTOR = 1;
-    public static final int CLAW = 7; 
+    public static final int LIFTONE = 20;
+    public static final int LIFTTWO = 21;
+    public static final int ARMMOTOR = 23;
+    public static final int CLAW = 24; 
 }

@@ -60,9 +60,9 @@ public class WsVision implements Subsystem {
     @Override
     public void update() {
 
-        left.update(swerve.getFieldYaw());
-        right.update(swerve.getFieldYaw());
-        back.update(swerve.getFieldYaw());
+        // left.update(swerve.getFieldYaw());
+        // right.update(swerve.getFieldYaw());
+        // back.update(swerve.getFieldYaw());
         if (aprilTagsInView()) lastUpdate.reset();
         SmartDashboard.putBoolean("Vision targetinView", aprilTagsInView());
         SmartDashboard.putNumber("GP X", back.tx);
@@ -75,9 +75,9 @@ public class WsVision implements Subsystem {
 
     @Override
     public void resetState() {
-        left.update(swerve.getFieldYaw());
-        right.update(swerve.getFieldYaw());
-        back.update(swerve.getFieldYaw());
+        // left.update(swerve.getFieldYaw());
+        // right.update(swerve.getFieldYaw());
+        // back.update(swerve.getFieldYaw());
     }
 
     @Override

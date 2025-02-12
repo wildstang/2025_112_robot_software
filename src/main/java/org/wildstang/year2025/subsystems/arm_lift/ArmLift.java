@@ -48,7 +48,7 @@ public class ArmLift implements Subsystem {
     private WsSpark liftMotor2;
         private double currentLiftPos;
     private enum gameStates {GROUND_INTAKE, L2_ALGAE_REEF, L3_ALGAE_REEF, STORAGE, SCORE_PRELOAD, SHOOT_NET, START}; // Our Arm/Lift States
-    private gameStates gameState;
+    private gameStates gameState = gameStates.STORAGE;
     
    
 
@@ -111,6 +111,10 @@ public class ArmLift implements Subsystem {
         dpadDown.addInputListener(this);
         driverFaceLeft = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_FACE_LEFT);
         driverFaceLeft.addInputListener(this);
+        leftJoyStickY = (AnalogInput) Core.getInputManager().getInput(WsInputs.DRIVER_LEFT_JOYSTICK_Y);
+        // leftJoyStickY.addInputListener(this);
+        rightJoyStickX = (AnalogInput) Core.getInputManager().getInput(WsInputs.DRIVER_RIGHT_JOYSTICK_X);
+        // rightJoyStickX.addInputListener(this);
     
     }
 

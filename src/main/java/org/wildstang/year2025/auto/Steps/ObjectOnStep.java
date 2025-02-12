@@ -20,7 +20,7 @@ public class ObjectOnStep extends AutoStep{
 
     @Override
     public void update() {
-        swerve.setAutoObject(isOn);
+        // swerve.setAutoObject(isOn);
         setFinished();
     }
 

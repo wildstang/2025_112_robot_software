@@ -14,7 +14,7 @@ public class AlignOnStep extends AutoStep{
         on = isOn;
     }
     public void update(){
-        swerve.setAutoAlign(on);
+        // swerve.setAutoAlign(on);
         this.setFinished();
     }
     public void initialize(){
