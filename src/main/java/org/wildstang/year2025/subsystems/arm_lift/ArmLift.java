@@ -50,9 +50,6 @@ public class ArmLift implements Subsystem {
     private boolean recalculateFlag;
     private double validArmAngle;
     private double validLiftHeight;
-    private double[] validSetpoints;
-    private double armTorque;
-    private double liftTorque;
     
     @Override
     public void init(){
@@ -140,7 +137,7 @@ public class ArmLift implements Subsystem {
 
     private void calculateValidProfile(){
         //getting setpoints within proper bounds
-        validSetpoints = getValidSeptpoints(liftSetpoint, currentLiftPos, armSetpoint, currentArmAngle);
+        double[] validSetpoints = getValidSeptpoints(liftSetpoint, currentLiftPos, armSetpoint, currentArmAngle);
         validArmAngle = validSetpoints[0];
         validLiftHeight = validSetpoints[1];
 
@@ -168,38 +165,18 @@ public class ArmLift implements Subsystem {
          currentLiftPos = getLiftHeight();
 
          if(recalculateFlag){
-            double[] validSetpoints = getValidSeptpoints(currentLiftPos, liftSetpoint, currentArmAngle, armSetpoint);
-            if(armProfile.profileDone && liftProfile.profileDone && validSetpoints[0] == armSetpoint && validSetpoints[1] == liftSetpoint){
-                armProfile.calculate(currentArmAngle,armSetpoint);
-                liftProfile.calculate(currentLiftPos, liftSetpoint);
+            if(armProfile.profileDone && liftProfile.profileDone) {
+                double[] validSetpoints = getValidSeptpoints(currentLiftPos, liftSetpoint, currentArmAngle, armSetpoint);
+                if (validSetpoints[0] == armSetpoint && validSetpoints[1] == liftSetpoint){
+                    armProfile.calculate(currentArmAngle,armSetpoint);
+                    liftProfile.calculate(currentLiftPos, liftSetpoint);
+                }
             }
          }
 
-         switch (gameState){
-            case GROUND_INTAKE:
-                armMotor.getController().setVoltage(armControlOutput(currentArmAngle));
-                liftMotor1.getController().setVoltage(liftControlOutput(currentLiftPos));
-                liftMotor2.getController().setVoltage(liftControlOutput(-currentLiftPos));
-                break;
-            case L2_ALGAE_REEF:
-                armMotor.getController().setVoltage(armControlOutput(currentArmAngle));
-                liftMotor1.getController().setVoltage(liftControlOutput(currentLiftPos));
-                liftMotor2.getController().setVoltage(liftControlOutput(-currentLiftPos));
-                break;
-            case L3_ALGAE_REEF:
-                armMotor.getController().setVoltage(armControlOutput(currentArmAngle));
-                liftMotor1.getController().setVoltage(liftControlOutput(currentLiftPos));
-                liftMotor2.getController().setVoltage(liftControlOutput(-currentLiftPos));
-                break;
-            case SHOOT_NET:
-                armMotor.getController().setVoltage(armControlOutput(currentArmAngle));
-                liftMotor1.getController().setVoltage(liftControlOutput(currentLiftPos));
-                liftMotor2.getController().setVoltage(liftControlOutput(-currentLiftPos));
-                break;
-            default:
-                liftMotor1.stop();
-                liftMotor2.stop();
-        }
+        armMotor.getController().setVoltage(armControlOutput(currentArmAngle));
+        liftMotor1.getController().setVoltage(liftControlOutput(currentLiftPos));
+        liftMotor2.getController().setVoltage(liftControlOutput(-currentLiftPos));
     }
 
     private void putDashboard(){
@@ -273,11 +250,10 @@ public class ArmLift implements Subsystem {
                 validArmAngle = Math.min(goalArmAngle, ArmLiftConstants.MIN_CLAW_POWER_CHAIN_ANGLE);
             }
         }
-
         return new double[]{validArmAngle, validLiftHeight};
     }
 
-// Get the Torque of the 12 volt motor curve
+    // Get the force of the 12 volt motor curve
     private double getMaxLiftForce(double goalVel){
         return ArmLiftConstants.LIFT_STALL_FORCE * (1 - goalVel/ArmLiftConstants.LIFT_FREE_SPEED);
     }
