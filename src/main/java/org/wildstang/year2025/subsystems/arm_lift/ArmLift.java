@@ -1,10 +1,5 @@
 package org.wildstang.year2025.subsystems.arm_lift;
 
-
-import com.revrobotics.AbsoluteEncoder;
-import com.revrobotics.spark.SparkAbsoluteEncoder;
-
-import edu.wpi.first.wpilibj.DigitalGlitchFilter;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import org.wildstang.framework.io.inputs.Input;
@@ -18,22 +13,18 @@ import org.wildstang.framework.subsystems.Subsystem;
 import org.wildstang.year2025.robot.WsInputs;
 import org.wildstang.year2025.robot.WsOutputs;
 import org.wildstang.year2025.subsystems.Claw.Claw;
-import org.wildstang.year2025.subsystems.arm_lift.ArmLiftConstants;
-
 
 /**
  * Interface describing a subsystem class.
  */
 public class ArmLift implements Subsystem {
-
-
     /* Control System Variables */
     PIDController armPIDC;
     PIDController liftPIDC;
     MotionProfile armProfile;
     MotionProfile liftProfile;
 
-    /*Inputs Variables*/
+    /*Input Variables*/
     private DigitalInput dpadDown; 
     private DigitalInput dpadLeft;
     private DigitalInput dpadRight;
@@ -42,24 +33,18 @@ public class ArmLift implements Subsystem {
     private AnalogInput leftJoyStickY;
     private AnalogInput rightJoyStickX;
     
-
     /* Lift Variables */
     private WsSpark liftMotor1;
     private WsSpark liftMotor2;
-        private double currentLiftPos;
+    private double currentLiftPos;
     private enum gameStates {GROUND_INTAKE, L2_ALGAE_REEF, L3_ALGAE_REEF, STORAGE, SCORE_PRELOAD, SHOOT_NET, START}; // Our Arm/Lift States
     private gameStates gameState = gameStates.STORAGE;
     
-   
-
     /* Arm Variables */
     private double currentArmAngle;
-    public int armDirection; /* + is clockwise and - is counterclockwise */
     private WsSpark armMotor;
     private double armSetpoint;
     private double liftSetpoint;
-    //private boolean activateArm = false;
-    //private int inputType = 0;
 
     /*Other */
     private boolean recalculateFlag;
@@ -69,36 +54,30 @@ public class ArmLift implements Subsystem {
     private double armTorque;
     private double liftTorque;
     
-
-
-     @Override
+    @Override
     public void init(){
         initOutput();
         initInputs();
         recalculateFlag = false;
-        armProfile = new MotionProfile(ArmLiftConstants.MAX_ARM_ACCELERATION, ArmLiftConstants.MAX_ARM_VELOCITY, ArmLiftConstants.ARM_SMALL_DELTA_P);
-        liftProfile = new MotionProfile(ArmLiftConstants.MAX_LIFT_ACCELERATION, ArmLiftConstants.MAX_LIFT_VELOCITY, ArmLiftConstants.LIFT_SMALL_DELTA_P);
+        armProfile = new MotionProfile(ArmLiftConstants.MAX_ARM_ACCELERATION
+        , ArmLiftConstants.MAX_ARM_VELOCITY, ArmLiftConstants.ARM_SMALL_DELTA_P);
+        liftProfile = new MotionProfile(ArmLiftConstants.MAX_LIFT_ACCELERATION
+        , ArmLiftConstants.MAX_LIFT_VELOCITY, ArmLiftConstants.LIFT_SMALL_DELTA_P);
         armPIDC = new PIDController(ArmLiftConstants.ARM_POS_P_GAIN, ArmLiftConstants.ARM_POS_I_GAIN
-        , ArmLiftConstants.ARM_VEL_P_GAIN, ArmLiftConstants.MAX_INTEGRAL);
+        , ArmLiftConstants.ARM_VEL_P_GAIN, ArmLiftConstants.MAX_ARM_VELOCITY);
         liftPIDC = new PIDController(ArmLiftConstants.LIFT_POS_P_GAIN, ArmLiftConstants.LIFT_POS_I_GAIN
-        , ArmLiftConstants.LIFT_VEL_P_GAIN, ArmLiftConstants.MAX_INTEGRAL);
-
+        , ArmLiftConstants.LIFT_VEL_P_GAIN, ArmLiftConstants.MAX_LIFT_VELOCITY);
     }
 
     public void initOutput(){
         liftMotor1 = (WsSpark) Core.getOutputManager().getOutput(WsOutputs.LIFTONE);
         liftMotor2 = (WsSpark) Core.getOutputManager().getOutput(WsOutputs.LIFTTWO);
-             liftMotor1.setBrake();
+        liftMotor1.setBrake();
         liftMotor2.setBrake();
-// liftMotor1.setCurrentLimit(armDirection, armDirection, armDirection);
+        // liftMotor1.setCurrentLimit(armDirection, armDirection, armDirection);
        
         armMotor = (WsSpark) Core.getOutputManager().getOutput(WsOutputs.ARMMOTOR);
-        liftMotor1.enableVoltageCompensation();
-        liftMotor2.enableVoltageCompensation();
-        armMotor.enableVoltageCompensation();
-    
     }
-
 
     public void initInputs(){
         dpadUp = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_DPAD_UP);
@@ -115,66 +94,48 @@ public class ArmLift implements Subsystem {
         // leftJoyStickY.addInputListener(this);
         rightJoyStickX = (AnalogInput) Core.getInputManager().getInput(WsInputs.DRIVER_RIGHT_JOYSTICK_X);
         // rightJoyStickX.addInputListener(this);
-    
     }
-
 
     public void inputUpdate(Input source){
         if(source == dpadRight || source == dpadLeft || source == dpadDown || source == dpadUp || source == driverFaceLeft){
-            if(dpadDown.getValue()){
+            if (dpadDown.getValue()) {
                 gameState = gameStates.GROUND_INTAKE;
 
                 //preset setpoints
                 armSetpoint = ArmLiftConstants.GROUND_INTAKE_RIGHT_ANGLE;
                 liftSetpoint = ArmLiftConstants.MIN_LIFT_HEIGHT;
-
-               calculateValidProfile();
-
-            }else if(dpadLeft.getValue()){
+            } else if (dpadLeft.getValue()) {
                 gameState = gameStates.L2_ALGAE_REEF;
 
                 //preset setpoints
                 armSetpoint = ArmLiftConstants.L2_ANGLE;
                 liftSetpoint = ArmLiftConstants.L2_LIFT_HEIGHT;
-
-               calculateValidProfile();
-                
-            }
-            else if(dpadRight.getValue()){
+            } else if (dpadRight.getValue()) {
                 gameState = gameStates.L3_ALGAE_REEF;
 
                 //preset setpoints
                 armSetpoint = ArmLiftConstants.L3_ANGLE;
                 liftSetpoint = ArmLiftConstants.L3_LIFT_HEIGHT;
-                
-                calculateValidProfile();
-            }
-            else if (dpadUp.getValue()){
+            } else if (dpadUp.getValue()) {
                 gameState = gameStates.SHOOT_NET;
 
                 //preset setpoints
                 armSetpoint = ArmLiftConstants.SHOOT_NET_ANGLE;
                 liftSetpoint = ArmLiftConstants.SHOOT_NET_LIFT_HEIGHT;
-
-                calculateValidProfile();
-            }
-            else if(driverFaceLeft.getValue()){
+            } else if (driverFaceLeft.getValue()) {
                 gameState = gameStates.STORAGE;
                 
                 //preset setpoints
                 armSetpoint = ArmLiftConstants.STORAGE_ANGLE;
                 liftSetpoint = ArmLiftConstants.STORAGE_LIFT_HEIGHT;
-
-                calculateValidProfile();
-            } 
-            ;}
+            }
+            calculateValidProfile();
+        }
     }
     
-
     public void update(){
         testAnalogSubsystem();
         putDashboard();
-        
     }
 
     private void calculateValidProfile(){
@@ -182,7 +143,6 @@ public class ArmLift implements Subsystem {
         validSetpoints = getValidSeptpoints(liftSetpoint, currentLiftPos, armSetpoint, currentArmAngle);
         validArmAngle = validSetpoints[0];
         validLiftHeight = validSetpoints[1];
-
 
         //multiple stage profile 
         if (liftSetpoint != validLiftHeight || armSetpoint != validArmAngle){
@@ -196,7 +156,6 @@ public class ArmLift implements Subsystem {
 
     // Press sensetive lift (not done)
     public void testAnalogSubsystem(){
-        
         liftMotor1.setSpeed(leftJoyStickY.getValue());
         liftMotor2.setSpeed(leftJoyStickY.getValue());
 
@@ -204,10 +163,9 @@ public class ArmLift implements Subsystem {
     }
 
     private void competitionControlSystem(){
-
          //get current positions of arm and lift
          currentArmAngle = armMotor.getController().getAbsoluteEncoder().getPosition() * (2*Math.PI); // multiplies encode value of 0-1 by 2pi for radians
-         currentLiftPos = getLiftHeight(liftMotor1.getController().getAnalog().getVoltage());
+         currentLiftPos = getLiftHeight();
 
          if(recalculateFlag){
             double[] validSetpoints = getValidSeptpoints(currentLiftPos, liftSetpoint, currentArmAngle, armSetpoint);
@@ -238,12 +196,10 @@ public class ArmLift implements Subsystem {
                 liftMotor1.getController().setVoltage(liftControlOutput(currentLiftPos));
                 liftMotor2.getController().setVoltage(liftControlOutput(-currentLiftPos));
                 break;
-
             default:
                 liftMotor1.stop();
                 liftMotor2.stop();
         }
-
     }
 
     private void putDashboard(){
@@ -255,55 +211,41 @@ public class ArmLift implements Subsystem {
         SmartDashboard.putString("Current State", gameState.name());
         SmartDashboard.putNumber("Arm set point", armSetpoint);
         SmartDashboard.putNumber("Lift setpoint", liftSetpoint);
-
     }
-
 
     //calculating lift height from a function of voltage
-    private double getLiftHeight(double potentiometerVoltage){
-        double slopeOfHeight = ArmLiftConstants.MAX_LIFT_HEIGHT;
-        return slopeOfHeight * (potentiometerVoltage - ArmLiftConstants.MAX_POTENTIOMETER_VOLTAGE) + ArmLiftConstants.MAX_LIFT_HEIGHT;
+    private double getLiftHeight(){
+        double slope = (ArmLiftConstants.MAX_LIFT_HEIGHT-ArmLiftConstants.MIN_LIFT_HEIGHT) / (ArmLiftConstants.MAX_POTENTIOMETER_VOLTAGE - ArmLiftConstants.MIN_POTENTIOMETER_VOLTAGE);
+        return (liftMotor1.getController().getAnalog().getVoltage() - ArmLiftConstants.MIN_POTENTIOMETER_VOLTAGE) * slope + ArmLiftConstants.MIN_LIFT_HEIGHT;
     }
 
-    
     //generates an output for the motor with an acceleration feedforward, position feedforward, and PID
     public double armControlOutput(double currentAngle){
-        
-        double goalPos = armProfile.getSamples()[0];
-        double goalVel = armProfile.getSamples()[1];
-        double goalAcc = armProfile.getSamples()[2];
+        double[] curTarget = armProfile.getSamples();
+        double goalPos = curTarget[0];
+        double goalVel = curTarget[1] + armPIDC.positionPIController(goalPos, currentAngle);
+        double goalAcc = curTarget[2];
 
         double FF = 12 * (getCurrentArmTorque(goalAcc, currentAngle) / getMaxArmTorque(goalVel));
-
-        double positionPI = armPIDC.positionPIController(goalPos, currentAngle);
-        double velocityP = armPIDC.velocityPController(positionPI + goalVel, currentAngle);
-        SmartDashboard.putNumber("Arm Position PI", positionPI);
+        double velocityP = armPIDC.velocityPController(goalVel, currentAngle);
+        // SmartDashboard.putNumber("Arm Position PI", positionPI);
         SmartDashboard.putNumber("Arm Velocity P", velocityP);
         return FF + velocityP;
-        
     }
-
 
     //generates an output for the motor with an acceleration feedforward, position feedforward, and PID
     public double liftControlOutput(double currentPosition){
+        double[] curTarget = liftProfile.getSamples();
+        double goalPos = curTarget[0];
+        double goalVel = curTarget[1] + liftPIDC.positionPIController(goalPos, currentPosition);
+        double goalAcc = curTarget[2];
 
-        double goalPos = liftProfile.getSamples()[0];
-        double goalVel = liftProfile.getSamples()[1];
-        double goalAcc = liftProfile.getSamples()[2];
-
-        
-        double positionPI = liftPIDC.positionPIController(currentPosition, goalPos);
-        double velocityP = liftPIDC.velocityPController(positionPI + goalVel, currentPosition);
-        
-        SmartDashboard.putNumber("Lift Position PI", positionPI);
+        double FF = 12 * (getCurrentLiftForce(goalAcc) / getMaxLiftForce(goalVel));
+        double velocityP = liftPIDC.velocityPController(goalVel, currentPosition);
+        // SmartDashboard.putNumber("Lift Position PI", positionPI);
         SmartDashboard.putNumber("Lift Velocity P", velocityP);
-        
-        double FF = 12 * (getCurrentLiftTorque(goalAcc) / getMaxLiftTorque(goalVel));
-        
         return velocityP + FF;
-        
     }
-
 
     //returns valid setpoints for the arm and lift based on current positions 
     public double[] getValidSeptpoints(double goalLiftPos, double curLiftPos, double goalArmAngle, double curArmAngle){
@@ -332,59 +274,42 @@ public class ArmLift implements Subsystem {
             }
         }
 
-    
         return new double[]{validArmAngle, validLiftHeight};
-
     }
 
 // Get the Torque of the 12 volt motor curve
-    private double getMaxLiftTorque(double goalVel){
-        double rotationalSpeed = goalVel/ArmLiftConstants.PULLEY_RADIUS;
-        liftTorque = (-(ArmLiftConstants.STALL/ArmLiftConstants.FREE_SPEED)*rotationalSpeed) + ArmLiftConstants.STALL;
-        return liftTorque;
+    private double getMaxLiftForce(double goalVel){
+        return ArmLiftConstants.LIFT_STALL_FORCE * (1 - goalVel/ArmLiftConstants.LIFT_FREE_SPEED);
     }
 
-    private double getCurrentLiftTorque(double goalAccel){
-
-        double Force = ArmLiftConstants.LIFT_ARM_MASS * (ArmLiftConstants.GRAVITY + goalAccel);
-        double currentTorque = Force * ArmLiftConstants.PULLEY_RADIUS;
-        return currentTorque;
+    private double getCurrentLiftForce(double goalAccel){
+        return ArmLiftConstants.LIFT_ARM_MASS * (ArmLiftConstants.GRAVITY + goalAccel);
     }
 
     private double getMaxArmTorque(double goalVel){
-        double rotationalSpeed = goalVel/ArmLiftConstants.PULLEY_RADIUS;
-        armTorque = (-(ArmLiftConstants.STALL/ArmLiftConstants.FREE_SPEED)*rotationalSpeed) + ArmLiftConstants.STALL;
-        return armTorque;
+        return ArmLiftConstants.ARM_STALL * (1 - goalVel/ArmLiftConstants.ARM_FREE_SPEED);
     }
 
-    private double getCurrentArmTorque(double goalAccel, double currentAngle){
-
-        
-        double currentTorque = 
-            (ArmLiftConstants.ROTATIONAL_MASS * Math.cos(currentAngle) * ArmLiftConstants.GRAVITY) 
-            + 
-            (ArmLiftConstants.MOMEMENT_OF_INERTIA*goalAccel);
-        return currentTorque;
+    private double getCurrentArmTorque(double goalAccel, double currentAngle){     
+        return (ArmLiftConstants.ARM_MASS * ArmLiftConstants.GRAVITY * ArmLiftConstants.ARM_COM_RADIUS * Math.sin(currentAngle)) 
+        + (ArmLiftConstants.ARM_MOI * goalAccel);
     }
 
     public void selfTest(){
-        
     }
 
     @Override
     public void resetState() {
         gameState = gameStates.STORAGE;
-        armDirection = 0;
     }
 
     @Override
     public void initSubsystems() {
-        
     }
 
     @Override
     public String getName() {
-        return "ArmLift";
+        return "Arm Lift";
     }
    
 }

@@ -58,7 +58,7 @@ public class LedController implements Subsystem {
 
     @Override
     public void initSubsystems() {      
-        // vision = (WsVision) Core.getSubsystemManager().getSubsystem(WsSubsystems.WS_VISION);   
+        vision = (WsVision) Core.getSubsystemManager().getSubsystem(WsSubsystems.WS_VISION);   
     }
 
     @Override

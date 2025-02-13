@@ -13,10 +13,10 @@ import org.wildstang.year2025.subsystems.swerve.SwerveDrive;
 public enum WsSubsystems implements Subsystems {
 
     // enumerate subsystems
-    // ARMLIFT("ArmLift", ArmLift.class),
-    // WS_VISION("Ws Vision", WsVision.class),
+    ARMLIFT("Arm Lift", ArmLift.class),
+    WS_VISION("Ws Vision", WsVision.class),
     SWERVE_DRIVE("Swerve Drive", SwerveDrive.class),
-    // LED("Led Controller", LedController.class),
+    LED("Led Controller", LedController.class),
     ;
 
     ;
