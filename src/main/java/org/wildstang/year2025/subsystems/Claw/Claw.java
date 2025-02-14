@@ -82,6 +82,7 @@ public class Claw implements Subsystem{
             if(timer.get() > ClawConstants.OUTTAKE_TIME){
                 currentState = clawStates.IDLE;
                 timer.reset();
+                algaeInClaw = false;
             }
             clawMotor.setSpeed(ClawConstants.CLAW_OUTTAKE_SPEED);
         break;
