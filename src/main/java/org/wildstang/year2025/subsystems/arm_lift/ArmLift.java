@@ -36,7 +36,7 @@ public class ArmLift implements Subsystem {
     /* Lift Variables */
     private WsSpark liftMotor1;
     private WsSpark liftMotor2;
-        private double currentLiftPos;
+    private double currentLiftPos;
     private enum gameStates {GROUND_INTAKE, L2_ALGAE_REEF, L3_ALGAE_REEF, STORAGE, SCORE_PRELOAD, SHOOT_NET, START}; // Our Arm/Lift States
     private gameStates gameState = gameStates.STORAGE;
     
@@ -69,7 +69,7 @@ public class ArmLift implements Subsystem {
     public void initOutput(){
         liftMotor1 = (WsSpark) Core.getOutputManager().getOutput(WsOutputs.LIFTONE);
         liftMotor2 = (WsSpark) Core.getOutputManager().getOutput(WsOutputs.LIFTTWO);
-             liftMotor1.setBrake();
+        liftMotor1.setBrake();
         liftMotor2.setBrake();
 // liftMotor1.setCurrentLimit(armDirection, armDirection, armDirection);
        
@@ -126,13 +126,13 @@ public class ArmLift implements Subsystem {
                 armSetpoint = ArmLiftConstants.STORAGE_ANGLE;
                 liftSetpoint = ArmLiftConstants.STORAGE_LIFT_HEIGHT;
             }
-                calculateValidProfile();
-            } 
+            calculateValidProfile();
+        }
     }
 
     public void update(){
         testAnalogSubsystem();
-        putDashboard();
+        // putDashboard();
     }
 
     private void calculateValidProfile(){
@@ -153,10 +153,10 @@ public class ArmLift implements Subsystem {
 
     // Press sensetive lift (not done)
     public void testAnalogSubsystem(){
-        liftMotor1.setSpeed(leftJoyStickY.getValue());
-        liftMotor2.setSpeed(leftJoyStickY.getValue());
+        liftMotor1.setSpeed(leftJoyStickY.getValue()*.5);
+        liftMotor2.setSpeed(-leftJoyStickY.getValue()*.5);
 
-        armMotor.setSpeed(rightJoyStickX.getValue());
+        armMotor.setSpeed(rightJoyStickX.getValue()*.2);
     }
 
     private void competitionControlSystem(){

@@ -37,7 +37,8 @@ public class SwerveModule {
         
         //set up angle and drive with pid and kpid respectively
         driveMotor.initClosedLoop(ModuleConstants.DRIVE_P, ModuleConstants.DRIVE_I, ModuleConstants.DRIVE_D, 0);
-        angleMotor.initClosedLoop(ModuleConstants.ANGLE_P, ModuleConstants.ANGLE_I, ModuleConstants.ANGLE_D, 0, true, 2.0 * Math.PI, 2.0 * Math.PI / 60.0, true);
+        angleMotor.initClosedLoop(ModuleConstants.ANGLE_P, ModuleConstants.ANGLE_I, ModuleConstants.ANGLE_D, 0, true, true);
+        angleMotor.setAbsEncConversion(2.0 * Math.PI, 2.0 * Math.PI / 60.0, true);
 
         driveMotor.setCurrentLimit(ModuleConstants.DRIVE_CURRENT_LIMIT, ModuleConstants.DRIVE_CURRENT_LIMIT, 0);
         angleMotor.setCurrentLimit(ModuleConstants.ANGLE_CURRENT_LIMIT, ModuleConstants.ANGLE_CURRENT_LIMIT, 0);
