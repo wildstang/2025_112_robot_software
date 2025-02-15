@@ -43,12 +43,17 @@ public class MotionProfile {
 
    private void trapezoidProfle(double curPos, double desPos){
       //Trapezoidal Profile
+      //cruiseTime = (dP - 2* minDistanceForMaxVel)/maxVel or time of crusing at maxVelocity
+      //totalTime =  cruiseTime + 2*maxAccelerationTime or time it takes to finish profile
+      //samples = (int)(totalTime/sampleTime)
       setArrayLengths((int) ((((desPos - curPos) - 2 * minDistanceForMaxVel) / maxVel + 2 * maxAccelerationTime) / sampleTime));
       setTrapezoidArrays(curPos, desPos);
    }
 
    //deals with the profile if it is a triangle
    private void triangularProfile(double curPos, double desPos){ 
+      //  totalTime = 2* Math.sqrt(2*Math.abs(dP)/maxAccel); //time it takes to finish profile
+      //samples = (int)(totalTime/sampleTime);
       setArrayLengths((int) (2 * Math.sqrt(2 * Math.abs(desPos = curPos) / maxAccel) / sampleTime));
       setTriangularArrays(curPos, desPos);
    }
