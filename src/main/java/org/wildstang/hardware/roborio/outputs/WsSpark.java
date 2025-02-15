@@ -393,7 +393,7 @@ public class WsSpark extends WsMotorController {
      */
 
     public double getOutputCurrent() {
-        if (follower == null) {
+        if (follower != null) {
             return (motor.getOutputCurrent() + follower.getOutputCurrent()) / 2.0;
         } else {
             return motor.getOutputCurrent();

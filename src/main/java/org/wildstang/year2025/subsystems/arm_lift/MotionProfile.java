@@ -46,7 +46,7 @@ public class MotionProfile {
       //cruiseTime = (dP - 2* minDistanceForMaxVel)/maxVel or time of crusing at maxVelocity
       //totalTime =  cruiseTime + 2*maxAccelerationTime or time it takes to finish profile
       //samples = (int)(totalTime/sampleTime)
-      setArrayLengths((int) ((((desPos - curPos) - 2 * minDistanceForMaxVel) / maxVel + 2 * maxAccelerationTime) / sampleTime));
+      setArrayLengths((int) (((Math.abs(desPos - curPos) - 2 * minDistanceForMaxVel) / maxVel + 2 * maxAccelerationTime) / sampleTime));
       setTrapezoidArrays(curPos, desPos);
    }
 
@@ -54,7 +54,7 @@ public class MotionProfile {
    private void triangularProfile(double curPos, double desPos){ 
       //  totalTime = 2* Math.sqrt(2*Math.abs(dP)/maxAccel); //time it takes to finish profile
       //samples = (int)(totalTime/sampleTime);
-      setArrayLengths((int) (2 * Math.sqrt(2 * Math.abs(desPos = curPos) / maxAccel) / sampleTime));
+      setArrayLengths((int) Math.abs(2 * Math.sqrt(2 * Math.abs(desPos - curPos) / maxAccel) / sampleTime));
       setTriangularArrays(curPos, desPos);
    }
 
@@ -81,7 +81,7 @@ public class MotionProfile {
 
          profileArray[i] = new double[] {accel, velocity, position};
       }
-      profileArray[profileArray.length] = new double[] {0, 0, desPos};  // ensure last sample has properly set values
+      profileArray[profileArray.length-1] = new double[] {0, 0, desPos};  // ensure last sample has properly set values
    }
 
    private void setTriangularArrays(double curPos, double desPos){
@@ -104,7 +104,7 @@ public class MotionProfile {
 
          profileArray[i] = new double[] {accel, velocity, position};
       }
-      profileArray[profileArray.length] = new double[] {0, 0, desPos};  // ensure last sample has properly set values
+      profileArray[profileArray.length-1] = new double[] {0, 0, desPos};  // ensure last sample has properly set values
    }
 
    public double[] getSamples(){

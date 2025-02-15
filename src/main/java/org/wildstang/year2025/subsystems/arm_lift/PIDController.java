@@ -53,14 +53,14 @@ public class PIDController {
         return pTerm + iTerm;
     }
 
-    public double velocityPController(double setPoint, double currentPos){
-        double pTerm = velocityPVal(setPoint, currentPos);
+    public double velocityPController(double setPoint, double currentVel){
+        double pTerm = velocityPVal(setPoint, currentVel);
         return pTerm;
     }
 
 
-    public double velocityPVal(double setPoint, double currentPos){
-        double error = setPoint - currentPos;
+    public double velocityPVal(double setPoint, double currentVel){
+        double error = setPoint - currentVel;
         vP = error*kvP;
         return vP;
     }

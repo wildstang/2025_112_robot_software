@@ -2,22 +2,22 @@ package org.wildstang.year2025.subsystems.arm_lift;
 
 public final class ArmLiftConstants {
     /* -------------------- Motion Profile -------------------*/
-    public static final double MAX_ARM_ACCELERATION = 20.18;
-    public static final double MAX_ARM_VELOCITY = 1.94;
-    public static final double MAX_LIFT_ACCELERATION = 15.1;
-    public static final double MAX_LIFT_VELOCITY = 1.42;
+    public static final double MAX_ARM_ACCELERATION = 10;//20.18;
+    public static final double MAX_ARM_VELOCITY = 1.94; //1.94;
+    public static final double MAX_LIFT_ACCELERATION = 1.5; // 1.51;
+    public static final double MAX_LIFT_VELOCITY = 1.4; //1.42;
     public static final double ARM_SMALL_DELTA_P = 0.1; //small number that deltaP can be under that defaults motion profile to have 0 acceleration and velocity
     public static final double LIFT_SMALL_DELTA_P = 0.02; //small number that deltaP can be under that defaults motion profile to have 0 acceleration and velocity
     /* ------------------------------------------------------- */
 
     /* -------------------- PID -------------------------------*/
-    public static final double ARM_POS_P_GAIN = 0.05;
+    public static final double ARM_POS_P_GAIN = 1.0;
     public static final double ARM_POS_I_GAIN = 0;
-    public static final double ARM_VEL_P_GAIN = 0.5;
+    public static final double ARM_VEL_P_GAIN = 10.0;
 
-    public static final double LIFT_POS_P_GAIN = 0.07;
+    public static final double LIFT_POS_P_GAIN = 1.4;
     public static final double LIFT_POS_I_GAIN = 0;
-    public static final double LIFT_VEL_P_GAIN = 0.7;
+    public static final double LIFT_VEL_P_GAIN = 14.0;
     /* ------------------------------------------------------- */
 
     /* -------------------- Game Positions -------------------------------*/
@@ -41,8 +41,8 @@ public final class ArmLiftConstants {
     public static final double SHOOT_NET_ANGLE = 3.32;
     public static final double SHOOT_NET_LIFT_HEIGHT = MAX_LIFT_HEIGHT;
 
-    public static final double STORAGE_ANGLE = 0.0;
-    public static final double STORAGE_LIFT_HEIGHT = 0.366;
+    public static final double STORAGE_ANGLE = Math.PI;
+    public static final double STORAGE_LIFT_HEIGHT = 0.10;
 
     //Intaking
     public static final double GROUND_INTAKE_RIGHT_ANGLE = 1.026;  // radians
@@ -50,22 +50,30 @@ public final class ArmLiftConstants {
 /* ------------------------------------------------------------------- */
 
 /* ---------------ARM AND LIFT BOUND CHECKING -------------*/
-    public static final double LOW_LIFT_HEIGHT = 5;
+    public static final double LOW_LIFT_HEIGHT = 0.2;
     public static final double HIGH_LIFT_HEIGHT = 15;
 
     //threshold angles where the lift can move down without hitting algae
-    public static final double MAX_LIFT_DOWN_ANGLE = 7*Math.PI/6;
-    public static final double MIN_LIFT_DOWN_ANGLE = 3*Math.PI/4;
+    public static final double MAX_LIFT_DOWN_ANGLE = 3.62;
+    public static final double MIN_LIFT_DOWN_ANGLE = 2.62;
 
-    //lowest angle possible without hitting the lift (when the lift is at a high position)
-    public final static double MIN_HIGH_ARM_ANGLE = Math.PI/6;
+    //angle bounds without hitting the lift (when the lift is at a high position)
+    public final static double MIN_HIGH_ARM_ANGLE = 0.72;
+    // public final static double MAX_HIGH_ARM_ANGLE = 
+    public static final double ALGAE_TOP_CLEARANCE = 0.06;
 
     //bounds  when the lift is at a low position so the arm doesn't hit bumpers or lift
-    public static final double MAX_LOW_ARM_ANGLE = 3*Math.PI/4;
-    public static final double MIN_LOW_ARM_ANGLE = Math.PI/4; 
+    public static final double MAX_LOW_ARM_ANGLE = 5.0;
+    public static final double MIN_LOW_ARM_ANGLE = 1.2;
 
+    public static final double POWER_CHAIN_LIFT_HEIGHT = 0.28;
+    public static final double POWER_CHAIN_LIFT_HEIGHT_MIN = 0.25;
+    public static final double POWER_CHAIN_LIFT_HEIGHT_MAX = 0.34;
+    public static final double ARM_POWER_CHAIN_LOW_LIMIT = 0;
+    public static final double ARM_POWER_CHAIN_HIGH_ANGLE = 5.4;
+    public static final double ARM_POWER_CHAIN_LOW_ANGLE = 0.36;
 
-    public static final double MIN_CLAW_POWER_CHAIN_ANGLE = Math.PI/6; //minimum claw angle that the claw can be within without hitting energy chain
+    public static final double MIN_CLAW_POWER_CHAIN_ANGLE = 0.37; //minimum claw angle that the claw can be within without hitting energy chain
     public static final double MAX_CLAW_POWER_CHAIN_ANGLE = 5*Math.PI/6; //max claw angle that the claw can be within without hitting energy chain
 
     public static final double LOWER_BOUND_POWER_CHAIN_ANGLE = 7*Math.PI/8; //lower bound that the claw angle must be above to be in danger of hitting power chain
