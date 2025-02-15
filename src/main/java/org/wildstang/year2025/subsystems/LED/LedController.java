@@ -18,7 +18,7 @@ public class LedController implements Subsystem {
     private Timer timer =  new Timer();
 
     private int port = 0;//port
-    private int length = 45;//length
+    private int length = 39;//length
     private int initialHue = 0;
     private int initialRed = 0;
     private int initialBlue = 0;
@@ -30,7 +30,6 @@ public class LedController implements Subsystem {
     private int[] orange = {255,100,0};
     private int[] cyan = {0,155,155};
     private int[] purple = {128,0,128};
-
 
     @Override
     public void update(){

@@ -1,8 +1,6 @@
 
 package org.wildstang.year2025.subsystems.Claw;
 
-import java.nio.file.ClosedWatchServiceException;
-
 import org.wildstang.framework.core.Core;
 import org.wildstang.framework.io.inputs.AnalogInput;
 import org.wildstang.framework.io.inputs.DigitalInput;
@@ -23,7 +21,7 @@ public class Claw implements Subsystem{
     private AnalogInput leftTrigger;
 
     //outputs
-    private WsSpark clawMotor;
+    private WsSpark clawMotor, clawMotor2;
 
     private enum clawStates {INTAKE, OUTTAKE, IDLE}; 
     private clawStates currentState;
@@ -60,9 +58,11 @@ public class Claw implements Subsystem{
         leftTrigger.addInputListener(this);
 
         clawMotor = (WsSpark) Core.getOutputManager().getOutput(WsOutputs.CLAWMOTOR);
+        clawMotor2 = (WsSpark) Core.getOutputManager().getOutput(WsOutputs.CLAWMOTOR2);
         timer = new Timer();
 
         algaeInClaw = false;
+        currentState = clawStates.IDLE;
     }
 
     @Override
@@ -70,29 +70,34 @@ public class Claw implements Subsystem{
     public void update() {
        switch(currentState){
         case INTAKE:
-            if(Math.abs(clawMotor.getVelocity()) < ClawConstants.CLAW_HOLD_SPEED || clawMotor.getController().getOutputCurrent() > ClawConstants.CLAW_CURRENT_HOLD){
+            if(Math.abs(clawMotor.getVelocity()) < ClawConstants.CLAW_HOLD_SPEED && clawMotor.getOutputCurrent() > ClawConstants.CLAW_CURRENT_HOLD){
                 algaeInClaw = true; 
             }
-            clawMotor.setCurrentLimit(5, 10, 3);
+            // clawMotor.setCurrentLimit(5, 10, 3);
             clawMotor.setSpeed(ClawConstants.CLAW_INTAKE_SPEED);
+            clawMotor2.setSpeed(-ClawConstants.CLAW_INTAKE_SPEED);
+            break;
 
-        break;
         case OUTTAKE:
-            clawMotor.setCurrentLimit(10, 15, 3);
+            // clawMotor.setCurrentLimit(10, 15, 3);
             if(timer.get() > ClawConstants.OUTTAKE_TIME){
                 currentState = clawStates.IDLE;
                 timer.reset();
                 algaeInClaw = false;
             }
             clawMotor.setSpeed(ClawConstants.CLAW_OUTTAKE_SPEED);
-        break;
+            clawMotor2.setSpeed(-ClawConstants.CLAW_OUTTAKE_SPEED);
+            break;
+
         case IDLE:
             clawMotor.setSpeed(0.0);
-        break;
+            clawMotor2.setSpeed(0.0);
+            break;
+
         default:
             clawMotor.setSpeed(0.0);
-        break;
-
+            clawMotor2.setSpeed(0.0);
+            break;
        }
        putDashboard();
     }
@@ -110,14 +115,17 @@ public class Claw implements Subsystem{
     @Override
     public void selfTest() {
         // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'selfTest'");
+        // throw new UnsupportedOperationException("Unimplemented method 'selfTest'");
+        return;
     }
 
     @Override
     public void initSubsystems() {
         // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'initSubsystems'");
+        // throw new UnsupportedOperationException("Unimplemented method 'initSubsystems'");
+        return;
     }
+
 
     @Override
     public String getName() {

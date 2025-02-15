@@ -5,7 +5,7 @@ import edu.wpi.first.wpilibj.Timer;
 public class MotionProfile {
    private Timer timer = new Timer(); // Timer function (Sort of like a stopwatch/clock)
    private final double sampleTime = 0.02; //seconds
-   private double[][] profileArray;  // Array that stores an array containing the goal acceleration, velocity, and position at each timestep
+   private double[][] profileArray = new double[1][3];  // Array that stores an array containing the goal acceleration, velocity, and position at each timestep
 
    public boolean profileDone; //if desired position is reached
    private double smallDeltaP;

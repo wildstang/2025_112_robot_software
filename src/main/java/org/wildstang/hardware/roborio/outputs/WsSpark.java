@@ -297,10 +297,10 @@ public class WsSpark extends WsMotorController {
      * @param FF the feed forward constant
      * @param isEncoderFlipped Whether to flip the phase of the external absolute encoder to match the motor
      */
-    public void initClosedLoop(double P, double I, double D, double FF, boolean isEncoderFlipped, double positionConversionFactor, double velocityConversionFactor){
+    public void initClosedLoop(double P, double I, double D, double FF, boolean isEncoderFlipped){
         config.closedLoop.pidf(P, I, D, FF, ClosedLoopSlot.kSlot0);
-        absEncoderConfig.positionConversionFactor(positionConversionFactor);
-        absEncoderConfig.velocityConversionFactor(velocityConversionFactor);
+        absEncoderConfig.positionConversionFactor(360.0);
+        absEncoderConfig.velocityConversionFactor(360.0/60.0);
         absEncoderConfig.inverted(isEncoderFlipped);
         config.apply(absEncoderConfig);
         config.closedLoop.feedbackSensor(FeedbackSensor.kAbsoluteEncoder);
@@ -318,10 +318,10 @@ public class WsSpark extends WsMotorController {
      * @param isEncoderFlipped Whether to flip the phase of the external absolute encoder to match the motor
      * @param isWrapped whether wrapping should be enabled
      */
-    public void initClosedLoop(double P, double I, double D, double FF, boolean isEncoderFlipped, double positionConversionFactor, double velocityConversionFactor, boolean isWrapped){
+    public void initClosedLoop(double P, double I, double D, double FF, boolean isEncoderFlipped, boolean isWrapped){
         config.closedLoop.pidf(P, I, D, FF, ClosedLoopSlot.kSlot0);
-        absEncoderConfig.positionConversionFactor(positionConversionFactor);
-        absEncoderConfig.velocityConversionFactor(velocityConversionFactor);
+        absEncoderConfig.positionConversionFactor(360.0);
+        absEncoderConfig.velocityConversionFactor(360.0/60.0);
         absEncoderConfig.inverted(isEncoderFlipped);
         config.apply(absEncoderConfig);
         config.closedLoop.feedbackSensor(FeedbackSensor.kAbsoluteEncoder);
