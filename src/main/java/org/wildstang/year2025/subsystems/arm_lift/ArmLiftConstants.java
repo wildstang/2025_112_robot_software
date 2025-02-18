@@ -4,8 +4,8 @@ public final class ArmLiftConstants {
     /* -------------------- Motion Profile -------------------*/
     public static final double MAX_ARM_ACCELERATION = 10;//20.18;
     public static final double MAX_ARM_VELOCITY = 1.94; //1.94;
-    public static final double MAX_LIFT_ACCELERATION = 1.5; // 1.51;
-    public static final double MAX_LIFT_VELOCITY = 1.4; //1.42;
+    public static final double MAX_LIFT_ACCELERATION = 0.8; // 1.51;
+    public static final double MAX_LIFT_VELOCITY = 1.0; //1.42;
     public static final double ARM_SMALL_DELTA_P = 0.1; //small number that deltaP can be under that defaults motion profile to have 0 acceleration and velocity
     public static final double LIFT_SMALL_DELTA_P = 0.02; //small number that deltaP can be under that defaults motion profile to have 0 acceleration and velocity
     /* ------------------------------------------------------- */
@@ -13,11 +13,11 @@ public final class ArmLiftConstants {
     /* -------------------- PID -------------------------------*/
     public static final double ARM_POS_P_GAIN = 1.0;
     public static final double ARM_POS_I_GAIN = 0;
-    public static final double ARM_VEL_P_GAIN = 10.0;
+    public static final double ARM_VEL_P_GAIN = 0.833;
 
-    public static final double LIFT_POS_P_GAIN = 1.4;
+    public static final double LIFT_POS_P_GAIN = 2.0;
     public static final double LIFT_POS_I_GAIN = 0;
-    public static final double LIFT_VEL_P_GAIN = 14.0;
+    public static final double LIFT_VEL_P_GAIN = 0.708;
     /* ------------------------------------------------------- */
 
     /* -------------------- Game Positions -------------------------------*/
@@ -26,14 +26,20 @@ public final class ArmLiftConstants {
     public static final double MIN_ARM_ANGLE = 0;
     public static final double MAX_ARM_ANGLE = 2*Math.PI;
 
-    public static final double L2_ANGLE = 1.03;
-    public static final double L2_LIFT_HEIGHT = 0.317;
+    public static final double L2_SCORE_ANGLE = 1.03;
+    public static final double L2_SCORE_LIFT_HEIGHT = 0.317;
 
-    public static final double L3_ANGLE = 1.03;
-    public static final double L3_LIFT_HEIGHT = MAX_LIFT_HEIGHT;
+    public static final double L3_SCORE_ANGLE = 1.03;
+    public static final double L3_SCORE_LIFT_HEIGHT = MAX_LIFT_HEIGHT;
 
-    public static final double L4_ANGLE = 3.42;
-    public static final double L4_LIFT_HEIGHT = MAX_LIFT_HEIGHT;
+    public static final double L4_SCORE_ANGLE = 3.42;
+    public static final double L4_SCORE_LIFT_HEIGHT = MAX_LIFT_HEIGHT;
+
+    public static final double L2_INTAKE_ANGLE = 1.94;
+    public static final double L2_INTAKE_LIFT_HEIGHT = 0.0;
+
+    public static final double L3_INTAKE_ANGLE = 1.94;
+    public static final double L3_INTAKE_LIFT_HEIGHT = .404;
     
     public static final double CORAL_STATION_ANGLE = 4.17;
     public static final double CORAL_STATION_HEIGHT = 0.286;
@@ -46,7 +52,7 @@ public final class ArmLiftConstants {
 
     //Intaking
     public static final double GROUND_INTAKE_RIGHT_ANGLE = 1.026;  // radians
-    public static final double INTAKE_LIFT_HEIGHT = 0.0;  // meters
+    public static final double GROUND_INTAKE_LIFT_HEIGHT = 0.0;  // meters
 /* ------------------------------------------------------------------- */
 
 /* ---------------ARM AND LIFT BOUND CHECKING -------------*/
@@ -86,7 +92,7 @@ public final class ArmLiftConstants {
 
     public static final double LIFT_PULLEY_RADIUS = .0254; // m
     public static final double LIFT_GEAR_RATIO = 62.0 / 14.0 * 58.0 / 40.0;
-    public static final double LIFT_FREE_SPEED = 5676.0 / LIFT_GEAR_RATIO * 2.0 * Math.PI / 60.0; // Radians per second
+    public static final double LIFT_FREE_SPEED = 5676.0 / LIFT_GEAR_RATIO * 2.0 * Math.PI * LIFT_PULLEY_RADIUS / 60.0; // meters per second
     public static final double LIFT_STALL_FORCE = 2.6 * LIFT_GEAR_RATIO * 2 / LIFT_PULLEY_RADIUS; // Newton
     public static final double LIFT_ARM_MASS = 12; // in kilograms
 

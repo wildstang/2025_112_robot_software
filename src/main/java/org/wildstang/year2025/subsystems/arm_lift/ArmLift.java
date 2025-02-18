@@ -47,7 +47,7 @@ public class ArmLift implements Subsystem {
     private double liftSetpoint;
 
     /*Other */
-    private boolean recalculateFlag;
+    private boolean liftRecalculateFlag, armRecalculateFlag;
     private double validArmAngle;
     private double validLiftHeight;
 
@@ -55,11 +55,14 @@ public class ArmLift implements Subsystem {
     public void init(){
         initOutput();
         initInputs();
-        recalculateFlag = false;
+        currentArmAngle = getArmAngle();
+        currentLiftPos = getLiftHeight();
+        liftRecalculateFlag = false;
+        armRecalculateFlag = false;
         armProfile = new MotionProfile(ArmLiftConstants.MAX_ARM_ACCELERATION
-        , ArmLiftConstants.MAX_ARM_VELOCITY, ArmLiftConstants.ARM_SMALL_DELTA_P);
+        , ArmLiftConstants.MAX_ARM_VELOCITY, currentArmAngle);
         liftProfile = new MotionProfile(ArmLiftConstants.MAX_LIFT_ACCELERATION
-        , ArmLiftConstants.MAX_LIFT_VELOCITY, ArmLiftConstants.LIFT_SMALL_DELTA_P);
+        , ArmLiftConstants.MAX_LIFT_VELOCITY, currentLiftPos);
         armPIDC = new PIDController(ArmLiftConstants.ARM_POS_P_GAIN, ArmLiftConstants.ARM_POS_I_GAIN
         , ArmLiftConstants.ARM_VEL_P_GAIN, ArmLiftConstants.MAX_ARM_VELOCITY);
         liftPIDC = new PIDController(ArmLiftConstants.LIFT_POS_P_GAIN, ArmLiftConstants.LIFT_POS_I_GAIN
@@ -100,19 +103,19 @@ public class ArmLift implements Subsystem {
 
                 //preset setpoints
                 armSetpoint = ArmLiftConstants.GROUND_INTAKE_RIGHT_ANGLE;
-                liftSetpoint = ArmLiftConstants.MIN_LIFT_HEIGHT;
+                liftSetpoint = ArmLiftConstants.GROUND_INTAKE_LIFT_HEIGHT;
             } else if (dpadLeft.getValue()) {
                 gameState = gameStates.L2_ALGAE_REEF;
 
                 //preset setpoints
-                armSetpoint = ArmLiftConstants.L2_ANGLE;
-                liftSetpoint = ArmLiftConstants.L2_LIFT_HEIGHT;
+                armSetpoint = ArmLiftConstants.L2_INTAKE_ANGLE;
+                liftSetpoint = ArmLiftConstants.L2_INTAKE_LIFT_HEIGHT;
             } else if (dpadRight.getValue()) {
                 gameState = gameStates.L3_ALGAE_REEF;
 
                 //preset setpoints
-                armSetpoint = ArmLiftConstants.L3_ANGLE;
-                liftSetpoint = ArmLiftConstants.L3_LIFT_HEIGHT;
+                armSetpoint = ArmLiftConstants.L3_INTAKE_ANGLE;
+                liftSetpoint = ArmLiftConstants.L3_INTAKE_LIFT_HEIGHT;
             } else if (dpadUp.getValue()) {
                 gameState = gameStates.SHOOT_NET;
 
@@ -143,8 +146,11 @@ public class ArmLift implements Subsystem {
         validLiftHeight = validSetpoints[1];
 
         //multiple stage profile 
-        if (liftSetpoint != validLiftHeight || armSetpoint != validArmAngle){
-            recalculateFlag = true;
+        if (liftSetpoint != validLiftHeight) {
+            liftRecalculateFlag = true;
+        }
+        if (armSetpoint != validArmAngle) {
+            armRecalculateFlag = true;
         }
 
         //generate a motion profile for the arm and the lift
@@ -155,12 +161,13 @@ public class ArmLift implements Subsystem {
     // Press sensetive lift (not done)
     public void testAnalogSubsystem(){
         // liftMotor1.getController().setVoltage(leftJoyStickY.getValue()*6);
-        // liftMotor2.getController().setVoltage(-leftJoyStickY.getValue()*6);
+        liftMotor2.getController().setVoltage(-leftJoyStickY.getValue()*6);
         liftMotor1.setSpeed(leftJoyStickY.getValue());
         liftMotor2.setSpeed(-leftJoyStickY.getValue());
+        SmartDashboard.putNumber("Lift Speed", leftJoyStickY.getValue());
 
-        armMotor.setSpeed(rightJoyStickX.getValue()*.5);
-        // armMotor.getController().setVoltage(rightJoyStickX.getValue()*6);
+        armMotor.setSpeed(rightJoyStickX.getValue());
+        SmartDashboard.putNumber("Arm Speed", rightJoyStickX.getValue());
     }
 
     private void competitionControlSystem(){
@@ -170,18 +177,19 @@ public class ArmLift implements Subsystem {
          currentLiftPos = getLiftHeight();
          currentLiftVel = getLiftVel();
 
-         if(recalculateFlag){
-            if(armProfile.profileDone && liftProfile.profileDone) {
+         if(liftRecalculateFlag && liftProfile.profileDone){
                 double[] validSetpoints = getValidSeptpoints(currentLiftPos, liftSetpoint, currentArmAngle, armSetpoint);
-                if (validSetpoints[0] == armSetpoint && validSetpoints[1] == liftSetpoint){
-                    armProfile.calculate(currentArmAngle,armSetpoint);
-                    liftProfile.calculate(currentLiftPos, liftSetpoint);
-                }
-            }
+                liftProfile.calculate(currentLiftPos, validSetpoints[1]);
         }
-        armMotor.setSpeed(armControlOutput(currentArmAngle, currentArmVel)/12);
-        liftMotor1.setSpeed(liftControlOutput(currentLiftPos, currentLiftVel)/12);
-        liftMotor2.setSpeed(-liftControlOutput(currentLiftPos, currentLiftVel)/12);
+        if (armRecalculateFlag && armProfile.profileDone){
+                double[] validSetpoints = getValidSeptpoints(currentLiftPos, liftSetpoint, currentArmAngle, armSetpoint);
+                armProfile.calculate(currentArmAngle, validSetpoints[0]);
+
+        }
+
+        // armMotor.setSpeed(armControlOutput(currentArmAngle, currentArmVel));
+        liftMotor1.setSpeed(liftControlOutput(currentLiftPos, currentLiftVel));
+        liftMotor2.setSpeed(-liftControlOutput(currentLiftPos, currentLiftVel));
     }
 
     private void putDashboard(){
@@ -193,6 +201,10 @@ public class ArmLift implements Subsystem {
         SmartDashboard.putString("Current State", gameState.name());
         SmartDashboard.putNumber("Arm set point", armSetpoint);
         SmartDashboard.putNumber("Lift setpoint", liftSetpoint);
+        SmartDashboard.putNumber("Lift Velocity", currentLiftVel);
+        SmartDashboard.putNumber("Arm Velocity", currentArmVel);
+        SmartDashboard.putNumber("Lift Target Vel", liftPIDC.positionPIController(liftSetpoint, currentLiftPos));
+        SmartDashboard.putNumber("Arm Target Vel", armPIDC.positionPIController(armSetpoint, currentArmAngle));
     }
 
     //calculating lift height from a function of voltage
@@ -216,32 +228,27 @@ public class ArmLift implements Subsystem {
     
     //generates an output for the motor with an acceleration feedforward, position feedforward, and PID
     public double armControlOutput(double currentAngle, double curVel){
-        // double[] curTarget = armProfile.getSamples();
-        // double goalPos = curTarget[0];
-        // double goalVel = curTarget[1] + armPIDC.positionPIController(goalPos, currentAngle);
-        // double goalAcc = curTarget[2];
+        double[] curTarget = armProfile.getSamples();
+        double goalPos = curTarget[0];
+        double goalVel = curTarget[1] + armPIDC.positionPIController(goalPos, currentAngle);
+        double goalAcc = curTarget[2];
+        SmartDashboard.putNumber("Arm GoalPos", goalPos);
+        SmartDashboard.putNumber("Arm GoalVel", goalVel);
 
-        // double FF = 12 * (getCurrentArmTorque(goalAcc, currentAngle) / getMaxArmTorque(goalVel));
-        // double velocityP = armPIDC.velocityPController(goalVel, curVel);
-        // // SmartDashboard.putNumber("Arm Position PI", positionPI);
-        // SmartDashboard.putNumber("Arm Velocity P", velocityP);
-        // return FF + velocityP;
-        return armPIDC.velocityPController(armPIDC.positionPIController(armSetpoint, currentAngle), curVel);
+        double FF = getCurrentArmTorque(goalAcc, currentAngle) / getMaxArmTorque(goalVel);
+        return armPIDC.velocityPController(goalVel, curVel) + FF;
     }
 
     //generates an output for the motor with an acceleration feedforward, position feedforward, and PID
     public double liftControlOutput(double currentPosition, double curVel){
-        // double[] curTarget = liftProfile.getSamples();
-        // double goalPos = curTarget[0];
-        // double goalVel = curTarget[1] + liftPIDC.positionPIController(goalPos, currentPosition);
-        // double goalAcc = curTarget[2];
-
-        // double FF = 12 * (getCurrentLiftForce(goalAcc) / getMaxLiftForce(goalVel));
-        // double velocityP = liftPIDC.velocityPController(goalVel, curVel);
-        // // SmartDashboard.putNumber("Lift Position PI", positionPI);
-        // SmartDashboard.putNumber("Lift Velocity P", velocityP);
-        // return velocityP + FF;
-        return liftPIDC.velocityPController(liftPIDC.positionPIController(liftSetpoint, currentPosition), curVel);
+        double[] curTarget = liftProfile.getSamples();
+        double goalPos = curTarget[0];
+        double goalVel = curTarget[1] + liftPIDC.positionPIController(goalPos, currentPosition);
+        double goalAcc = curTarget[2];
+        SmartDashboard.putNumber("Lift GoalPos", goalPos);
+        SmartDashboard.putNumber("Lift GoalVel", goalVel);
+        double FF = getCurrentLiftForce(goalAcc) / getMaxLiftForce(goalVel);
+        return liftPIDC.velocityPController(goalVel, curVel) + FF;
     }
 
     //returns valid setpoints for the arm and lift based on current positions 

@@ -8,31 +8,26 @@ public class MotionProfile {
    private double[][] profileArray = new double[1][3];  // Array that stores an array containing the goal acceleration, velocity, and position at each timestep
 
    public boolean profileDone; //if desired position is reached
-   private double smallDeltaP;
 
    private final double maxAccel; // The maximum acceleration (Calculated using math, physics, and motor data sheets)
    private final double maxVel; // Maximum velocity (A value that we pass in)
    private final double maxAccelerationTime; // The time it takes to reach max velocity (Our highest Velocity)
    private final double minDistanceForMaxVel; // minimum distance it takes to reach max velocity
 
-   public MotionProfile(double maxAcceleration, double maxVelocity, double smallDeltaP){
+   public MotionProfile(double maxAcceleration, double maxVelocity, double curPos){
       this.maxAccel = maxAcceleration;
       this.maxVel = maxVelocity;
       this.maxAccelerationTime = maxVelocity/maxAcceleration; // time it takes to reach max velocity
       this.minDistanceForMaxVel = 0.5 * maxAcceleration * Math.pow(maxAccelerationTime, 2.0); //mininum distance required to reach maxVelocity
-      this.smallDeltaP = smallDeltaP;
       profileDone = false;
+      profileArray = new double[][] {{curPos, 0, 0}};
    }
 
    public void calculate(double curPos, double desPos){
       timer.reset();
       profileDone = false;
       
-      if (Math.abs(desPos - curPos) < smallDeltaP) { // No profile needed
-         profileArray = new double[][] {{0,0,desPos}};
-         profileDone = true;
-         return;
-      } else if (Math.abs(desPos - curPos) <= 2 * minDistanceForMaxVel) {  //if change in position is less than minimum distance required to reach max velocity, use triangle profile
+      if (Math.abs(desPos - curPos) <= 2 * minDistanceForMaxVel) {  //if change in position is less than minimum distance required to reach max velocity, use triangle profile
          //Triangular Profile
          triangularProfile(curPos, desPos);
       } else {
@@ -46,7 +41,7 @@ public class MotionProfile {
       //cruiseTime = (dP - 2* minDistanceForMaxVel)/maxVel or time of crusing at maxVelocity
       //totalTime =  cruiseTime + 2*maxAccelerationTime or time it takes to finish profile
       //samples = (int)(totalTime/sampleTime)
-      setArrayLengths((int) (((Math.abs(desPos - curPos) - 2 * minDistanceForMaxVel) / maxVel + 2 * maxAccelerationTime) / sampleTime));
+      setArrayLengths((int) (((Math.abs(desPos - curPos) - 2 * minDistanceForMaxVel) / maxVel + 2 * maxAccelerationTime) / sampleTime)+1);
       setTrapezoidArrays(curPos, desPos);
    }
 
@@ -54,7 +49,7 @@ public class MotionProfile {
    private void triangularProfile(double curPos, double desPos){ 
       //  totalTime = 2* Math.sqrt(2*Math.abs(dP)/maxAccel); //time it takes to finish profile
       //samples = (int)(totalTime/sampleTime);
-      setArrayLengths((int) Math.abs(2 * Math.sqrt(2 * Math.abs(desPos - curPos) / maxAccel) / sampleTime));
+      setArrayLengths((int) Math.abs(2 * Math.sqrt(Math.abs(desPos - curPos) / maxAccel) / sampleTime)+1);
       setTriangularArrays(curPos, desPos);
    }
 
@@ -64,24 +59,26 @@ public class MotionProfile {
       double velocity = 0;
       double position = curPos;
       int dir = (int) Math.signum(desPos - curPos);
-      for(int i = 0; i < profileArray.length - 1; i++){
+      for(int i = 0; i < profileArray.length; i++){
          if (i <= (int) (maxAccelerationTime / sampleTime)) {
             accel = maxAccel * dir;  // before reaching max velocity (acceleration)
-         } else if (i < profileArray.length - (int) (maxAccelerationTime / sampleTime)) {
+            velocity = accel * sampleTime * i;
+         } else if (i < profileArray.length - 1 - (int) (maxAccelerationTime / sampleTime)) {
             accel = 0;  // during cruise time there is zero acceleration
+            velocity = dir * maxVel;
          } else {
             accel = -maxAccel * dir;  // deceleration
+            velocity = -accel * sampleTime * (profileArray.length - i);
          }
-
-         // Integrate acceleration to get velocity
-         velocity += accel * sampleTime;
 
          // Integrate velocity to get position
          position += velocity * sampleTime;
 
-         profileArray[i] = new double[] {accel, velocity, position};
+         profileArray[i][0] = position;
+         profileArray[i][1] = velocity;
+         profileArray[i][2] = accel;
       }
-      profileArray[profileArray.length-1] = new double[] {0, 0, desPos};  // ensure last sample has properly set values
+      profileArray[profileArray.length - 1] = new double[] {0, 0, desPos};  // ensure last sample has properly set values
    }
 
    private void setTriangularArrays(double curPos, double desPos){
@@ -90,26 +87,27 @@ public class MotionProfile {
       double position = curPos;
       int dir = (int) Math.signum(desPos - curPos);
       for(int i = 0; i < profileArray.length - 1; i++){
-         if (i < profileArray.length / 2.0) {
+         if (i < (int) (profileArray.length - 1) / 2.0) {
             accel = maxAccel * dir;
+            velocity = accel * sampleTime * i;
          } else {
             accel = -maxAccel * dir;
+            velocity = -accel * sampleTime * (profileArray.length - 1 - i);
          }
-
-         // Integrate acceleration to get velocity
-         velocity += accel * sampleTime;
 
          // Integrate velocity to get position
          position += velocity * sampleTime;
 
-         profileArray[i] = new double[] {accel, velocity, position};
+         profileArray[i][0] = position;
+         profileArray[i][1] = velocity;
+         profileArray[i][2] = accel;
       }
-      profileArray[profileArray.length-1] = new double[] {0, 0, desPos};  // ensure last sample has properly set values
+      profileArray[profileArray.length - 1] = new double[] {0, 0, desPos};  // ensure last sample has properly set values
    }
 
    public double[] getSamples(){
       if (profileDone) {
-         return profileArray[profileArray.length - 1];
+         return profileArray[0];
       }
 
       if(!timer.isRunning()){
@@ -118,10 +116,11 @@ public class MotionProfile {
 
       int curIndex = (int)(timer.get()/sampleTime);
       //curent index is bigger than how many samples there: profile is done
-      if (curIndex >= profileArray.length) {
-         curIndex = profileArray.length - 1;
-         profileDone = true;
+      if (curIndex >= profileArray.length - 1) {
          timer.stop();
+         profileDone = true;
+         profileArray = new double[][] {profileArray[profileArray.length - 1]};
+         return profileArray[0];
       }
 
       return profileArray[curIndex];
