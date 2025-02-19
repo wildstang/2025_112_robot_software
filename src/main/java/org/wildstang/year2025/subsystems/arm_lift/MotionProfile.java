@@ -1,6 +1,7 @@
 package org.wildstang.year2025.subsystems.arm_lift;
 
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class MotionProfile {
    private Timer timer = new Timer(); // Timer function (Sort of like a stopwatch/clock)
@@ -42,6 +43,7 @@ public class MotionProfile {
       //totalTime =  cruiseTime + 2*maxAccelerationTime or time it takes to finish profile
       //samples = (int)(totalTime/sampleTime)
       setArrayLengths((int) (((Math.abs(desPos - curPos) - 2 * minDistanceForMaxVel) / maxVel + 2 * maxAccelerationTime) / sampleTime)+1);
+      System.out.println("foo");
       setTrapezoidArrays(curPos, desPos);
    }
 
@@ -59,7 +61,7 @@ public class MotionProfile {
       double velocity = 0;
       double position = curPos;
       int dir = (int) Math.signum(desPos - curPos);
-      for(int i = 0; i < profileArray.length; i++){
+      for(int i = 0; i < profileArray.length - 1; i++){
          if (i <= (int) (maxAccelerationTime / sampleTime)) {
             accel = maxAccel * dir;  // before reaching max velocity (acceleration)
             velocity = accel * sampleTime * i;
@@ -68,8 +70,10 @@ public class MotionProfile {
             velocity = dir * maxVel;
          } else {
             accel = -maxAccel * dir;  // deceleration
-            velocity = -accel * sampleTime * (profileArray.length - i);
+            velocity = -accel * sampleTime * (profileArray.length - 1 - i);
          }
+
+         System.out.println(velocity);
 
          // Integrate velocity to get position
          position += velocity * sampleTime;
@@ -78,7 +82,7 @@ public class MotionProfile {
          profileArray[i][1] = velocity;
          profileArray[i][2] = accel;
       }
-      profileArray[profileArray.length - 1] = new double[] {0, 0, desPos};  // ensure last sample has properly set values
+      profileArray[profileArray.length - 1] = new double[] {desPos, 0, 0};  // ensure last sample has properly set values
    }
 
    private void setTriangularArrays(double curPos, double desPos){
@@ -102,12 +106,12 @@ public class MotionProfile {
          profileArray[i][1] = velocity;
          profileArray[i][2] = accel;
       }
-      profileArray[profileArray.length - 1] = new double[] {0, 0, desPos};  // ensure last sample has properly set values
+      profileArray[profileArray.length - 1] = new double[] {desPos, 0, 0};  // ensure last sample has properly set values
    }
 
    public double[] getSamples(){
       if (profileDone) {
-         return profileArray[0];
+         return profileArray[profileArray.length - 1];
       }
 
       if(!timer.isRunning()){
@@ -117,10 +121,11 @@ public class MotionProfile {
       int curIndex = (int)(timer.get()/sampleTime);
       //curent index is bigger than how many samples there: profile is done
       if (curIndex >= profileArray.length - 1) {
+         curIndex = profileArray.length - 1;
          timer.stop();
          profileDone = true;
-         profileArray = new double[][] {profileArray[profileArray.length - 1]};
-         return profileArray[0];
+         // profileArray = new double[][] {profileArray[profileArray.length - 1]};
+         // return profileArray[0];
       }
 
       return profileArray[curIndex];

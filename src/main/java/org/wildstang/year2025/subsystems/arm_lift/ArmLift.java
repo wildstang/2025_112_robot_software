@@ -64,9 +64,9 @@ public class ArmLift implements Subsystem {
         liftProfile = new MotionProfile(ArmLiftConstants.MAX_LIFT_ACCELERATION
         , ArmLiftConstants.MAX_LIFT_VELOCITY, currentLiftPos);
         armPIDC = new PIDController(ArmLiftConstants.ARM_POS_P_GAIN, ArmLiftConstants.ARM_POS_I_GAIN
-        , ArmLiftConstants.ARM_VEL_P_GAIN, ArmLiftConstants.MAX_ARM_VELOCITY);
+        , ArmLiftConstants.ARM_VEL_P_GAIN, 1.0);
         liftPIDC = new PIDController(ArmLiftConstants.LIFT_POS_P_GAIN, ArmLiftConstants.LIFT_POS_I_GAIN
-        , ArmLiftConstants.LIFT_VEL_P_GAIN, ArmLiftConstants.MAX_LIFT_VELOCITY);
+        , ArmLiftConstants.LIFT_VEL_P_GAIN, 0.5);
     }
 
     public void initOutput(){
@@ -97,39 +97,53 @@ public class ArmLift implements Subsystem {
     }
 
     public void inputUpdate(Input source){
-        if(source == dpadRight || source == dpadLeft || source == dpadDown || source == dpadUp || source == driverFaceLeft){
+        if((source == dpadRight && dpadRight.getValue()) || (source == dpadLeft && dpadLeft.getValue()) || (source == dpadDown && dpadDown.getValue()) || (source == dpadUp && dpadUp.getValue()) || (source == driverFaceLeft && driverFaceLeft.getValue())){
             if (dpadDown.getValue()) {
-                gameState = gameStates.GROUND_INTAKE;
+                if (gameState != gameStates.GROUND_INTAKE){
+                    gameState = gameStates.GROUND_INTAKE;
 
-                //preset setpoints
-                armSetpoint = ArmLiftConstants.GROUND_INTAKE_RIGHT_ANGLE;
-                liftSetpoint = ArmLiftConstants.GROUND_INTAKE_LIFT_HEIGHT;
+                    //preset setpoints
+                    armSetpoint = ArmLiftConstants.GROUND_INTAKE_RIGHT_ANGLE;
+                    liftSetpoint = ArmLiftConstants.GROUND_INTAKE_LIFT_HEIGHT;
+                    calculateValidProfile();
+                }
             } else if (dpadLeft.getValue()) {
-                gameState = gameStates.L2_ALGAE_REEF;
+                if (gameState != gameStates.L2_ALGAE_REEF){
+                    gameState = gameStates.L2_ALGAE_REEF;
 
-                //preset setpoints
-                armSetpoint = ArmLiftConstants.L2_INTAKE_ANGLE;
-                liftSetpoint = ArmLiftConstants.L2_INTAKE_LIFT_HEIGHT;
+                    //preset setpoints
+                    armSetpoint = ArmLiftConstants.L2_INTAKE_ANGLE;
+                    liftSetpoint = ArmLiftConstants.L2_INTAKE_LIFT_HEIGHT;
+                    calculateValidProfile();
+                }
             } else if (dpadRight.getValue()) {
-                gameState = gameStates.L3_ALGAE_REEF;
+                if (gameState != gameStates.L3_ALGAE_REEF){
+                    gameState = gameStates.L3_ALGAE_REEF;
 
-                //preset setpoints
-                armSetpoint = ArmLiftConstants.L3_INTAKE_ANGLE;
-                liftSetpoint = ArmLiftConstants.L3_INTAKE_LIFT_HEIGHT;
+                    //preset setpoints
+                    armSetpoint = ArmLiftConstants.L3_INTAKE_ANGLE;
+                    liftSetpoint = ArmLiftConstants.L3_INTAKE_LIFT_HEIGHT;
+                    calculateValidProfile();
+                }
             } else if (dpadUp.getValue()) {
-                gameState = gameStates.SHOOT_NET;
+                if (gameState != gameStates.SHOOT_NET) {
+                    gameState = gameStates.SHOOT_NET;
 
-                //preset setpoints
-                armSetpoint = ArmLiftConstants.SHOOT_NET_ANGLE;
-                liftSetpoint = ArmLiftConstants.SHOOT_NET_LIFT_HEIGHT;
+                    //preset setpoints
+                    armSetpoint = ArmLiftConstants.SHOOT_NET_ANGLE;
+                    liftSetpoint = ArmLiftConstants.SHOOT_NET_LIFT_HEIGHT;
+                    calculateValidProfile();
+                }
             } else if (driverFaceLeft.getValue()) {
-                gameState = gameStates.STORAGE;
-                
-                //preset setpoints
-                armSetpoint = ArmLiftConstants.STORAGE_ANGLE;
-                liftSetpoint = ArmLiftConstants.STORAGE_LIFT_HEIGHT;
+                if (gameState != gameStates.STORAGE){
+                    gameState = gameStates.STORAGE;
+                    
+                    //preset setpoints
+                    armSetpoint = ArmLiftConstants.STORAGE_ANGLE;
+                    liftSetpoint = ArmLiftConstants.STORAGE_LIFT_HEIGHT;
+                    calculateValidProfile();
+                }
             }
-            calculateValidProfile();
         }
     }
 
@@ -141,17 +155,19 @@ public class ArmLift implements Subsystem {
 
     private void calculateValidProfile(){
         //getting setpoints within proper bounds
-        double[] validSetpoints = getValidSeptpoints(liftSetpoint, currentLiftPos, armSetpoint, currentArmAngle);
-        validArmAngle = validSetpoints[0];
-        validLiftHeight = validSetpoints[1];
+        // double[] validSetpoints = getValidSeptpoints(liftSetpoint, currentLiftPos, armSetpoint, currentArmAngle);
+        // validArmAngle = validSetpoints[0];
+        // validLiftHeight = validSetpoints[1];
 
-        //multiple stage profile 
-        if (liftSetpoint != validLiftHeight) {
-            liftRecalculateFlag = true;
-        }
-        if (armSetpoint != validArmAngle) {
-            armRecalculateFlag = true;
-        }
+        // //multiple stage profile 
+        // if (liftSetpoint != validLiftHeight) {
+        //     liftRecalculateFlag = true;
+        // }
+        // if (armSetpoint != validArmAngle) {
+        //     armRecalculateFlag = true;
+        // }
+        validArmAngle = armSetpoint;
+        validLiftHeight = liftSetpoint;
 
         //generate a motion profile for the arm and the lift
         armProfile.calculate(currentArmAngle,validArmAngle);
@@ -183,11 +199,11 @@ public class ArmLift implements Subsystem {
         }
         if (armRecalculateFlag && armProfile.profileDone){
                 double[] validSetpoints = getValidSeptpoints(currentLiftPos, liftSetpoint, currentArmAngle, armSetpoint);
-                armProfile.calculate(currentArmAngle, validSetpoints[0]);
+                // armProfile.calculate(currentArmAngle, validSetpoints[0]);
 
         }
 
-        // armMotor.setSpeed(armControlOutput(currentArmAngle, currentArmVel));
+        armMotor.setSpeed(armControlOutput(currentArmAngle, currentArmVel));
         liftMotor1.setSpeed(liftControlOutput(currentLiftPos, currentLiftVel));
         liftMotor2.setSpeed(-liftControlOutput(currentLiftPos, currentLiftVel));
     }

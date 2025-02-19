@@ -2,26 +2,26 @@ package org.wildstang.year2025.subsystems.arm_lift;
 
 public final class ArmLiftConstants {
     /* -------------------- Motion Profile -------------------*/
-    public static final double MAX_ARM_ACCELERATION = 10;//20.18;
-    public static final double MAX_ARM_VELOCITY = 1.94; //1.94;
-    public static final double MAX_LIFT_ACCELERATION = 0.8; // 1.51;
+    public static final double MAX_ARM_ACCELERATION = 6;//20.18;
+    public static final double MAX_ARM_VELOCITY = 3.0; //1.94;
+    public static final double MAX_LIFT_ACCELERATION = 1.5; // 1.51;
     public static final double MAX_LIFT_VELOCITY = 1.0; //1.42;
     public static final double ARM_SMALL_DELTA_P = 0.1; //small number that deltaP can be under that defaults motion profile to have 0 acceleration and velocity
     public static final double LIFT_SMALL_DELTA_P = 0.02; //small number that deltaP can be under that defaults motion profile to have 0 acceleration and velocity
     /* ------------------------------------------------------- */
 
     /* -------------------- PID -------------------------------*/
-    public static final double ARM_POS_P_GAIN = 1.0;
-    public static final double ARM_POS_I_GAIN = 0;
-    public static final double ARM_VEL_P_GAIN = 0.833;
+    public static final double ARM_POS_P_GAIN = 8.0;
+    public static final double ARM_POS_I_GAIN = 0.7;
+    public static final double ARM_VEL_P_GAIN = 0.15;
 
-    public static final double LIFT_POS_P_GAIN = 2.0;
-    public static final double LIFT_POS_I_GAIN = 0;
-    public static final double LIFT_VEL_P_GAIN = 0.708;
+    public static final double LIFT_POS_P_GAIN = 8.0;
+    public static final double LIFT_POS_I_GAIN = 2.0;
+    public static final double LIFT_VEL_P_GAIN = 0.4;
     /* ------------------------------------------------------- */
 
     /* -------------------- Game Positions -------------------------------*/
-    public static final double MAX_LIFT_HEIGHT = 0.720;  // meters
+    public static final double MAX_LIFT_HEIGHT = 0.650;  // meters
     public static final double MIN_LIFT_HEIGHT = 0;  // meters
     public static final double MIN_ARM_ANGLE = 0;
     public static final double MAX_ARM_ANGLE = 2*Math.PI;
@@ -51,7 +51,7 @@ public final class ArmLiftConstants {
     public static final double STORAGE_LIFT_HEIGHT = 0.10;
 
     //Intaking
-    public static final double GROUND_INTAKE_RIGHT_ANGLE = 1.026;  // radians
+    public static final double GROUND_INTAKE_RIGHT_ANGLE = 1.1;  // radians
     public static final double GROUND_INTAKE_LIFT_HEIGHT = 0.0;  // meters
 /* ------------------------------------------------------------------- */
 
@@ -94,13 +94,13 @@ public final class ArmLiftConstants {
     public static final double LIFT_GEAR_RATIO = 62.0 / 14.0 * 58.0 / 40.0;
     public static final double LIFT_FREE_SPEED = 5676.0 / LIFT_GEAR_RATIO * 2.0 * Math.PI * LIFT_PULLEY_RADIUS / 60.0; // meters per second
     public static final double LIFT_STALL_FORCE = 2.6 * LIFT_GEAR_RATIO * 2 / LIFT_PULLEY_RADIUS; // Newton
-    public static final double LIFT_ARM_MASS = 12; // in kilograms
+    public static final double LIFT_ARM_MASS = 7; // in kilograms
 
     public static final double ARM_GEAR_RATO = 68.0 / 12.0 * 68.0 / 22.0 * 68.0 / 22.0 * 68.0 / 16.0;
     public static final double ARM_FREE_SPEED = 5676.0 / ARM_GEAR_RATO * 2.0 * Math.PI / 60.0; // Radians per second
     public static final double ARM_STALL = 2.6 * ARM_GEAR_RATO; // Newton Meters
     public static final double ARM_MASS = 6.132; //in kilograms
     public static final double ARM_COM_RADIUS = 0.3586583298;  // m
-    public static final double ARM_MOI = 1.3989580104;  // kg m^2
+    public static final double ARM_MOI = 1.0;  // kg m^2
     public static final double GRAVITY = 9.80665; // m/s^2 gravity
 }
