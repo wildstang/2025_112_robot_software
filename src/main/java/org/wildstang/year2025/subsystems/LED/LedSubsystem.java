@@ -1,8 +1,11 @@
 package org.wildstang.year2025.subsystems.LED;
 
+import org.wildstang.framework.core.Core;
+import org.wildstang.framework.io.inputs.DigitalInput;
 import org.wildstang.framework.io.inputs.Input;
 import org.wildstang.framework.subsystems.Subsystem;
-import org.wildstang.year2025.subsystems.targeting.WsVision;
+import org.wildstang.year2025.robot.WsInputs;
+import org.wildstang.year2025.subsystems.localization.WsVision;
 
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
@@ -34,16 +37,25 @@ public class LedSubsystem implements Subsystem {
     private int changeSpeed = 2;
     private int plusOr;
     private int doFlash = 0;
-    private int flashColor = 0;
+    private int flashColor = 1;
     private int flashHalf = 1;
     private int flashSpeedOne = 7;
     private int flashSpeedTwo = 4;
     private int currentColor = 0;
+    private DigitalInput leftBumper;
+    private DigitalInput rightBumper;
 
     @Override
     public void inputUpdate(Input source) {
         // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'inputUpdate'");
+        if (leftBumper.getValue() == true){
+            doRand = 1;
+            doFlash = 0;
+        }
+        else if (rightBumper.getValue() == true){
+            doRand = 0;
+            doFlash = 1;
+        }
     }
 
     @Override
@@ -62,6 +74,12 @@ public class LedSubsystem implements Subsystem {
         }
         led.setData(ledBuffer);
         led.start();
+
+        leftBumper = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_LEFT_SHOULDER);
+        leftBumper.addInputListener(this);
+        rightBumper = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_RIGHT_SHOULDER);
+        rightBumper.addInputListener(this);
+
         }
 
     @Override
@@ -78,7 +96,7 @@ public class LedSubsystem implements Subsystem {
             if (startRand == 1){ 
                 startRand = 0;
                 for (int i = 0; i < length; i++){
-                    int randBlue = (int)(Math.random() * 255);
+                    int randBlue = (int)((Math.random() * 155) + 100);
                     ledBuffer.setRGB(i, 0, 0, randBlue);
                 }
             }
