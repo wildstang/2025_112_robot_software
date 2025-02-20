@@ -12,6 +12,7 @@ import org.wildstang.framework.core.Core;
 import org.wildstang.framework.subsystems.Subsystem;
 import org.wildstang.year2025.robot.WsInputs;
 import org.wildstang.year2025.robot.WsOutputs;
+import org.wildstang.year2025.robot.WsSubsystems;
 import org.wildstang.year2025.subsystems.Claw.Claw;
 
 /**
@@ -25,13 +26,13 @@ public class ArmLift implements Subsystem {
     MotionProfile liftProfile;
 
     /*Input Variables*/
-    private DigitalInput dpadDown; // Ground Intake Button
-    private DigitalInput dpadLeft; // L2 Algae Reef Intake
-    private DigitalInput dpadRight; // L3 Algae Reef Intake
-    private DigitalInput dpadUp; // Shoot Net
-    private DigitalInput driverFaceLeft;
+    private DigitalInput faceDown; // Ground Intake Button
+    private DigitalInput faceLeft; // L2 Algae Reef Intake
+    private DigitalInput faceRight; // L3 Algae Reef Intake
+    private DigitalInput faceUp; // Shoot Net
     private AnalogInput leftJoyStickY;
     private AnalogInput rightJoyStickX;
+    private AnalogInput rightTrigger;
     
     /* Lift Variables */
     private WsSpark liftMotor1;
@@ -50,6 +51,7 @@ public class ArmLift implements Subsystem {
     private boolean liftRecalculateFlag, armRecalculateFlag;
     private double validArmAngle;
     private double validLiftHeight;
+    private Claw claw;
 
      @Override
     public void init(){
@@ -80,70 +82,34 @@ public class ArmLift implements Subsystem {
     }
 
     public void initInputs(){
-        dpadUp = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_DPAD_UP);
-        dpadUp.addInputListener(this);
-        dpadLeft = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_DPAD_LEFT);
-        dpadLeft.addInputListener(this);
-        dpadRight = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_DPAD_RIGHT);
-        dpadRight.addInputListener(this);
-        dpadDown = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_DPAD_DOWN);
-        dpadDown.addInputListener(this);
-        driverFaceLeft = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_FACE_LEFT);
-        driverFaceLeft.addInputListener(this);
-        leftJoyStickY = (AnalogInput) Core.getInputManager().getInput(WsInputs.DRIVER_LEFT_JOYSTICK_Y);
+        faceUp = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_FACE_UP);
+        faceUp.addInputListener(this);
+        faceLeft = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_FACE_LEFT);
+        faceLeft.addInputListener(this);
+        faceRight = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_FACE_RIGHT);
+        faceRight.addInputListener(this);
+        faceDown = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_FACE_DOWN);
+        faceDown.addInputListener(this);
+        rightTrigger = (AnalogInput) Core.getInputManager().getInput(WsInputs.DRIVER_RIGHT_TRIGGER);
+        rightTrigger.addInputListener(this);
+        // leftJoyStickY = (AnalogInput) Core.getInputManager().getInput(WsInputs.DRIVER_LEFT_JOYSTICK_Y);
         // leftJoyStickY.addInputListener(this);
-        rightJoyStickX = (AnalogInput) Core.getInputManager().getInput(WsInputs.DRIVER_RIGHT_JOYSTICK_X);
+        // rightJoyStickX = (AnalogInput) Core.getInputManager().getInput(WsInputs.DRIVER_RIGHT_JOYSTICK_X);
         // rightJoyStickX.addInputListener(this);
     }
 
     public void inputUpdate(Input source){
-        if((source == dpadRight && dpadRight.getValue()) || (source == dpadLeft && dpadLeft.getValue()) || (source == dpadDown && dpadDown.getValue()) || (source == dpadUp && dpadUp.getValue()) || (source == driverFaceLeft && driverFaceLeft.getValue())){
-            if (dpadDown.getValue()) {
-                if (gameState != gameStates.GROUND_INTAKE){
-                    gameState = gameStates.GROUND_INTAKE;
-
-                    //preset setpoints
-                    armSetpoint = ArmLiftConstants.GROUND_INTAKE_RIGHT_ANGLE;
-                    liftSetpoint = ArmLiftConstants.GROUND_INTAKE_LIFT_HEIGHT;
-                    calculateValidProfile();
-                }
-            } else if (dpadLeft.getValue()) {
-                if (gameState != gameStates.L2_ALGAE_REEF){
-                    gameState = gameStates.L2_ALGAE_REEF;
-
-                    //preset setpoints
-                    armSetpoint = ArmLiftConstants.L2_INTAKE_ANGLE;
-                    liftSetpoint = ArmLiftConstants.L2_INTAKE_LIFT_HEIGHT;
-                    calculateValidProfile();
-                }
-            } else if (dpadRight.getValue()) {
-                if (gameState != gameStates.L3_ALGAE_REEF){
-                    gameState = gameStates.L3_ALGAE_REEF;
-
-                    //preset setpoints
-                    armSetpoint = ArmLiftConstants.L3_INTAKE_ANGLE;
-                    liftSetpoint = ArmLiftConstants.L3_INTAKE_LIFT_HEIGHT;
-                    calculateValidProfile();
-                }
-            } else if (dpadUp.getValue()) {
-                if (gameState != gameStates.SHOOT_NET) {
-                    gameState = gameStates.SHOOT_NET;
-
-                    //preset setpoints
-                    armSetpoint = ArmLiftConstants.SHOOT_NET_ANGLE;
-                    liftSetpoint = ArmLiftConstants.SHOOT_NET_LIFT_HEIGHT;
-                    calculateValidProfile();
-                }
-            } else if (driverFaceLeft.getValue()) {
-                if (gameState != gameStates.STORAGE){
-                    gameState = gameStates.STORAGE;
-                    
-                    //preset setpoints
-                    armSetpoint = ArmLiftConstants.STORAGE_ANGLE;
-                    liftSetpoint = ArmLiftConstants.STORAGE_LIFT_HEIGHT;
-                    calculateValidProfile();
-                }
-            }
+        System.out.println(source.getName());
+        if (faceDown.getValue()) {
+            setGameState(gameStates.STORAGE);
+        } else if (faceLeft.getValue()) {
+            setGameState(gameStates.L2_ALGAE_REEF);
+        } else if (faceRight.getValue()) {
+            setGameState(gameStates.L3_ALGAE_REEF);
+        } else if (faceUp.getValue()) {
+            setGameState(gameStates.SHOOT_NET);
+        } else if (rightTrigger.getValue() > 0) {
+            setGameState(gameStates.GROUND_INTAKE);
         }
     }
 
@@ -199,7 +165,7 @@ public class ArmLift implements Subsystem {
         }
         if (armRecalculateFlag && armProfile.profileDone){
                 double[] validSetpoints = getValidSeptpoints(currentLiftPos, liftSetpoint, currentArmAngle, armSetpoint);
-                // armProfile.calculate(currentArmAngle, validSetpoints[0]);
+                armProfile.calculate(currentArmAngle, validSetpoints[0]);
 
         }
 
@@ -209,7 +175,6 @@ public class ArmLift implements Subsystem {
     }
 
     private void putDashboard(){
-        SmartDashboard.putBoolean("Algae in claw", Claw.algaeInClaw);
         SmartDashboard.putNumber("Current Arm Angle", getArmAngle());
         SmartDashboard.putNumber("Current Lift Height", getLiftHeight());
         SmartDashboard.putNumber("Arm control output", armControlOutput(currentArmAngle, currentArmVel));
@@ -285,7 +250,7 @@ public class ArmLift implements Subsystem {
         if (curLiftPos < ArmLiftConstants.LOW_LIFT_HEIGHT){
             validArmAngle = Math.max(Math.min(validArmAngle, ArmLiftConstants.MAX_LOW_ARM_ANGLE), ArmLiftConstants.MIN_LOW_ARM_ANGLE);
         }
-        if(Claw.algaeInClaw){
+        if(claw.algaeInClaw){
             //if lift is at a high position, ensure arm angle doesn't go too low so that claw w/ algae hits the lift
             if (curLiftPos < ArmLiftConstants.LOW_LIFT_HEIGHT){
                 validArmAngle = Math.max(Math.min(validArmAngle, ArmLiftConstants.ARM_POWER_CHAIN_HIGH_ANGLE),ArmLiftConstants.MIN_HIGH_ARM_ANGLE);
@@ -334,6 +299,41 @@ public class ArmLift implements Subsystem {
         + (ArmLiftConstants.ARM_MOI * goalAccel);
     }
 
+    public void setGameState(gameStates newState){
+        if (newState != gameState) {
+            switch (newState) {
+                case STORAGE:
+                    gameState = gameStates.STORAGE;
+                    armSetpoint = ArmLiftConstants.STORAGE_ANGLE;
+                    liftSetpoint = ArmLiftConstants.STORAGE_LIFT_HEIGHT;
+                    break;
+
+                case L2_ALGAE_REEF:
+                    gameState = gameStates.L2_ALGAE_REEF;
+                    armSetpoint = ArmLiftConstants.L2_INTAKE_ANGLE;
+                    liftSetpoint = ArmLiftConstants.L2_INTAKE_LIFT_HEIGHT;
+                    break;
+
+                case L3_ALGAE_REEF:
+                    gameState = gameStates.L3_ALGAE_REEF;
+                    armSetpoint = ArmLiftConstants.L3_INTAKE_ANGLE;
+                    liftSetpoint = ArmLiftConstants.L3_INTAKE_ANGLE;
+                    break;
+
+                case SHOOT_NET:
+                    gameState = gameStates.SHOOT_NET;
+                    armSetpoint = ArmLiftConstants.SHOOT_NET_ANGLE;
+                    liftSetpoint = ArmLiftConstants.SHOOT_NET_LIFT_HEIGHT;
+                    break;
+
+                default:
+                    break;
+            }
+            calculateValidProfile();
+
+        }
+    }
+
     public void selfTest(){
     }
 
@@ -344,6 +344,7 @@ public class ArmLift implements Subsystem {
 
     @Override
     public void initSubsystems() {
+        claw = (Claw) Core.getSubsystemManager().getSubsystem(WsSubsystems.CLAW);
     }
 
     @Override

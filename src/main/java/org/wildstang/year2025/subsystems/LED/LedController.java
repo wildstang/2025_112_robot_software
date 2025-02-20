@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.Timer;
 
 public class LedController implements Subsystem {
 
+    Timer clock = new Timer();
     private AddressableLED led;
     private AddressableLEDBuffer ledBuffer;
     private WsVision vision;
@@ -33,19 +34,20 @@ public class LedController implements Subsystem {
 
     @Override
     public void update(){
-        if (Core.getIsDisabledMode()){
-            if (Core.isAutoLocked()){
-                if (Core.isBlue()) cycleBlue();
-                else cycleRed();
-            } else rainbow();
-        } else {
+        // if (Core.getIsDisabledMode()){
+        //     if (Core.isAutoLocked()){
+        //         if (Core.isBlue()) cycleBlue();
+        //         else cycleRed();
+        //     } else rainbow();
+        // } else {
 
             
-            if (Core.isAutoLocked()){
-                if (Core.isBlue()) cycleBlue();
-                else cycleRed();
-            } else rainbow();
-        }
+        //     if (Core.isAutoLocked()){
+        //         if (Core.isBlue()) cycleBlue();
+        //         else cycleRed();
+        //     } else rainbow();
+        // }
+        blueTieDye();
         led.setData(ledBuffer);
         led.start();
     }
@@ -114,5 +116,28 @@ public class LedController implements Subsystem {
             ledBuffer.setRGB(i, 0, 0, 255-(initialBlue + (i*255/ledBuffer.getLength()))%255);
         }
         initialBlue = (initialBlue + 5) % 255;
+    }
+    public void blueTieDye(){
+        clock.start();
+                if(clock.hasElapsed(1.0)){
+                    for(int i = 0; i < length; i++){
+                        int randomNum = (int)(Math.random()*2);
+                        Timer timer = new Timer();
+                        timer.start();
+                        switch(randomNum){
+                        case 0:
+                            ledBuffer.setRGB(i, 0, 0, 153);
+                            break;
+                        case 1:
+                            ledBuffer.setRGB(i, 102, 178, 150);
+                            break;
+                        case 2:
+                            ledBuffer.setRGB(i, 200, 153, 200);
+                            break;
+                        }
+                    }
+                    clock.stop();
+                    clock.reset();
+                }
     }
 }

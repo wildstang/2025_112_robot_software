@@ -1,6 +1,8 @@
 package org.wildstang.year2025.subsystems.swerve;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
+import com.revrobotics.spark.SparkAnalogSensor;
+import com.revrobotics.spark.SparkLimitSwitch;
 
 // import org.photonvision.PhotonUtils;
 import org.wildstang.framework.core.Core;
@@ -38,19 +40,19 @@ public class SwerveDrive extends SwerveDriveTemplate {
     private AnalogInput leftStickX;  // translation joystick x
     private AnalogInput leftStickY;  // translation joystick y
     private AnalogInput rightStickX;  // rot joystick
-    private AnalogInput leftTrigger, rightTrigger;  //speed derate, thrust 
-    private DigitalInput leftBumper, rightBumper;  // intake, shoot
+    private AnalogInput rightTrigger;  //speed derate 
+    // private DigitalInput leftBumper, rightBumper;  // intake, shoot
     private DigitalInput select;  // gyro reset
     private DigitalInput start;  // 
     private DigitalInput faceUp;  // rotation lock 0 degrees
     private DigitalInput faceRight;  // rotation lock 90 degrees
     private DigitalInput faceLeft;  // rotation lock 270 degrees
     private DigitalInput faceDown;  // rotation lock 180 degrees
-    private DigitalInput dpadUp;
+    // private DigitalInput dpadUp;
     private DigitalInput leftStickButton;
 
-    // private DigitalInput pixyDio;
-    // private AnalogInput pixyAnalog;
+    private SparkLimitSwitch pixyDio;
+    private SparkAnalogSensor pixyAnalog;
 
     private double xOutput;
     private double yOutput;
@@ -58,7 +60,7 @@ public class SwerveDrive extends SwerveDriveTemplate {
     private double xSpeed;
     private double ySpeed;
     private double wSpeed;
-    private double thrustValue;
+    // private double thrustValue;
     private double derateValue;
     private boolean rotLocked;
     private double rotTarget;
@@ -106,31 +108,32 @@ public class SwerveDrive extends SwerveDriveTemplate {
         rightStickX.addInputListener(this);
         rightTrigger = (AnalogInput) Core.getInputManager().getInput(WsInputs.DRIVER_RIGHT_TRIGGER);
         rightTrigger.addInputListener(this);
-        leftTrigger = (AnalogInput) Core.getInputManager().getInput(WsInputs.DRIVER_LEFT_TRIGGER);
-        leftTrigger.addInputListener(this);
-        rightBumper = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_RIGHT_SHOULDER);
+        // leftTrigger = (AnalogInput) Core.getInputManager().getInput(WsInputs.DRIVER_LEFT_TRIGGER);
+        // leftTrigger.addInputListener(this);
+        // rightBumper = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_RIGHT_SHOULDER);
         // rightBumper.addInputListener(this);
-        leftBumper = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_LEFT_SHOULDER);
+        // leftBumper = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_LEFT_SHOULDER);
         // leftBumper.addInputListener(this);
         select = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_SELECT);
         select.addInputListener(this);
         start = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_START);
         start.addInputListener(this);
-        faceUp = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_FACE_UP);
+        // faceUp = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_FACE_UP);
         // faceUp.addInputListener(this);
-        faceLeft = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_FACE_LEFT);
+        // faceLeft = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_FACE_LEFT);
         // faceLeft.addInputListener(this);
-        faceRight = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_FACE_RIGHT);
+        // faceRight = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_FACE_RIGHT);
         // faceRight.addInputListener(this);
-        faceDown = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_FACE_DOWN);
+        // faceDown = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_FACE_DOWN);
         // faceDown.addInputListener(this);
-        dpadUp = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_DPAD_UP);
+        // dpadUp = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_DPAD_UP);
         // dpadUp.addInputListener(this);
-        leftStickButton = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_LEFT_JOYSTICK_BUTTON);
+        // leftStickButton = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_LEFT_JOYSTICK_BUTTON);
         // leftStickButton.addInputListener(this);
 
-        // pixyDio = (DigitalInput) Core.getInputManager().getInput(WsInputs.PIXY_DIO);
-        // pixyAnalog = (AnalogInput) Core.getInputManager().getInput(WsInputs.PIXY_ANALOG);
+        WsSpark clawMotor = (WsSpark) Core.getOutputManager().getOutput(WsOutputs.CLAWMOTOR);
+        pixyDio = clawMotor.getController().getForwardLimitSwitch();
+        pixyAnalog = clawMotor.getController().getAnalog();
     }
 
     public void initOutputs() {

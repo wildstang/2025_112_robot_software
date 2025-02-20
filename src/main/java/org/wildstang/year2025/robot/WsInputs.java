@@ -9,8 +9,6 @@ import org.wildstang.hardware.roborio.inputs.config.WsJSButtonInputConfig;
 import org.wildstang.hardware.roborio.inputs.config.WsDPadButtonInputConfig;
 import org.wildstang.hardware.roborio.inputs.config.WsJSJoystickInputConfig;
 
-import edu.wpi.first.wpilibj.AnalogInput;
-
 /**
  * Input mappings are stored here.
  * We currently use two Xbox controller for input, driver and operator, plus additional sensors.

@@ -26,7 +26,7 @@ public class Claw implements Subsystem{
     private enum clawStates {INTAKE, OUTTAKE, IDLE}; 
     private clawStates currentState;
     private Timer timer; 
-    public static boolean algaeInClaw;
+    public boolean algaeInClaw;
 
 
 
@@ -105,6 +105,7 @@ public class Claw implements Subsystem{
 
     private void putDashboard(){
         SmartDashboard.putString("Claw State", currentState.name());
+        SmartDashboard.putBoolean("Algae in claw", algaeInClaw);
     }
     @Override
     //reseting everything
