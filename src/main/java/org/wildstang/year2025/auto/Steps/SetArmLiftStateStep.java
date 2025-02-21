@@ -6,13 +6,13 @@ import org.wildstang.year2025.robot.WsSubsystems;
 import org.wildstang.year2025.subsystems.arm_lift.ArmLift;
 import org.wildstang.year2025.subsystems.arm_lift.ArmLift.gameStates;
 
-public class SetArmLiftPosStep extends AutoStep {
+public class SetArmLiftStateStep extends AutoStep {
 
     private ArmLift armLift;
     private gameStates newState;
 
     public SetArmLiftPosStep(gameStates newState){
-
+        this.newState = newState;
     }
 
     @Override
@@ -28,7 +28,7 @@ public class SetArmLiftPosStep extends AutoStep {
 
     @Override
     public String toString() {
-        return "Set ArmLift Position Step";
+        return "Set ArmLift State Step";
     }
     
 }

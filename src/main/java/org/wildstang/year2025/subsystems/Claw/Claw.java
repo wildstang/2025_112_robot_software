@@ -23,7 +23,7 @@ public class Claw implements Subsystem{
     //outputs
     private WsSpark clawMotor, clawMotor2;
 
-    private enum clawStates {INTAKE, OUTTAKE, IDLE}; 
+    public enum clawStates {INTAKE, OUTTAKE, IDLE}; 
     private clawStates currentState;
     private Timer timer; 
     public boolean algaeInClaw;
@@ -68,37 +68,37 @@ public class Claw implements Subsystem{
     @Override
     //  runs every 20 MS
     public void update() {
-       switch(currentState){
-        case INTAKE:
-            if(Math.abs(clawMotor.getVelocity()) < ClawConstants.CLAW_HOLD_SPEED && clawMotor.getOutputCurrent() > ClawConstants.CLAW_CURRENT_HOLD){
-                algaeInClaw = true; 
-            }
-            // clawMotor.setCurrentLimit(5, 10, 3);
-            clawMotor.setSpeed(ClawConstants.CLAW_INTAKE_SPEED);
-            clawMotor2.setSpeed(-ClawConstants.CLAW_INTAKE_SPEED);
-            break;
+        switch(currentState){
+            case INTAKE:
+                if(Math.abs(clawMotor.getVelocity()) < ClawConstants.CLAW_HOLD_SPEED && clawMotor.getOutputCurrent() > ClawConstants.CLAW_CURRENT_HOLD){
+                    algaeInClaw = true; 
+                }
+                // clawMotor.setCurrentLimit(5, 10, 3);
+                clawMotor.setSpeed(ClawConstants.CLAW_INTAKE_SPEED);
+                clawMotor2.setSpeed(-ClawConstants.CLAW_INTAKE_SPEED);
+                break;
 
-        case OUTTAKE:
-            // clawMotor.setCurrentLimit(10, 15, 3);
-            if(timer.get() > ClawConstants.OUTTAKE_TIME){
-                currentState = clawStates.IDLE;
-                timer.reset();
-                algaeInClaw = false;
-            }
-            clawMotor.setSpeed(ClawConstants.CLAW_OUTTAKE_SPEED);
-            clawMotor2.setSpeed(-ClawConstants.CLAW_OUTTAKE_SPEED);
-            break;
+            case OUTTAKE:
+                // clawMotor.setCurrentLimit(10, 15, 3);
+                if(timer.get() > ClawConstants.OUTTAKE_TIME){
+                    currentState = clawStates.IDLE;
+                    timer.reset();
+                    algaeInClaw = false;
+                }
+                clawMotor.setSpeed(ClawConstants.CLAW_OUTTAKE_SPEED);
+                clawMotor2.setSpeed(-ClawConstants.CLAW_OUTTAKE_SPEED);
+                break;
 
-        case IDLE:
-            clawMotor.setSpeed(0.0);
-            clawMotor2.setSpeed(0.0);
-            break;
+            case IDLE:
+                clawMotor.setSpeed(0.0);
+                clawMotor2.setSpeed(0.0);
+                break;
 
-        default:
-            clawMotor.setSpeed(0.0);
-            clawMotor2.setSpeed(0.0);
-            break;
-       }
+            default:
+                clawMotor.setSpeed(0.0);
+                clawMotor2.setSpeed(0.0);
+                break;
+        }
        putDashboard();
     }
 
