@@ -1,9 +1,7 @@
 package org.wildstang.year2025.robot;
 
 import org.wildstang.framework.core.AutoPrograms;
-import org.wildstang.year2025.auto.Programs.Jubilee;
-import org.wildstang.year2025.auto.Programs.Line;
-import org.wildstang.year2025.auto.Programs.TestProgram;
+import org.wildstang.year2025.auto.Programs.CenterAlgae;
 
 
 /**
@@ -14,9 +12,7 @@ public enum WsAutoPrograms implements AutoPrograms {
 
     // enumerate programs
     //SAMPLE_PROGRAM("Sample", SampleAutoProgram.class),
-    Line("Line", Line.class),
-    TEST_PROGRAM("Test Program", TestProgram.class),
-    Jubilee("Jubilee", Jubilee.class),
+    CENTER_ALGAE("Center Algae", CenterAlgae.class),
     ;
 
     /**

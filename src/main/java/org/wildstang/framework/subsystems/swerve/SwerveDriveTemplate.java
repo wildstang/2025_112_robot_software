@@ -16,6 +16,8 @@ public abstract class SwerveDriveTemplate implements Subsystem{
 
     public abstract Pose2d returnPose();
 
-    public abstract void setAutoValues(double xVelocity, double yVelocity, double xOffset, double yOffset);
+    public abstract void setAutoValues(double velocityX, double velocityY, double angVel, double xErr, double yErr, double heading);
+
+    public abstract void setPose(Pose2d pose2d);
 
 }

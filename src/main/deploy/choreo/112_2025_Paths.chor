@@ -1,0 +1,241 @@
+{
+ "name":"112_2025_Paths",
+ "version":1,
+ "type":"Swerve",
+ "variables":{
+  "expressions":{
+   "KeepOutR":{
+    "dimension":"Length",
+    "var":{
+     "exp":"0.3 m",
+     "val":0.3
+    }
+   }
+  },
+  "poses":{
+   "AlgaeEF":{
+    "x":{
+     "exp":"5.12 m",
+     "val":5.12
+    },
+    "y":{
+     "exp":"2.94 m",
+     "val":2.94
+    },
+    "heading":{
+     "exp":"-1.05 rad",
+     "val":-1.05
+    }
+   },
+   "AlgaeGH":{
+    "x":{
+     "exp":"5.75 m",
+     "val":5.75
+    },
+    "y":{
+     "exp":"4.026 m",
+     "val":4.026
+    },
+    "heading":{
+     "exp":"0 rad",
+     "val":0.0
+    }
+   },
+   "AlgaeIJ":{
+    "x":{
+     "exp":"5.12 m",
+     "val":5.12
+    },
+    "y":{
+     "exp":"5.12 m",
+     "val":5.12
+    },
+    "heading":{
+     "exp":"1.05 rad",
+     "val":1.05
+    }
+   },
+   "AlgaeKL":{
+    "x":{
+     "exp":"3.85 m",
+     "val":3.85
+    },
+    "y":{
+     "exp":"5.12 m",
+     "val":5.12
+    },
+    "heading":{
+     "exp":"2.09 rad",
+     "val":2.09
+    }
+   },
+   "BargeScore":{
+    "x":{
+     "exp":"7.75 m",
+     "val":7.75
+    },
+    "y":{
+     "exp":"5.5 m",
+     "val":5.5
+    },
+    "heading":{
+     "exp":"0 rad",
+     "val":0.0
+    }
+   },
+   "CenterStart":{
+    "x":{
+     "exp":"7.25 m",
+     "val":7.25
+    },
+    "y":{
+     "exp":"4.026 m",
+     "val":4.026
+    },
+    "heading":{
+     "exp":"0 rad",
+     "val":0.0
+    }
+   },
+   "EFStart":{
+    "x":{
+     "exp":"7.25 m",
+     "val":7.25
+    },
+    "y":{
+     "exp":"2.94 m",
+     "val":2.94
+    },
+    "heading":{
+     "exp":"0 rad",
+     "val":0.0
+    }
+   },
+   "IJStart":{
+    "x":{
+     "exp":"7.25 m",
+     "val":7.25
+    },
+    "y":{
+     "exp":"5.12 m",
+     "val":5.12
+    },
+    "heading":{
+     "exp":"0 rad",
+     "val":0.0
+    }
+   },
+   "KeepOutEF":{
+    "x":{
+     "exp":"5.21 m",
+     "val":5.21
+    },
+    "y":{
+     "exp":"3.8 m",
+     "val":3.8
+    },
+    "heading":{
+     "exp":"-1.05 rad",
+     "val":-1.05
+    }
+   },
+   "KeepOutIJ":{
+    "x":{
+     "exp":"5.21 m",
+     "val":5.21
+    },
+    "y":{
+     "exp":"4.27 m",
+     "val":4.27
+    },
+    "heading":{
+     "exp":"0 rad",
+     "val":0.0
+    }
+   },
+   "KeepOutKL":{
+    "x":{
+     "exp":"4.660809268951416 m",
+     "val":4.660809268951416
+    },
+    "y":{
+     "exp":"4.7867422294616695 m",
+     "val":4.7867422294616695
+    },
+    "heading":{
+     "exp":"0 rad",
+     "val":0.0
+    }
+   }
+  }
+ },
+ "config":{
+  "frontLeft":{
+   "x":{
+    "exp":"11 in",
+    "val":0.2794
+   },
+   "y":{
+    "exp":"11 in",
+    "val":0.2794
+   }
+  },
+  "backLeft":{
+   "x":{
+    "exp":"-11 in",
+    "val":-0.2794
+   },
+   "y":{
+    "exp":"11 in",
+    "val":0.2794
+   }
+  },
+  "mass":{
+   "exp":"150 lbs",
+   "val":68.0388555
+  },
+  "inertia":{
+   "exp":"6 kg m ^ 2",
+   "val":6.0
+  },
+  "gearing":{
+   "exp":"6.5",
+   "val":6.5
+  },
+  "radius":{
+   "exp":"2 in",
+   "val":0.0508
+  },
+  "vmax":{
+   "exp":"6000 RPM",
+   "val":628.3185307179587
+  },
+  "tmax":{
+   "exp":"1.2 N * m",
+   "val":1.2
+  },
+  "cof":{
+   "exp":"1.5",
+   "val":1.5
+  },
+  "bumper":{
+   "front":{
+    "exp":"16 in",
+    "val":0.4064
+   },
+   "side":{
+    "exp":"16 in",
+    "val":0.4064
+   },
+   "back":{
+    "exp":"16 in",
+    "val":0.4064
+   }
+  },
+  "differentialTrackWidth":{
+   "exp":"22 in",
+   "val":0.5588
+  }
+ },
+ "generationFeatures":[]
+}

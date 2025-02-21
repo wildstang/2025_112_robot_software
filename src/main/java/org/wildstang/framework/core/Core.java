@@ -18,6 +18,7 @@ import org.wildstang.framework.subsystems.SubsystemManager;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * Core of robot framework.
@@ -35,7 +36,6 @@ public class Core {
 
     private Class<?> m_inputFactoryClass;
     private Class<?> m_outputFactoryClass;
-    private static Alliance s_alliance;
 
     private static boolean isDisabled = true;
 
@@ -161,23 +161,14 @@ public class Core {
         }
     }
 
-    public static Alliance getAlliance() {
-        return s_alliance;
-    }
-
-    public static void setAlliance(Alliance alliance) {
-        s_alliance = alliance;
-    }
-
-    public static Boolean isBlue() {
-        return s_alliance == Alliance.Blue;
-    }
     public static boolean getIsDisabledMode(){
         return isDisabled;
     }
+
     public static void setIsDisabledMode(boolean state){
         isDisabled = state;
     }
+
     public static boolean isAutoLocked(){
         return s_autoManager.isAutoLocked();
     }

@@ -1,6 +1,6 @@
 package org.wildstang.year2025.subsystems.localization;
 
-
+import java.util.List;
 
 import org.photonvision.PhotonCamera;
 import org.photonvision.targeting.PhotonPipelineResult;
@@ -13,10 +13,10 @@ import edu.wpi.first.math.geometry.Transform3d;
 
 public class PoPV {
 
-    // AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
+    AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
 
     PhotonCamera liftTopCamera;
-    PhotonPipelineResult cameraResults;
+    List<PhotonPipelineResult> cameraResults;
     boolean cameraHasResult;
     PhotonTrackedTarget cameraTarget;
     Transform3d currentAprilTag;
@@ -28,13 +28,17 @@ public class PoPV {
     }
 
     public void update(){
-        cameraResults = liftTopCamera.getLatestResult();
-        cameraHasResult = cameraResults.hasTargets();
-    
-        if(cameraHasResult){
-            cameraTarget = cameraResults.getBestTarget();
-            currentAprilTag = cameraTarget.getBestCameraToTarget();
+        cameraResults = liftTopCamera.getAllUnreadResults();
+        if (!cameraResults.isEmpty()) {
+            for (int i = 0; i < cameraResults.size(); i++) {
+            cameraHasResult = cameraResults.get(i).hasTargets();
             
+                if(cameraHasResult){
+                    cameraTarget = cameraResults.get(i).getBestTarget();
+                    currentAprilTag = cameraTarget.getBestCameraToTarget();
+                    
+                }
+            }
         }
     }
 

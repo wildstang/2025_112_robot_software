@@ -12,8 +12,6 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-import org.wildstang.year2025.subsystems.arm_lift.PIDController;
-
 /**
  * Once the Main class starts this class, the VM is configured to call the
  * functions corresponding to each mode, as described in the IterativeRobotBase

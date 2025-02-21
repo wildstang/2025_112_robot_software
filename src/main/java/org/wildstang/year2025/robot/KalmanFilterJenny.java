@@ -176,7 +176,7 @@ public class KalmanFilterJenny {
         update();
 
         // Get the updated state
-        SimpleMatrix updatedState = getState();
+        // SimpleMatrix updatedState = getState();
        
 
     }

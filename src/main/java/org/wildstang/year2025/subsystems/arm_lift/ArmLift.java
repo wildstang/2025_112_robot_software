@@ -15,6 +15,8 @@ import org.wildstang.year2025.robot.WsOutputs;
 import org.wildstang.year2025.robot.WsSubsystems;
 import org.wildstang.year2025.subsystems.Claw.Claw;
 
+import com.revrobotics.spark.SparkAnalogSensor;
+
 /**
  * Interface describing a subsystem class.
  */
@@ -32,13 +34,14 @@ public class ArmLift implements Subsystem {
     private DigitalInput faceUp; // Shoot Net
     private AnalogInput leftJoyStickY;
     private AnalogInput rightJoyStickX;
-    private AnalogInput rightTrigger;
+    private AnalogInput leftTrigger;
     
     /* Lift Variables */
     private WsSpark liftMotor1;
     private WsSpark liftMotor2;
+    private SparkAnalogSensor liftPot;
     private double currentLiftPos, currentLiftVel;
-    private enum gameStates {GROUND_INTAKE, L2_ALGAE_REEF, L3_ALGAE_REEF, STORAGE, SCORE_PRELOAD, SHOOT_NET, START}; // Our Arm/Lift States
+    public enum gameStates {GROUND_INTAKE, L2_ALGAE_REEF, L3_ALGAE_REEF, STORAGE, SCORE_PRELOAD, SHOOT_NET, START}; // Our Arm/Lift States
     private gameStates gameState = gameStates.STORAGE;
     
     /* Arm Variables */
@@ -57,6 +60,7 @@ public class ArmLift implements Subsystem {
     public void init(){
         initOutput();
         initInputs();
+        liftPot = liftMotor1.getController().getAnalog();
         currentArmAngle = getArmAngle();
         currentLiftPos = getLiftHeight();
         liftRecalculateFlag = false;
@@ -90,12 +94,17 @@ public class ArmLift implements Subsystem {
         faceRight.addInputListener(this);
         faceDown = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_FACE_DOWN);
         faceDown.addInputListener(this);
-        rightTrigger = (AnalogInput) Core.getInputManager().getInput(WsInputs.DRIVER_RIGHT_TRIGGER);
-        rightTrigger.addInputListener(this);
-        // leftJoyStickY = (AnalogInput) Core.getInputManager().getInput(WsInputs.DRIVER_LEFT_JOYSTICK_Y);
+        leftTrigger = (AnalogInput) Core.getInputManager().getInput(WsInputs.DRIVER_LEFT_TRIGGER);
+        leftTrigger.addInputListener(this);
+        leftJoyStickY = (AnalogInput) Core.getInputManager().getInput(WsInputs.DRIVER_LEFT_JOYSTICK_Y);
         // leftJoyStickY.addInputListener(this);
-        // rightJoyStickX = (AnalogInput) Core.getInputManager().getInput(WsInputs.DRIVER_RIGHT_JOYSTICK_X);
+        rightJoyStickX = (AnalogInput) Core.getInputManager().getInput(WsInputs.DRIVER_RIGHT_JOYSTICK_X);
         // rightJoyStickX.addInputListener(this);
+    }
+    
+    @Override
+    public void initSubsystems() {
+        claw = (Claw) Core.getSubsystemManager().getSubsystem(WsSubsystems.CLAW);
     }
 
     public void inputUpdate(Input source){
@@ -108,7 +117,7 @@ public class ArmLift implements Subsystem {
             setGameState(gameStates.L3_ALGAE_REEF);
         } else if (faceUp.getValue()) {
             setGameState(gameStates.SHOOT_NET);
-        } else if (rightTrigger.getValue() > 0) {
+        } else if (leftTrigger.getValue() != 0) {
             setGameState(gameStates.GROUND_INTAKE);
         }
     }
@@ -175,6 +184,7 @@ public class ArmLift implements Subsystem {
     }
 
     private void putDashboard(){
+        SmartDashboard.putNumber("Lift Pot Voltage", liftPot.getPosition());
         SmartDashboard.putNumber("Current Arm Angle", getArmAngle());
         SmartDashboard.putNumber("Current Lift Height", getLiftHeight());
         SmartDashboard.putNumber("Arm control output", armControlOutput(currentArmAngle, currentArmVel));
@@ -340,11 +350,6 @@ public class ArmLift implements Subsystem {
     @Override
     public void resetState() {
         gameState = gameStates.STORAGE;
-    }
-
-    @Override
-    public void initSubsystems() {
-        claw = (Claw) Core.getSubsystemManager().getSubsystem(WsSubsystems.CLAW);
     }
 
     @Override

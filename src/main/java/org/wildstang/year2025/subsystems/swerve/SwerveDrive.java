@@ -4,10 +4,8 @@ import com.ctre.phoenix6.hardware.Pigeon2;
 import com.revrobotics.spark.SparkAnalogSensor;
 import com.revrobotics.spark.SparkLimitSwitch;
 
-// import org.photonvision.PhotonUtils;
 import org.wildstang.framework.core.Core;
 import org.wildstang.framework.io.inputs.Input;
-// import org.wildstang.framework.logger.Log;
 import org.wildstang.framework.io.inputs.AnalogInput;
 import org.wildstang.framework.io.inputs.DigitalInput;
 import org.wildstang.framework.subsystems.swerve.SwerveDriveTemplate;
@@ -15,19 +13,13 @@ import org.wildstang.hardware.roborio.outputs.WsSpark;
 import org.wildstang.year2025.robot.CANConstants;
 import org.wildstang.year2025.robot.WsInputs;
 import org.wildstang.year2025.robot.WsOutputs;
-// import org.wildstang.year2025.subsystems.localization.WsVision;
 
 import edu.wpi.first.math.geometry.Pose2d;
-// import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
-// import edu.wpi.first.math.geometry.Pose2d;
-// import edu.wpi.first.math.geometry.Rotation2d;
-// import edu.wpi.first.math.geometry.Translation2d;
-// import edu.wpi.first.math.kinematics.ChassisSpeeds;
-// import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-// import edu.wpi.first.math.kinematics.SwerveModulePosition;
-// import edu.wpi.first.math.kinematics.SwerveModuleState;
-// import edu.wpi.first.wpilibj.DriverStation;
-// import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**Class: SwerveDrive
@@ -40,18 +32,10 @@ public class SwerveDrive extends SwerveDriveTemplate {
     private AnalogInput leftStickX;  // translation joystick x
     private AnalogInput leftStickY;  // translation joystick y
     private AnalogInput rightStickX;  // rot joystick
-    private AnalogInput rightTrigger;  //speed derate 
-    // private DigitalInput leftBumper, rightBumper;  // intake, shoot
+    private AnalogInput leftTrigger;  //speed derate 
     private DigitalInput select;  // gyro reset
-    private DigitalInput start;  // 
-    private DigitalInput faceUp;  // rotation lock 0 degrees
-    private DigitalInput faceRight;  // rotation lock 90 degrees
-    private DigitalInput faceLeft;  // rotation lock 270 degrees
-    private DigitalInput faceDown;  // rotation lock 180 degrees
-    // private DigitalInput dpadUp;
-    private DigitalInput leftStickButton;
 
-    private SparkLimitSwitch pixyDio;
+    private SparkLimitSwitch pixyDigital;
     private SparkAnalogSensor pixyAnalog;
 
     private double xOutput;
@@ -60,31 +44,23 @@ public class SwerveDrive extends SwerveDriveTemplate {
     private double xSpeed;
     private double ySpeed;
     private double wSpeed;
-    // private double thrustValue;
     private double derateValue;
     private boolean rotLocked;
     private double rotTarget;
-    private double pathXErr;
-    private double pathYErr;
-    // private double curX, curY, curTheta;
+    private double pathXTarget;
+    private double pathYTarget;
 
     public final Pigeon2 gyro = new Pigeon2(CANConstants.GYRO);
     public SwerveModule[] modules;
     private SwerveSignal swerveSignal;
     private WsSwerveHelper swerveHelper = new WsSwerveHelper();
-    // private SwerveDrivePoseEstimator poseEstimator;
+    private SwerveDrivePoseEstimator poseEstimator;
 
-    // ChassisSpeeds chassisSpeeds;
-    // SwerveDriveKinematics swerveKinematics;
-    // SwerveModuleState[] moduleStates = new SwerveModuleState[4];
-    // private WsVision pvCam;
-    // private double targetYaw;
+    SwerveDriveKinematics swerveKinematics;
 
     public enum driveType {TELEOP, AUTO};
     public driveType driveState;
-    private boolean isBlueAlliance;
-    // private Pose2d curPose;
-    public boolean sensorOverride;
+    private Pose2d curPose;
 
     private static final double DEG_TO_RAD = Math.PI / 180.0;
     private static final double RAD_TO_DEG = 180.0 / Math.PI;
@@ -98,41 +74,19 @@ public class SwerveDrive extends SwerveDriveTemplate {
     }
 
     public void initInputs() {
-        // pvCam = (WsVision) Core.getSubsystemManager().getSubsystem("Ws Vision");
-
         leftStickX = (AnalogInput) Core.getInputManager().getInput(WsInputs.DRIVER_LEFT_JOYSTICK_X);
         leftStickX.addInputListener(this);
         leftStickY = (AnalogInput) Core.getInputManager().getInput(WsInputs.DRIVER_LEFT_JOYSTICK_Y);
         leftStickY.addInputListener(this);
         rightStickX = (AnalogInput) Core.getInputManager().getInput(WsInputs.DRIVER_RIGHT_JOYSTICK_X);
         rightStickX.addInputListener(this);
-        rightTrigger = (AnalogInput) Core.getInputManager().getInput(WsInputs.DRIVER_RIGHT_TRIGGER);
-        rightTrigger.addInputListener(this);
-        // leftTrigger = (AnalogInput) Core.getInputManager().getInput(WsInputs.DRIVER_LEFT_TRIGGER);
-        // leftTrigger.addInputListener(this);
-        // rightBumper = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_RIGHT_SHOULDER);
-        // rightBumper.addInputListener(this);
-        // leftBumper = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_LEFT_SHOULDER);
-        // leftBumper.addInputListener(this);
+        leftTrigger = (AnalogInput) Core.getInputManager().getInput(WsInputs.DRIVER_LEFT_TRIGGER);
+        leftTrigger.addInputListener(this);
         select = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_SELECT);
         select.addInputListener(this);
-        start = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_START);
-        start.addInputListener(this);
-        // faceUp = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_FACE_UP);
-        // faceUp.addInputListener(this);
-        // faceLeft = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_FACE_LEFT);
-        // faceLeft.addInputListener(this);
-        // faceRight = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_FACE_RIGHT);
-        // faceRight.addInputListener(this);
-        // faceDown = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_FACE_DOWN);
-        // faceDown.addInputListener(this);
-        // dpadUp = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_DPAD_UP);
-        // dpadUp.addInputListener(this);
-        // leftStickButton = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_LEFT_JOYSTICK_BUTTON);
-        // leftStickButton.addInputListener(this);
 
         WsSpark clawMotor = (WsSpark) Core.getOutputManager().getOutput(WsOutputs.CLAWMOTOR);
-        pixyDio = clawMotor.getController().getForwardLimitSwitch();
+        pixyDigital = clawMotor.getController().getForwardLimitSwitch();
         pixyAnalog = clawMotor.getController().getAnalog();
     }
 
@@ -149,29 +103,27 @@ public class SwerveDrive extends SwerveDriveTemplate {
                 (WsSpark) Core.getOutputManager().getOutput(WsOutputs.ANGLE4), DriveConstants.REAR_RIGHT_OFFSET)
         };
 
-        // swerveKinematics = new SwerveDriveKinematics(new Translation2d(DriveConstants.ROBOT_WIDTH/2, DriveConstants.ROBOT_LENGTH/2), new Translation2d(DriveConstants.ROBOT_WIDTH/2, -DriveConstants.ROBOT_LENGTH/2), new Translation2d(-DriveConstants.ROBOT_WIDTH/2, DriveConstants.ROBOT_LENGTH/2), new Translation2d(-DriveConstants.ROBOT_WIDTH/2, -DriveConstants.ROBOT_LENGTH/2));
+        swerveKinematics = new SwerveDriveKinematics(new Translation2d(DriveConstants.ROBOT_WIDTH/2, DriveConstants.ROBOT_LENGTH/2), new Translation2d(DriveConstants.ROBOT_WIDTH/2, -DriveConstants.ROBOT_LENGTH/2), new Translation2d(-DriveConstants.ROBOT_WIDTH/2, DriveConstants.ROBOT_LENGTH/2), new Translation2d(-DriveConstants.ROBOT_WIDTH/2, -DriveConstants.ROBOT_LENGTH/2));
         //create default swerveSignal
         swerveSignal = new SwerveSignal(new double[]{0.0, 0.0, 0.0, 0.0}, new double[]{0.0, 0.0, 0.0, 0.0});
-        // poseEstimator = new SwerveDrivePoseEstimator(swerveKinematics, odoAngle(), odoPosition(), new Pose2d());
+        poseEstimator = new SwerveDrivePoseEstimator(swerveKinematics, odoAngle(), odoPosition(), new Pose2d());
+    }
+
+    @Override
+    public void initSubsystems(){
     }
 
     @Override
     public void inputUpdate(Input source) {
-        if (source == leftStickButton && leftStickButton.getValue()) sensorOverride = !sensorOverride;
-        
-        else driveState = driveType.TELEOP;
+        driveState = driveType.TELEOP;
         
         // reset gyro when facing away from alliance station
         if (source == select && select.getValue()) {
-            if (isBlueAlliance) {
-                gyro.setYaw(0.0);  // away from alliance station is 0 rad on blue alliance
-                rotTarget = 0.0;
+            if (Core.isBlueAlliance()) {
+                setGyro(0);
             } else {
-                gyro.setYaw(Math.PI * RAD_TO_DEG);  // away from alliance station is pi rad on red alliance
-                rotTarget = Math.PI;
+                setGyro(Math.PI);
             }
-        } else if (source == start && start.getValue()) {
-            // setGyro(getPosTheta());
         }
 
         // get x and y speeds
@@ -181,33 +133,9 @@ public class SwerveDrive extends SwerveDriveTemplate {
         yOutput = swerveHelper.scaleDeadband(-leftStickX.getValue(), DriveConstants.DEADBAND);  // joystick x value corresonds to driving sideways in the opposite direction, i.e. pushing the stick to the drivers left (stick -X) should make the robot drive towards the 
 
         // reverse x/y directions if on red alliance to match field coordinate system
-        if (!isBlueAlliance) {
+        if (!Core.isBlueAlliance()) {
             xOutput *= -1;
             yOutput *= -1;
-        }
-
-        if ((source == faceUp && faceUp.getValue()) || (source == faceRight && faceRight.getValue()) || (source == faceDown && faceDown.getValue()) || (source == faceLeft && faceLeft.getValue())){
-            if (faceUp.getValue()){
-                if (faceLeft.getValue()){
-                    rotTarget = Math.PI / 4.0;
-                } else if (faceRight.getValue()){ 
-                    rotTarget = 7.0 * Math.PI / 4.0;
-                } else  rotTarget = 0.0;
-            } else if (faceDown.getValue()){
-                if (faceLeft.getValue()){
-                    rotTarget = 3.0 * Math.PI / 4.0;
-                } else if (faceRight.getValue()){ 
-                    rotTarget = 5.0 * Math.PI / 4.0;
-                } else  rotTarget = Math.PI;
-            } else if (faceLeft.getValue()){
-                rotTarget = Math.PI / 2.0;
-            } else if (faceRight.getValue()){
-                rotTarget = 3.0 * Math.PI / 2.0;
-            }
-            rotLocked = true;
-            if (!isBlueAlliance) {
-                rotTarget = (rotTarget + Math.PI) % (2.0 * Math.PI);  // flip rotation target if on red alliance to match field coordinate system
-            }
         }
 
         //get rotational joystick
@@ -222,43 +150,27 @@ public class SwerveDrive extends SwerveDriveTemplate {
             rotOutput *= DriveConstants.ROTATION_SPEED;
             rotLocked = false;
         } 
-        // else if (rotLocked == false) {
-        //     rotTarget = getGyroAngle();
-        //     rotLocked = true;
-        // }
+        else if (rotLocked == false) {
+            rotTarget = getGyroAngle();
+            rotLocked = true;
+        }
         
         //assign thrust
-        // thrustValue = 1 - DriveConstants.DRIVE_THRUST + DriveConstants.DRIVE_THRUST * Math.abs(rightTrigger.getValue());
-        // derateValue = (DriveConstants.DRIVE_DERATE * Math.abs(leftTrigger.getValue()) + 1);
-        // xOutput *= thrustValue/derateValue;
-        // yOutput *= thrustValue/derateValue;
-        // rotOutput *= thrustValue/derateValue;
-
+        derateValue = (DriveConstants.DRIVE_DERATE * Math.abs(leftTrigger.getValue()) + 1);
+        xOutput /= derateValue;
+        yOutput /= derateValue;
+        rotOutput /= derateValue;
     }
     
     @Override
     public void resetState() {
         setToTeleop();
-        rotTarget = getGyroAngle();
-        sensorOverride = false;
-        // isBlueAlliance = DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue;
-        // goalPose = FieldConstants.BLUE_AMP;
-        // curX = 0.0;
-        // curY = 0.0;
-        // curTheta = 0.0;
     }
 
     @Override
     public void update() {
-        // isBlueAlliance = DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue;
-        
-        // poseEstimator.update(odoAngle(), odoPosition());
-        // targetYaw = pvCam.getYaw();
-        // pvCam.odometryUpdate(poseEstimator);
-        // curPose = poseEstimator.getEstimatedPosition();
-        // for(int i = 0; i < modules.length; i++){
-        //     moduleStates[i] = modules[i].getModuleState();
-        // }
+        poseEstimator.update(odoAngle(), odoPosition());
+        curPose = poseEstimator.getEstimatedPosition();
 
         switch (driveState) {
             case TELEOP:
@@ -266,8 +178,8 @@ public class SwerveDrive extends SwerveDriveTemplate {
                 break;
             case AUTO:
                 rotOutput = wSpeed * DriveConstants.DRIVE_F_ROT + swerveHelper.getRotControl(rotTarget, getGyroAngle());
-                xOutput = xSpeed * DriveConstants.DRIVE_F_K + pathXErr * DriveConstants.POS_P;
-                yOutput = ySpeed * DriveConstants.DRIVE_F_K + pathYErr * DriveConstants.POS_P;
+                xOutput = xSpeed * DriveConstants.DRIVE_F_K + (pathXTarget - curPose.getX()) * DriveConstants.POS_P;
+                yOutput = ySpeed * DriveConstants.DRIVE_F_K + (pathYTarget - curPose.getY()) * DriveConstants.POS_P;
                 break;
         }
         
@@ -285,30 +197,13 @@ public class SwerveDrive extends SwerveDriveTemplate {
         SmartDashboard.putNumber("Auto x velocity", xSpeed);
         SmartDashboard.putNumber("Auto y velocity", ySpeed);
         SmartDashboard.putNumber("Auto ang velocity", wSpeed);
-        SmartDashboard.putNumber("Auto x pos", pathXErr);
-        SmartDashboard.putNumber("Auto y pos", pathYErr);
-        // SmartDashboard.putNumber("pose x", getPosX());
-        // SmartDashboard.putNumber("pose y", getPosY());
-        // SmartDashboard.putNumber("pose theta", getPosTheta());
+        SmartDashboard.putNumber("Auto x pos", pathXTarget);
+        SmartDashboard.putNumber("Auto y pos", pathYTarget);
         SmartDashboard.putNumber("rot target", rotTarget);
-        SmartDashboard.putBoolean("Blue Alliance", isBlueAlliance);
-        // SmartDashboard.putString("cur pose", curPose.toString());
-    }
-    
-    @Override
-    public void selfTest() {
-    }
-
-    @Override
-    public String getName() {
-        return "Swerve Drive";
-    }
-
-    /** resets the drive encoders on each module */
-    public void resetDriveEncoders() {
-        for (int i = 0; i < modules.length; i++) {
-            modules[i].resetDriveEncoders();
-        }
+        SmartDashboard.putBoolean("Blue Alliance", Core.isBlueAlliance());
+        SmartDashboard.putString("cur pose", curPose.toString());
+        SmartDashboard.putNumber("Pixy Voltage", pixyAnalog.getVoltage());
+        SmartDashboard.putBoolean("Pixy Obj Det", pixyDigital.isPressed());
     }
 
     /** sets the drive to teleop/cross, and sets drive motors to coast */
@@ -320,7 +215,8 @@ public class SwerveDrive extends SwerveDriveTemplate {
         rotOutput = 0;
         xOutput = 0;
         yOutput = 0;
-        rotLocked = false;
+        rotTarget = getGyroAngle();
+        rotLocked = true;
     }
 
     /**sets the drive to autonomous */
@@ -332,8 +228,8 @@ public class SwerveDrive extends SwerveDriveTemplate {
         xSpeed = 0;
         ySpeed = 0;
         wSpeed = 0;
-        pathXErr = 0;
-        pathYErr = 0;
+        pathXTarget = curPose.getX();
+        pathYTarget = curPose.getY();
         rotTarget = getGyroAngle();
     }
 
@@ -346,17 +242,13 @@ public class SwerveDrive extends SwerveDriveTemplate {
     }
 
     @Override
-    public void setAutoValues(double in1, double in2, double in3, double in4) {
-
-    }
-
     /**sets autonomous values from the path data file */
-    public void setAutoValues(double velocityX, double velocityY, double angVel, double xErr, double yErr, double heading) {
+    public void setAutoValues(double velocityX, double velocityY, double angVel, double xTarget, double yTarget, double heading) {
         xSpeed = velocityX;
         ySpeed = velocityY;
         wSpeed = angVel;
-        pathXErr = xErr;
-        pathYErr = yErr;
+        pathXTarget = xTarget;
+        pathYTarget = yTarget;
         rotTarget = heading;
     }
 
@@ -379,50 +271,28 @@ public class SwerveDrive extends SwerveDriveTemplate {
         return (((gyro.getYaw().getValueAsDouble() * DEG_TO_RAD) % (2.0 * Math.PI)) + 2.0 * Math.PI) % (2.0 * Math.PI);
     }
 
-    // public Rotation2d odoAngle(){
-    //     return new Rotation2d(getGyroAngle());
-    // }
+    public Rotation2d odoAngle(){
+        return new Rotation2d(getGyroAngle());
+    }
 
-    // public SwerveModulePosition[] odoPosition(){
-    //     return new SwerveModulePosition[]{modules[0].odoPosition(), modules[1].odoPosition(), modules[2].odoPosition(), modules[3].odoPosition()};
-    // }
+    public SwerveModulePosition[] odoPosition(){
+        return new SwerveModulePosition[]{modules[0].odoPosition(), modules[1].odoPosition(), modules[2].odoPosition(), modules[3].odoPosition()};
+    }
 
-    // public void setPose(Pose2d pos){
-    //     this.poseEstimator.resetPosition(odoAngle(), odoPosition(), pos);
-    // }
+    public void setPose(Pose2d pos){
+        this.poseEstimator.resetPosition(odoAngle(), odoPosition(), pos);
+    }
 
     public Pose2d returnPose(){
-        // return poseEstimator.getEstimatedPosition();
-        return new Pose2d();
+        return curPose;
     }
-
-    // public double getPosX(){
-    //     double newX = poseEstimator.getEstimatedPosition().getX();
-    //     if (!Double.isNaN(newX)) curX = newX;
-    //     return curX;
-    // }
-
-    // public double getPosY(){
-    //     double newY = poseEstimator.getEstimatedPosition().getY();
-    //     if (!Double.isNaN(newY)) curY = newY;
-    //     return curY;
-    // }
-
-    // public double getPosTheta(){
-    //     double newTheta = (2.0 * Math.PI + (poseEstimator.getEstimatedPosition().getRotation().getRadians() % (2.0 * Math.PI))) % (2.0 * Math.PI);
-    //     if (!Double.isNaN(newTheta)) curTheta = newTheta;
-    //     return curTheta;
-    // }
-
-    // public Boolean isAtTarget(){
-    //     if (sensorOverride) return true;
-    //     return true;
-    // }
+    
+    @Override
+    public void selfTest() {
+    }
 
     @Override
-    public void initSubsystems(){
-
+    public String getName() {
+        return "Swerve Drive";
     }
-
-    
 }
