@@ -7,20 +7,20 @@
    "KeepOutR":{
     "dimension":"Length",
     "var":{
-     "exp":"0.3 m",
-     "val":0.3
+     "exp":"1 m",
+     "val":1.0
     }
    }
   },
   "poses":{
    "AlgaeEF":{
     "x":{
-     "exp":"5.12 m",
-     "val":5.12
+     "exp":"5.22 m",
+     "val":5.22
     },
     "y":{
-     "exp":"2.94 m",
-     "val":2.94
+     "exp":"2.81 m",
+     "val":2.81
     },
     "heading":{
      "exp":"-1.05 rad",
@@ -29,8 +29,8 @@
    },
    "AlgaeGH":{
     "x":{
-     "exp":"5.75 m",
-     "val":5.75
+     "exp":"5.9 m",
+     "val":5.9
     },
     "y":{
      "exp":"4.026 m",
@@ -43,12 +43,12 @@
    },
    "AlgaeIJ":{
     "x":{
-     "exp":"5.12 m",
-     "val":5.12
+     "exp":"5.22 m",
+     "val":5.22
     },
     "y":{
-     "exp":"5.12 m",
-     "val":5.12
+     "exp":"5.24 m",
+     "val":5.24
     },
     "heading":{
      "exp":"1.05 rad",
@@ -57,12 +57,12 @@
    },
    "AlgaeKL":{
     "x":{
-     "exp":"3.85 m",
-     "val":3.85
+     "exp":"3.75 m",
+     "val":3.75
     },
     "y":{
-     "exp":"5.12 m",
-     "val":5.12
+     "exp":"5.23 m",
+     "val":5.23
     },
     "heading":{
      "exp":"2.09 rad",
@@ -75,8 +75,8 @@
      "val":7.75
     },
     "y":{
-     "exp":"5.5 m",
-     "val":5.5
+     "exp":"5.6 m",
+     "val":5.6
     },
     "heading":{
      "exp":"0 rad",
@@ -103,8 +103,8 @@
      "val":7.25
     },
     "y":{
-     "exp":"2.94 m",
-     "val":2.94
+     "exp":"AlgaeEF.y",
+     "val":2.81
     },
     "heading":{
      "exp":"0 rad",
@@ -117,50 +117,22 @@
      "val":7.25
     },
     "y":{
-     "exp":"5.12 m",
-     "val":5.12
+     "exp":"AlgaeIJ.y",
+     "val":5.24
     },
     "heading":{
      "exp":"0 rad",
      "val":0.0
     }
    },
-   "KeepOutEF":{
+   "KeepOutReef":{
     "x":{
-     "exp":"5.21 m",
-     "val":5.21
+     "exp":"4.48945 m",
+     "val":4.48945
     },
     "y":{
-     "exp":"3.8 m",
-     "val":3.8
-    },
-    "heading":{
-     "exp":"-1.05 rad",
-     "val":-1.05
-    }
-   },
-   "KeepOutIJ":{
-    "x":{
-     "exp":"5.21 m",
-     "val":5.21
-    },
-    "y":{
-     "exp":"4.27 m",
-     "val":4.27
-    },
-    "heading":{
-     "exp":"0 rad",
-     "val":0.0
-    }
-   },
-   "KeepOutKL":{
-    "x":{
-     "exp":"4.660809268951416 m",
-     "val":4.660809268951416
-    },
-    "y":{
-     "exp":"4.7867422294616695 m",
-     "val":4.7867422294616695
+     "exp":"4.026 m",
+     "val":4.026
     },
     "heading":{
      "exp":"0 rad",
