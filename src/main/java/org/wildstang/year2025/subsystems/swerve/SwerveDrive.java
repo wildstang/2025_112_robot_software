@@ -13,6 +13,8 @@ import org.wildstang.hardware.roborio.outputs.WsSpark;
 import org.wildstang.year2025.robot.CANConstants;
 import org.wildstang.year2025.robot.WsInputs;
 import org.wildstang.year2025.robot.WsOutputs;
+import org.wildstang.year2025.robot.WsSubsystems;
+import org.wildstang.year2025.subsystems.Claw.Claw;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
@@ -57,8 +59,9 @@ public class SwerveDrive extends SwerveDriveTemplate {
     private SwerveDrivePoseEstimator poseEstimator;
 
     SwerveDriveKinematics swerveKinematics;
+    private Claw claw;
 
-    public enum driveType {TELEOP, AUTO, INTAKE};
+    public enum driveType {TELEOP, AUTO, GROUND_INTAKE};
     public driveType driveState;
     private Pose2d curPose;
 
@@ -71,6 +74,7 @@ public class SwerveDrive extends SwerveDriveTemplate {
         initOutputs();
         resetState();
         gyro.setYaw(0.0);
+        claw = (Claw) Core.getSubsystemManager().getSubsystem(WsSubsystems.CLAW);
     }
 
     public void initInputs() {
@@ -143,7 +147,7 @@ public class SwerveDrive extends SwerveDriveTemplate {
         
         if(leftTrigger.getValue() != 0){
             if (algaeInView()){
-                 driveState = driveType.INTAKE;
+                 driveState = driveType.GROUND_INTAKE;
             }
          }else if(rotOutput != 0){
              driveState = driveType.TELEOP;
@@ -187,7 +191,10 @@ public class SwerveDrive extends SwerveDriveTemplate {
                 xOutput = xSpeed * DriveConstants.DRIVE_F_K + (pathXTarget - curPose.getX()) * DriveConstants.POS_P;
                 yOutput = ySpeed * DriveConstants.DRIVE_F_K + (pathYTarget - curPose.getY()) * DriveConstants.POS_P;
                 break;
-            case INTAKE:
+            case GROUND_INTAKE:
+                if(claw.algaeInClaw){
+                    driveState = driveType.TELEOP;
+                }
                 rotLocked = true;
                 rotTarget =  ((1.0 - pixyAnalog.getVoltage()) * 0.524 + getGyroAngle() + 2.0 * Math.PI) % (2.0 * Math.PI);
                 rotOutput = swerveHelper.getRotControl(rotTarget, getGyroAngle());
