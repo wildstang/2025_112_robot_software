@@ -40,7 +40,7 @@ public class LedSubsystem implements Subsystem {
     private int flashColor = 2;
     private int flashHalf = 1;
     private int flashSpeedOne = 5;
-    private int flashSpeedTwo = 10;
+    private int flashSpeedTwo = 6;
     private int currentColor = 0;
     private DigitalInput leftStick;
     private DigitalInput rightStick;
@@ -59,6 +59,12 @@ public class LedSubsystem implements Subsystem {
             doFlash = 1;
             k = 0;
             c = 0;
+            if (flashColor == 1){
+                flashColor = 2;
+            }
+            else if (flashColor == 2){
+                flashColor = 1;
+            }
         }
     }
 
