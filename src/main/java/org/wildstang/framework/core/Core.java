@@ -254,16 +254,15 @@ public class Core {
      * @return Stored Alliance value or null if not present.
      * @see <a href="https://docs.wpilib.org/en/stable/docs/software/basic-programming/alliancecolor.html">WPILib Get Alliance Color</a>
      */
-    public static Alliance getAlliance() {
+    private static Alliance getAlliance() {
         if (Core.alliance == null) {
             Optional<Alliance> alliance = DriverStation.getAlliance();
             if (alliance.isPresent()) {
                 Core.alliance = alliance.get();
                 Log.info("Alliance updated to " + Core.alliance.toString());
                 SmartDashboard.putBoolean("FMS Alliance Received", true);
-            }
-            else {
-                Log.warn("No Alliance could be retrieved from DriverStation");
+            } else {
+                // Log.warn("No Alliance could be retrieved from DriverStation");
                 SmartDashboard.putBoolean("FMS Alliance Received", false);
             }
         }

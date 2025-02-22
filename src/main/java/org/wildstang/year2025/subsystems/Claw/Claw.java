@@ -28,9 +28,6 @@ public class Claw implements Subsystem{
     private Timer timer; 
     public boolean algaeInClaw;
 
-
-
-
     @Override
     //Called everytime an input/buttons is pressed
     public void inputUpdate(Input source) {
@@ -99,7 +96,6 @@ public class Claw implements Subsystem{
        putDashboard();
     }
 
-
     public void setGameState(clawStates desiredState){
         if(desiredState != currentState){
             switch(desiredState){
@@ -117,10 +113,12 @@ public class Claw implements Subsystem{
             }
         }
     }
+
     private void putDashboard(){
         SmartDashboard.putString("Claw State", currentState.name());
         SmartDashboard.putBoolean("Algae in claw", algaeInClaw);
     }
+
     @Override
     //reseting everything
     public void resetState() {
@@ -129,15 +127,11 @@ public class Claw implements Subsystem{
 
     @Override
     public void selfTest() {
-        // TODO Auto-generated method stub
-        // throw new UnsupportedOperationException("Unimplemented method 'selfTest'");
         return;
     }
 
     @Override
     public void initSubsystems() {
-        // TODO Auto-generated method stub
-        // throw new UnsupportedOperationException("Unimplemented method 'initSubsystems'");
         return;
     }
 
