@@ -226,13 +226,13 @@ public class LedSubsystem implements Subsystem {
         }
         // TODO Auto-generated method stub
         if (colorFn == 0){ //Standard coloring
-
+            NormalBlue();
         }
         else if (colorFn == 1){ //Intake State, maybe outtake with red
             Flash();
         }
         else if (colorFn == 2){ //Vision detects algae
-
+            NormalGreen();
         }
 
     }
