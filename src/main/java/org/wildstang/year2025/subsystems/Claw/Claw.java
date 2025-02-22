@@ -23,7 +23,7 @@ public class Claw implements Subsystem{
     //outputs
     private WsSpark clawMotor, clawMotor2;
 
-    public enum clawStates {INTAKE, OUTTAKE, IDLE}; 
+    public enum clawStates {INTAKE, OUTTAKE, IDLE, HOLD}; 
     private clawStates currentState;
     private Timer timer; 
     public boolean algaeInClaw;
@@ -64,12 +64,18 @@ public class Claw implements Subsystem{
     public void update() {
        switch(currentState){
         case INTAKE:
-            if(Math.abs(clawMotor.getVelocity()) < ClawConstants.CLAW_HOLD_SPEED && clawMotor.getOutputCurrent() > ClawConstants.CLAW_CURRENT_HOLD){
+            if(Math.abs(clawMotor.getVelocity()) == 0.0 && clawMotor.getOutputCurrent() > ClawConstants.CLAW_CURRENT_HOLD){
                 algaeInClaw = true; 
             }
+            if(algaeInClaw){
+                clawMotor.setSpeed(ClawConstants.CLAW_HOLD_SPEED);
+                clawMotor2.setSpeed(-ClawConstants.CLAW_HOLD_SPEED);
+            }
+            else{
             // clawMotor.setCurrentLimit(5, 10, 3);
             clawMotor.setSpeed(ClawConstants.CLAW_INTAKE_SPEED);
             clawMotor2.setSpeed(-ClawConstants.CLAW_INTAKE_SPEED);
+            }
             break;
 
         case OUTTAKE:
@@ -107,6 +113,9 @@ public class Claw implements Subsystem{
                     break;
                 case IDLE:
                     currentState = clawStates.IDLE;
+                    break;
+                case HOLD:
+                    currentState = clawStates.HOLD; 
                     break;
                 default:
                     break;
