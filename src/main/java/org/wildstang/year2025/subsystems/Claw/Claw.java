@@ -27,18 +27,19 @@ public class Claw implements Subsystem{
     private clawStates currentState;
     private Timer timer; 
     public boolean algaeInClaw;
+    private int algaeHoldCount;
 
     @Override
     //Called everytime an input/buttons is pressed
     public void inputUpdate(Input source) {
-       if(leftTrigger.getValue() != 0){
-        setGameState(clawStates.INTAKE);
-       }
-       else if (rightBumper.getValue()){
-        setGameState(clawStates.OUTTAKE);
-        timer.reset();
-        timer.start();
-       }
+        if(leftTrigger.getValue() != 0){
+            setGameState(clawStates.INTAKE);
+        }
+        else if (rightBumper.getValue()){
+            setGameState(clawStates.OUTTAKE);
+            timer.reset();
+            timer.start();
+        }
     }
 
     @Override
@@ -57,15 +58,23 @@ public class Claw implements Subsystem{
 
         algaeInClaw = false;
         currentState = clawStates.IDLE;
+        algaeHoldCount = 0;
     }
 
     @Override
     //  runs every 20 MS
     public void update() {
+        SmartDashboard.putNumber("claw velocity", clawMotor.getVelocity());
+        SmartDashboard.putNumber("claw current", clawMotor.getOutputCurrent());
        switch(currentState){
         case INTAKE:
-            if(Math.abs(clawMotor.getVelocity()) == 0.0 && clawMotor.getOutputCurrent() > ClawConstants.CLAW_CURRENT_HOLD){
-                algaeInClaw = true; 
+            if(Math.abs(clawMotor.getVelocity()) < 1.0 && clawMotor.getOutputCurrent() > ClawConstants.CLAW_HOLD_CURRENT){
+                algaeHoldCount++;
+                if (algaeHoldCount >= 10){
+                    algaeInClaw = true;
+                }
+            } else {
+                algaeHoldCount = 0;
             }
             if(algaeInClaw){
                 clawMotor.setSpeed(ClawConstants.CLAW_HOLD_SPEED);
@@ -126,6 +135,7 @@ public class Claw implements Subsystem{
     private void putDashboard(){
         SmartDashboard.putString("Claw State", currentState.name());
         SmartDashboard.putBoolean("Algae in claw", algaeInClaw);
+        
     }
 
     @Override

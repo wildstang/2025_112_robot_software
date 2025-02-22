@@ -51,8 +51,8 @@ public final class ArmLiftConstants {
     public static final double STORAGE_LIFT_HEIGHT = 0.10;
 
     //Intaking
-    public static final double GROUND_INTAKE_RIGHT_ANGLE = 1.1;  // radians
-    public static final double GROUND_INTAKE_LIFT_HEIGHT = 0.08;  // meters
+    public static final double GROUND_INTAKE_RIGHT_ANGLE = 1.2;  // radians
+    public static final double GROUND_INTAKE_LIFT_HEIGHT = 0.05;  // meters
 /* ------------------------------------------------------------------- */
 
 /* ---------------ARM AND LIFT BOUND CHECKING -------------*/

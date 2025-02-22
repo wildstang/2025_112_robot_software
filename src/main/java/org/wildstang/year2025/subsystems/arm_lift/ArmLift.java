@@ -315,7 +315,7 @@ public class ArmLift implements Subsystem {
                 case GROUND_INTAKE:
                     gameState = gameStates.GROUND_INTAKE;
                     armSetpoint = ArmLiftConstants.GROUND_INTAKE_RIGHT_ANGLE;
-                    armSetpoint = ArmLiftConstants.GROUND_INTAKE_LIFT_HEIGHT;
+                    liftSetpoint = ArmLiftConstants.GROUND_INTAKE_LIFT_HEIGHT;
                     break;
                 case STORAGE:
                     gameState = gameStates.STORAGE;

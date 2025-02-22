@@ -189,7 +189,7 @@ public class SwerveDrive extends SwerveDriveTemplate {
                 break;
             case INTAKE:
                 rotLocked = true;
-                rotTarget =  ((1.65 - pixyAnalog.getVoltage())/1.65 * 0.524 + getGyroAngle() + 2.0 * Math.PI) % (2.0 * Math.PI);
+                rotTarget =  ((1.0 - pixyAnalog.getVoltage()) * 0.524 + getGyroAngle() + 2.0 * Math.PI) % (2.0 * Math.PI);
                 rotOutput = swerveHelper.getRotControl(rotTarget, getGyroAngle());
                 break; 
         }
@@ -198,7 +198,7 @@ public class SwerveDrive extends SwerveDriveTemplate {
         xOutput = Math.min(Math.max(xOutput, -1.0), 1.0);
         yOutput = Math.min(Math.max(yOutput, -1.0), 1.0);
         this.swerveSignal = swerveHelper.setDrive(xOutput , yOutput, rotOutput, getGyroAngle());
-        drive();  
+        drive();
 
         SmartDashboard.putNumber("Gyro Reading", getGyroAngle());
         SmartDashboard.putNumber("X output", xOutput);
