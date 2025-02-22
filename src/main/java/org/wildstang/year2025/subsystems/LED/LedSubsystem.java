@@ -45,8 +45,8 @@ public class LedSubsystem implements Subsystem {
     private int plusOr;
     private int flashColor = 2;
     private int flashHalf = 1;
-    private int flashSpeedOne = 5;
-    private int flashSpeedTwo = 6;
+    private int flashSpeedOne = 10;
+    private int flashSpeedTwo = 12;
     private int currentColor = 0;
     private DigitalInput leftStick;
     private DigitalInput rightStick;

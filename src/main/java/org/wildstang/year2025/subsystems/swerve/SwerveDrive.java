@@ -22,6 +22,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**Class: SwerveDrive
@@ -57,6 +59,8 @@ public class SwerveDrive extends SwerveDriveTemplate {
     private SwerveSignal swerveSignal;
     private WsSwerveHelper swerveHelper = new WsSwerveHelper();
     private SwerveDrivePoseEstimator poseEstimator;
+    
+    XboxController controller = new XboxController(0);
 
     SwerveDriveKinematics swerveKinematics;
     private Claw claw;
@@ -67,6 +71,7 @@ public class SwerveDrive extends SwerveDriveTemplate {
 
     private static final double DEG_TO_RAD = Math.PI / 180.0;
     private static final double RAD_TO_DEG = 180.0 / Math.PI;
+    private int counterRumble = 22;
 
     @Override
     public void init() {
@@ -147,6 +152,7 @@ public class SwerveDrive extends SwerveDriveTemplate {
         
         if(leftTrigger.getValue() != 0){
             if (algaeInView()){
+                counterRumble = 0;
                  driveState = driveType.GROUND_INTAKE;
             }
          }else if(rotOutput != 0){
@@ -192,6 +198,14 @@ public class SwerveDrive extends SwerveDriveTemplate {
                 yOutput = ySpeed * DriveConstants.DRIVE_F_K + (pathYTarget - curPose.getY()) * DriveConstants.POS_P;
                 break;
             case GROUND_INTAKE:
+                if(counterRumble < 20){
+                    counterRumble ++;
+                    controller.setRumble(RumbleType.kBothRumble,0.5);
+                }
+                else{
+                    counterRumble = 22;
+                }
+                
                 if(claw.algaeInClaw){
                     driveState = driveType.TELEOP;
                 }
