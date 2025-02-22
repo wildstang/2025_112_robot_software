@@ -37,8 +37,6 @@ public class Claw implements Subsystem{
         }
         else if (rightBumper.getValue()){
             setGameState(clawStates.OUTTAKE);
-            timer.reset();
-            timer.start();
         }
     }
 
@@ -119,6 +117,8 @@ public class Claw implements Subsystem{
                     break;
                 case OUTTAKE:
                     currentState = clawStates.OUTTAKE;
+                    timer.reset();
+                    timer.start();
                     break;
                 case IDLE:
                     currentState = clawStates.IDLE;
