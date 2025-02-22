@@ -312,6 +312,11 @@ public class ArmLift implements Subsystem {
     public void setGameState(gameStates newState){
         if (newState != gameState) {
             switch (newState) {
+                case GROUND_INTAKE:
+                    gameState = gameStates.GROUND_INTAKE;
+                    armSetpoint = ArmLiftConstants.GROUND_INTAKE_RIGHT_ANGLE;
+                    armSetpoint = ArmLiftConstants.GROUND_INTAKE_LIFT_HEIGHT;
+                    break;
                 case STORAGE:
                     gameState = gameStates.STORAGE;
                     armSetpoint = ArmLiftConstants.STORAGE_ANGLE;

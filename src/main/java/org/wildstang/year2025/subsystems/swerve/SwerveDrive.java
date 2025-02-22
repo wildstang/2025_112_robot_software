@@ -58,7 +58,7 @@ public class SwerveDrive extends SwerveDriveTemplate {
 
     SwerveDriveKinematics swerveKinematics;
 
-    public enum driveType {TELEOP, AUTO};
+    public enum driveType {TELEOP, AUTO, INTAKE};
     public driveType driveState;
     private Pose2d curPose;
 
@@ -115,8 +115,6 @@ public class SwerveDrive extends SwerveDriveTemplate {
 
     @Override
     public void inputUpdate(Input source) {
-        driveState = driveType.TELEOP;
-        
         // reset gyro when facing away from alliance station
         if (source == select && select.getValue()) {
             if (Core.isBlueAlliance()) {
@@ -143,6 +141,14 @@ public class SwerveDrive extends SwerveDriveTemplate {
         // drivetrain positive value corresponds to ccw rotation
         rotOutput = swerveHelper.scaleDeadband(-rightStickX.getValue(), DriveConstants.DEADBAND);  // negate joystick value so positive on the joystick (right) commands a negative rot speed (turn cw) and vice versa
         
+        if(leftTrigger.getValue() != 0){
+            if (algaeInView()){
+                 driveState = driveType.INTAKE;
+            }
+         }else if(rotOutput != 0){
+             driveState = driveType.TELEOP;
+         } 
+
         // if the rotational joystick is being used, the robot should not be auto tracking heading
         // otherwise engage rotation lock at current heading
         if (rotOutput != 0) {
@@ -181,6 +187,11 @@ public class SwerveDrive extends SwerveDriveTemplate {
                 xOutput = xSpeed * DriveConstants.DRIVE_F_K + (pathXTarget - curPose.getX()) * DriveConstants.POS_P;
                 yOutput = ySpeed * DriveConstants.DRIVE_F_K + (pathYTarget - curPose.getY()) * DriveConstants.POS_P;
                 break;
+            case INTAKE:
+                rotLocked = true;
+                rotTarget =  ((1.65 - pixyAnalog.getVoltage())/1.65 * 0.524 + getGyroAngle() + 2.0 * Math.PI) % (2.0 * Math.PI);
+                rotOutput = swerveHelper.getRotControl(rotTarget, getGyroAngle());
+                break; 
         }
         
         rotOutput = Math.min(Math.max(rotOutput, -1.0), 1.0);
@@ -255,6 +266,10 @@ public class SwerveDrive extends SwerveDriveTemplate {
     /**sets the autonomous heading controller to a new target */
     public void setAutoHeading(double headingTarget) {
         rotTarget = headingTarget;
+    }
+
+    private boolean algaeInView(){
+        return pixyDigital.isPressed();
     }
 
     /**

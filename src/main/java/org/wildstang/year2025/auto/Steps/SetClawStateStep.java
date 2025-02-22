@@ -5,24 +5,25 @@ import org.wildstang.framework.core.Core;
 import org.wildstang.year2025.robot.WsSubsystems;
 import org.wildstang.year2025.subsystems.Claw.Claw;
 import org.wildstang.year2025.subsystems.Claw.Claw.clawStates;
+import org.wildstang.year2025.subsystems.arm_lift.ArmLift;
 
 public class SetClawStateStep extends AutoStep {
 
     private Claw claw;
     private clawStates newState;
 
-    public SetArmLiftPosStep(clawStates newState){
+    public SetClawStateStep(clawStates newState){
         this.newState = newState;
     }
 
     @Override
     public void initialize() {
-        armLift = (ArmLift) Core.getSubsystemManager().getSubsystem(WsSubsystems.ARMLIFT);
+        claw = (Claw) Core.getSubsystemManager().getSubsystem(WsSubsystems.CLAW);
     }
 
     @Override
     public void update() {
-        armLift.setGameState(newState);
+        claw.setGameState(newState);
         setFinished();
     }
 

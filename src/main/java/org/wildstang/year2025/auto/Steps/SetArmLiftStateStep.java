@@ -11,7 +11,7 @@ public class SetArmLiftStateStep extends AutoStep {
     private ArmLift armLift;
     private gameStates newState;
 
-    public SetArmLiftPosStep(gameStates newState){
+    public SetArmLiftStateStep(gameStates newState){
         this.newState = newState;
     }
 

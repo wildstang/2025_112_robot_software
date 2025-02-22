@@ -34,7 +34,7 @@ public class Claw implements Subsystem{
     @Override
     //Called everytime an input/buttons is pressed
     public void inputUpdate(Input source) {
-       if(leftBumper.getValue()){
+       if(leftTrigger.getValue() != 0){
         setGameState(clawStates.INTAKE);
        }
        else if (rightBumper.getValue()){
@@ -78,7 +78,7 @@ public class Claw implements Subsystem{
         case OUTTAKE:
             // clawMotor.setCurrentLimit(10, 15, 3);
             if(timer.get() > ClawConstants.OUTTAKE_TIME){
-                currentState = clawStates.IDLE;
+                setGameState(clawStates.IDLE);
                 timer.reset();
                 algaeInClaw = false;
             }
