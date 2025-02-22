@@ -10,6 +10,9 @@ import org.wildstang.year2025.subsystems.localization.WsVision;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class LedSubsystem implements Subsystem {
 
@@ -17,6 +20,9 @@ public class LedSubsystem implements Subsystem {
     private AddressableLEDBuffer ledBuffer;
     private WsVision vision;
     private Timer timer =  new Timer();
+    private Timer clock1 = new Timer();
+    private Timer clock2 = new Timer();
+    
 
     private int[] white = {255,255,255};
     private int[] blue = {0,0,255};
@@ -34,7 +40,8 @@ public class LedSubsystem implements Subsystem {
     
     private int colorFn;
     private int startRand = 1;
-    private int changeSpeed = 2;
+    private int startRandG = 1;
+    private int changeSpeed = 12;
     private int plusOr;
     private int flashColor = 2;
     private int flashHalf = 1;
@@ -46,12 +53,16 @@ public class LedSubsystem implements Subsystem {
     private DigitalInput dpadUp;
     private int k = 0;
     private int c = 0;
+    private int s = 0;
+    private int shiftSpeed = 20;
+
+    XboxController controller = new XboxController(0);
 
     @Override
     public void inputUpdate(Input source) {
         // TODO Auto-generated method stub
         if (leftStick.getValue() == true){
-            colorFn = 0;
+            NormalBlue();
         }
         
         else if (rightStick.getValue() == true){
@@ -64,71 +75,62 @@ public class LedSubsystem implements Subsystem {
             else if (flashColor == 2){
                 flashColor = 1;
             }
+            timer.stop();
+            timer.reset();
+            timer.start();
+            controller.setRumble(RumbleType.kBothRumble, 0.5);
+        }
+        else if (dpadUp.getValue() == true){
+            NormalGreen();
         }
     }
 
     public void NormalBlue(){
-        if (startRand == 1){ 
-            startRand = 0;
-            for (int i = 0; i < length; i++){
-                int randBlue = (int)((Math.random() * 155) + 100);
-                ledBuffer.setRGB(i, 0, 0, randBlue);
+        clock1.start();
+            if(clock1.hasElapsed(0.05)){
+                for(int i = 0; i < length; i++){
+                    int randomNum = (int)(Math.random()*2);
+                    switch(randomNum){
+                    case 0:
+                        ledBuffer.setRGB(i, 0, 0, 153);
+                        break;
+                    case 1:
+                        ledBuffer.setRGB(i, 102, 178, 150);
+                        break;
+                    case 2:
+                        ledBuffer.setRGB(i, 200, 153, 200);
+                        break;
+                    }
+                }
+                clock1.stop();
+                clock1.reset();
             }
-        }
-        else if (startRand == 0){
-            for (int i = 0; i < length; i++){
-                double plusOrCheck = Math.random();
-                if (plusOrCheck >= 0.5){
-                    plusOr = 1;
-                }
-                else if (plusOrCheck < 0.5){
-                    plusOr = -1;
-                }
-                double numVal = Math.random() * changeSpeed * plusOr;
-                int currentBlue = (int)Math.abs(ledBuffer.getBlue(i) + numVal);
-                if (currentBlue > 255){
-                    currentBlue = currentBlue - changeSpeed;
-                }
-                if (currentBlue < 50){
-                    currentBlue = currentBlue + changeSpeed / 2;
-                }
-                ledBuffer.setRGB(i, 0, 0, currentBlue);
-            }
-        }
         led.setData(ledBuffer);
     }
 
     public void NormalGreen(){
-        if (startRand == 1){ 
-            startRand = 0;
-            for (int i = 0; i < length; i++){
-                int randBlue = (int)((Math.random() * 155) + 100);
-                ledBuffer.setRGB(i, 0, 0, randBlue);
+        
+        clock2.start();
+            if(clock2.hasElapsed(0.05)){
+                for(int i = 0; i < length; i++){
+                    int randomNum = (int)(Math.random()*2);
+                    switch(randomNum){
+                    case 0:
+                        ledBuffer.setRGB(i, 0, 153, 0);
+                        break;
+                    case 1:
+                        ledBuffer.setRGB(i, 102, 200, 150);
+                        break;
+                    case 2:
+                        ledBuffer.setRGB(i, 200, 255, 200);
+                        break;
+                    }
+                }
+                clock2.stop();
+                clock2.reset();
             }
-        }
-        else if (startRand == 0){
-            for (int i = 0; i < length; i++){
-                double plusOrCheck = Math.random();
-                if (plusOrCheck >= 0.5){
-                    plusOr = 1;
-                }
-                else if (plusOrCheck < 0.5){
-                    plusOr = -1;
-                }
-                double numVal = Math.random() * changeSpeed * plusOr;
-                int currentBlue = (int)Math.abs(ledBuffer.getBlue(i) + numVal);
-                if (currentBlue > 255){
-                    currentBlue = currentBlue - changeSpeed;
-                }
-                if (currentBlue < 50){
-                    currentBlue = currentBlue + changeSpeed / 2;
-                }
-                ledBuffer.setRGB(i, 0, 0, currentBlue);
-            }
-        }
         led.setData(ledBuffer);
     }
-
     public void Flash(){
         if (flashHalf == 1){
             if (k <= 255 / (1 + flashSpeedOne)){
@@ -146,7 +148,7 @@ public class LedSubsystem implements Subsystem {
                         if (currentColor > 255){
                             currentColor = 255;
                         }
-                        ledBuffer.setRGB(i, 0, currentColor, ((int)((ledBuffer.getBlue(i))/1.5)));
+                        ledBuffer.setRGB(i, (int)(0.5 * currentColor), currentColor, (int)(0.875 * currentColor));
                     }
                 }
             }
@@ -170,13 +172,13 @@ public class LedSubsystem implements Subsystem {
                         if (currentColor < 0){
                             currentColor = 0;
                         }
-                        ledBuffer.setRGB(i, 0, currentColor, ledBuffer.getBlue(i));
+                        ledBuffer.setRGB(i, (int)(0.5 * currentColor), currentColor, (int)(0.675 * currentColor));
                     }
                 }
             }
             else {
                 flashHalf = 1;
-                colorFn = 0;
+                NormalBlue();
             }
         }
         led.setData(ledBuffer);
@@ -216,12 +218,21 @@ public class LedSubsystem implements Subsystem {
 
     @Override
     public void update() {
-        // TODO Auto-generated method stub
-        if (colorFn == 0){
-            NormalBlue();
+        if(timer.hasElapsed(0.65)){
+            controller.setRumble(RumbleType.kBothRumble, 0);
+            timer.stop();
+            timer.reset();
+            
         }
-        else if (colorFn == 1){
+        // TODO Auto-generated method stub
+        if (colorFn == 0){ //Standard coloring
+
+        }
+        else if (colorFn == 1){ //Intake State, maybe outtake with red
             Flash();
+        }
+        else if (colorFn == 2){ //Vision detects algae
+
         }
 
     }
