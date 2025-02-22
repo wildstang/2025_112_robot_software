@@ -35,15 +35,12 @@ public class Claw implements Subsystem{
     //Called everytime an input/buttons is pressed
     public void inputUpdate(Input source) {
        if(leftBumper.getValue()){
-        currentState = clawStates.INTAKE;
+        setGameState(clawStates.INTAKE);
        }
        else if (rightBumper.getValue()){
-        currentState = clawStates.OUTTAKE;
+        setGameState(clawStates.OUTTAKE);
         timer.reset();
         timer.start();
-       }
-       else{
-        currentState = clawStates.IDLE;
        }
     }
 
@@ -68,41 +65,58 @@ public class Claw implements Subsystem{
     @Override
     //  runs every 20 MS
     public void update() {
-        switch(currentState){
-            case INTAKE:
-                if(Math.abs(clawMotor.getVelocity()) < ClawConstants.CLAW_HOLD_SPEED && clawMotor.getOutputCurrent() > ClawConstants.CLAW_CURRENT_HOLD){
-                    algaeInClaw = true; 
-                }
-                // clawMotor.setCurrentLimit(5, 10, 3);
-                clawMotor.setSpeed(ClawConstants.CLAW_INTAKE_SPEED);
-                clawMotor2.setSpeed(-ClawConstants.CLAW_INTAKE_SPEED);
-                break;
+       switch(currentState){
+        case INTAKE:
+            if(Math.abs(clawMotor.getVelocity()) < ClawConstants.CLAW_HOLD_SPEED && clawMotor.getOutputCurrent() > ClawConstants.CLAW_CURRENT_HOLD){
+                algaeInClaw = true; 
+            }
+            // clawMotor.setCurrentLimit(5, 10, 3);
+            clawMotor.setSpeed(ClawConstants.CLAW_INTAKE_SPEED);
+            clawMotor2.setSpeed(-ClawConstants.CLAW_INTAKE_SPEED);
+            break;
 
-            case OUTTAKE:
-                // clawMotor.setCurrentLimit(10, 15, 3);
-                if(timer.get() > ClawConstants.OUTTAKE_TIME){
-                    currentState = clawStates.IDLE;
-                    timer.reset();
-                    algaeInClaw = false;
-                }
-                clawMotor.setSpeed(ClawConstants.CLAW_OUTTAKE_SPEED);
-                clawMotor2.setSpeed(-ClawConstants.CLAW_OUTTAKE_SPEED);
-                break;
+        case OUTTAKE:
+            // clawMotor.setCurrentLimit(10, 15, 3);
+            if(timer.get() > ClawConstants.OUTTAKE_TIME){
+                currentState = clawStates.IDLE;
+                timer.reset();
+                algaeInClaw = false;
+            }
+            clawMotor.setSpeed(ClawConstants.CLAW_OUTTAKE_SPEED);
+            clawMotor2.setSpeed(-ClawConstants.CLAW_OUTTAKE_SPEED);
+            break;
 
-            case IDLE:
-                clawMotor.setSpeed(0.0);
-                clawMotor2.setSpeed(0.0);
-                break;
+        case IDLE:
+            clawMotor.setSpeed(0.0);
+            clawMotor2.setSpeed(0.0);
+            break;
 
-            default:
-                clawMotor.setSpeed(0.0);
-                clawMotor2.setSpeed(0.0);
-                break;
-        }
+        default:
+            clawMotor.setSpeed(0.0);
+            clawMotor2.setSpeed(0.0);
+            break;
+       }
        putDashboard();
     }
 
 
+    public void setGameState(clawStates desiredState){
+        if(desiredState != currentState){
+            switch(desiredState){
+                case INTAKE:
+                    currentState = clawStates.INTAKE;
+                    break;
+                case OUTTAKE:
+                    currentState = clawStates.OUTTAKE;
+                    break;
+                case IDLE:
+                    currentState = clawStates.IDLE;
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
     private void putDashboard(){
         SmartDashboard.putString("Claw State", currentState.name());
         SmartDashboard.putBoolean("Algae in claw", algaeInClaw);

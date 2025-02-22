@@ -101,7 +101,7 @@ public class ArmLift implements Subsystem {
         rightJoyStickX = (AnalogInput) Core.getInputManager().getInput(WsInputs.DRIVER_RIGHT_JOYSTICK_X);
         // rightJoyStickX.addInputListener(this);
     }
-    
+
     @Override
     public void initSubsystems() {
         claw = (Claw) Core.getSubsystemManager().getSubsystem(WsSubsystems.CLAW);
