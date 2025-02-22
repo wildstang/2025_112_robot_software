@@ -37,24 +37,28 @@ public class LedSubsystem implements Subsystem {
     private int changeSpeed = 2;
     private int plusOr;
     private int doFlash = 0;
-    private int flashColor = 1;
+    private int flashColor = 2;
     private int flashHalf = 1;
-    private int flashSpeedOne = 7;
-    private int flashSpeedTwo = 4;
+    private int flashSpeedOne = 5;
+    private int flashSpeedTwo = 10;
     private int currentColor = 0;
-    private DigitalInput leftBumper;
-    private DigitalInput rightBumper;
+    private DigitalInput leftStick;
+    private DigitalInput rightStick;
+    private int k = 0;
+    private int c = 0;
 
     @Override
     public void inputUpdate(Input source) {
         // TODO Auto-generated method stub
-        if (leftBumper.getValue() == true){
+        if (leftStick.getValue() == true){
             doRand = 1;
             doFlash = 0;
         }
-        else if (rightBumper.getValue() == true){
+        else if (rightStick.getValue() == true){
             doRand = 0;
             doFlash = 1;
+            k = 0;
+            c = 0;
         }
     }
 
@@ -75,10 +79,10 @@ public class LedSubsystem implements Subsystem {
         led.setData(ledBuffer);
         led.start();
 
-        leftBumper = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_LEFT_SHOULDER);
-        leftBumper.addInputListener(this);
-        rightBumper = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_RIGHT_SHOULDER);
-        rightBumper.addInputListener(this);
+        leftStick = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_LEFT_JOYSTICK_BUTTON);
+        leftStick.addInputListener(this);
+        rightStick = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_RIGHT_JOYSTICK_BUTTON);
+        rightStick.addInputListener(this);
 
         }
 
@@ -114,7 +118,7 @@ public class LedSubsystem implements Subsystem {
                     if (currentBlue > 255){
                         currentBlue = currentBlue - changeSpeed;
                     }
-                    if (currentBlue < 100){
+                    if (currentBlue < 50){
                         currentBlue = currentBlue + changeSpeed / 2;
                     }
                     ledBuffer.setRGB(i, 0, 0, currentBlue);
@@ -125,60 +129,73 @@ public class LedSubsystem implements Subsystem {
         if (doFlash == 1){
             doRand = 0;
             if (flashHalf == 1){
-                for (int k = 0; k < 255 / (1 + flashSpeedOne); k++){
+                if (k <= 255 / (1 + flashSpeedOne)){
+                    k++;
                     for (int i = 0; i < length; i++){
-                        currentColor = (int)((Math.random() + 1) * flashSpeedOne) + currentColor;
-                        if (currentColor > 255){
-                            currentColor = 255;
-                            if (flashColor == 1){
-                                ledBuffer.setRGB(i, currentColor, 0, ledBuffer.getBlue(i));
+                        if (flashColor == 1){
+                            currentColor = (int)((Math.random() + 1) * flashSpeedOne) + ledBuffer.getRed(i);
+                            if (currentColor > 255){
+                                currentColor = 255;
                             }
-                            if (flashColor == 2){
-                                ledBuffer.setRGB(i, 0, currentColor, ledBuffer.getBlue(i));
+                            ledBuffer.setRGB(i, currentColor, 0, ((int)((ledBuffer.getBlue(i))/1.5)));
+                        }
+                        if (flashColor == 2){
+                            currentColor = (int)((Math.random() + 1) * flashSpeedOne) + ledBuffer.getGreen(i);
+                            if (currentColor > 255){
+                                currentColor = 255;
                             }
-                        }    
+                            ledBuffer.setRGB(i, 0, currentColor, ((int)((ledBuffer.getBlue(i))/1.5)));
+                        }
                     }
                 }
-                flashHalf = 2;
+                else {
+                    flashHalf = 2;
+                }
             }
             else if (flashHalf == 2){
-                for (int k = 0; k < 255 / (0.5 * flashSpeedTwo); k++){
+                if (c <= 255 / (0.5 * flashSpeedTwo)){
+                    c++;
                     for (int i = 0; i < length; i++){
-                        currentColor = (int)((Math.random() -1.5) * flashSpeedTwo) + currentColor;
-                        if (currentColor < 0){
-                            currentColor = 0;
                             if (flashColor == 1){
+                                currentColor = (int)((Math.random() -1.5) * flashSpeedTwo) + ledBuffer.getRed(i);
+                                if (currentColor < 0){
+                                    currentColor = 0;
+                                }
                                 ledBuffer.setRGB(i, currentColor, 0, ledBuffer.getBlue(i));
-                            }
                             if (flashColor == 2){
+                                currentColor = (int)((Math.random() -1.5) * flashSpeedTwo) + ledBuffer.getGreen(i);
+                                if (currentColor < 0){
+                                    currentColor = 0;
+                                }
                                 ledBuffer.setRGB(i, 0, currentColor, ledBuffer.getBlue(i));
                             }
                         }
                     }
                 }
-                doFlash = 0;
-                doRand = 1;
-                flashHalf = 1;
+                else {
+                    doFlash = 0;
+                    doRand = 1;
+                    flashHalf = 1;
+                }
             }
         }
+        led.setData(ledBuffer);
     }
 
     @Override
     public void resetState() {
         // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'resetState'");
     }
 
     @Override
     public void initSubsystems() {
         // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'initSubsystems'");
     }
 
     @Override
     public String getName() {
         // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getName'");
+        return ("LED");
     }
 
     public void setRGB(int red, int green, int blue){

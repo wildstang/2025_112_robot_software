@@ -50,12 +50,12 @@ public class Claw implements Subsystem{
     @Override
     //initializes + ONE AND DONE + START
     public void init() {
-        // leftBumper = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_LEFT_SHOULDER);
-        // leftBumper.addInputListener(this);
-        // rightBumper = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_RIGHT_SHOULDER);
-        // rightBumper.addInputListener(this);
-        // leftTrigger = (AnalogInput) Core.getInputManager().getInput(WsInputs.DRIVER_LEFT_TRIGGER);
-        // leftTrigger.addInputListener(this);
+        leftBumper = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_LEFT_SHOULDER);
+        leftBumper.addInputListener(this);
+        rightBumper = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_RIGHT_SHOULDER);
+        rightBumper.addInputListener(this);
+        leftTrigger = (AnalogInput) Core.getInputManager().getInput(WsInputs.DRIVER_LEFT_TRIGGER);
+        leftTrigger.addInputListener(this);
 
         clawMotor = (WsSpark) Core.getOutputManager().getOutput(WsOutputs.CLAWMOTOR);
         clawMotor2 = (WsSpark) Core.getOutputManager().getOutput(WsOutputs.CLAWMOTOR2);
