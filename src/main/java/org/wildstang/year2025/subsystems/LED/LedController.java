@@ -50,6 +50,7 @@ public class LedController implements Subsystem {
 
     @Override
     public void inputUpdate(Input source) {
+
     }
 
     @Override
@@ -77,6 +78,7 @@ public class LedController implements Subsystem {
     public void setRGB(int[] color){
         setRGB(color[0],color[1],color[2]);
     }
+
 
     // private void rainbow(){
     //     for (int i = 0; i < ledBuffer.getLength(); i++){
