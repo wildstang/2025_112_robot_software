@@ -32,11 +32,10 @@ public class LedSubsystem implements Subsystem {
     private int initialRed = 0;
     private int initialBlue = 0;
     
-    private int doRand = 0;
+    private int colorFn;
     private int startRand = 1;
     private int changeSpeed = 2;
     private int plusOr;
-    private int doFlash = 0;
     private int flashColor = 2;
     private int flashHalf = 1;
     private int flashSpeedOne = 5;
@@ -44,6 +43,7 @@ public class LedSubsystem implements Subsystem {
     private int currentColor = 0;
     private DigitalInput leftStick;
     private DigitalInput rightStick;
+    private DigitalInput dpadUp;
     private int k = 0;
     private int c = 0;
 
@@ -51,14 +51,13 @@ public class LedSubsystem implements Subsystem {
     public void inputUpdate(Input source) {
         // TODO Auto-generated method stub
         if (leftStick.getValue() == true){
-            doRand = 1;
-            doFlash = 0;
+            colorFn = 0;
         }
+        
         else if (rightStick.getValue() == true){
-            doRand = 0;
-            doFlash = 1;
             k = 0;
             c = 0;
+            colorFn = 1;
             if (flashColor == 1){
                 flashColor = 2;
             }
@@ -66,6 +65,121 @@ public class LedSubsystem implements Subsystem {
                 flashColor = 1;
             }
         }
+    }
+
+    public void NormalBlue(){
+        if (startRand == 1){ 
+            startRand = 0;
+            for (int i = 0; i < length; i++){
+                int randBlue = (int)((Math.random() * 155) + 100);
+                ledBuffer.setRGB(i, 0, 0, randBlue);
+            }
+        }
+        else if (startRand == 0){
+            for (int i = 0; i < length; i++){
+                double plusOrCheck = Math.random();
+                if (plusOrCheck >= 0.5){
+                    plusOr = 1;
+                }
+                else if (plusOrCheck < 0.5){
+                    plusOr = -1;
+                }
+                double numVal = Math.random() * changeSpeed * plusOr;
+                int currentBlue = (int)Math.abs(ledBuffer.getBlue(i) + numVal);
+                if (currentBlue > 255){
+                    currentBlue = currentBlue - changeSpeed;
+                }
+                if (currentBlue < 50){
+                    currentBlue = currentBlue + changeSpeed / 2;
+                }
+                ledBuffer.setRGB(i, 0, 0, currentBlue);
+            }
+        }
+        led.setData(ledBuffer);
+    }
+
+    public void NormalGreen(){
+        if (startRand == 1){ 
+            startRand = 0;
+            for (int i = 0; i < length; i++){
+                int randBlue = (int)((Math.random() * 155) + 100);
+                ledBuffer.setRGB(i, 0, 0, randBlue);
+            }
+        }
+        else if (startRand == 0){
+            for (int i = 0; i < length; i++){
+                double plusOrCheck = Math.random();
+                if (plusOrCheck >= 0.5){
+                    plusOr = 1;
+                }
+                else if (plusOrCheck < 0.5){
+                    plusOr = -1;
+                }
+                double numVal = Math.random() * changeSpeed * plusOr;
+                int currentBlue = (int)Math.abs(ledBuffer.getBlue(i) + numVal);
+                if (currentBlue > 255){
+                    currentBlue = currentBlue - changeSpeed;
+                }
+                if (currentBlue < 50){
+                    currentBlue = currentBlue + changeSpeed / 2;
+                }
+                ledBuffer.setRGB(i, 0, 0, currentBlue);
+            }
+        }
+        led.setData(ledBuffer);
+    }
+
+    public void Flash(){
+        if (flashHalf == 1){
+            if (k <= 255 / (1 + flashSpeedOne)){
+                k++;
+                for (int i = 0; i < length; i++){
+                    if (flashColor == 1){
+                        currentColor = (int)((Math.random() + 1) * flashSpeedOne) + ledBuffer.getRed(i);
+                        if (currentColor > 255){
+                            currentColor = 255;
+                        }
+                        ledBuffer.setRGB(i, currentColor, 0, ((int)((ledBuffer.getBlue(i))/1.5)));
+                    }
+                    if (flashColor == 2){
+                        currentColor = (int)((Math.random() + 1) * flashSpeedOne) + ledBuffer.getGreen(i);
+                        if (currentColor > 255){
+                            currentColor = 255;
+                        }
+                        ledBuffer.setRGB(i, 0, currentColor, ((int)((ledBuffer.getBlue(i))/1.5)));
+                    }
+                }
+            }
+            else {
+                flashHalf = 2;
+            }
+        }
+        else if (flashHalf == 2){
+            if (c <= 255 / (0.5 * flashSpeedTwo)){
+                c++;
+                for (int i = 0; i < length; i++){
+                    if (flashColor == 1){
+                        currentColor = (int)((Math.random() -1.5) * flashSpeedTwo) + ledBuffer.getRed(i);
+                        if (currentColor < 0){
+                            currentColor = 0;
+                        }
+                        ledBuffer.setRGB(i, currentColor, 0, ledBuffer.getBlue(i));
+                    }
+                    if (flashColor == 2){
+                        currentColor = (int)((Math.random() -1.5) * flashSpeedTwo) + ledBuffer.getGreen(i);
+                        if (currentColor < 0){
+                            currentColor = 0;
+                        }
+                        ledBuffer.setRGB(i, 0, currentColor, ledBuffer.getBlue(i));
+                    }
+                }
+            }
+            else {
+                flashHalf = 1;
+                colorFn = 0;
+            }
+        }
+        led.setData(ledBuffer);
     }
 
     @Override
@@ -89,6 +203,8 @@ public class LedSubsystem implements Subsystem {
         leftStick.addInputListener(this);
         rightStick = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_RIGHT_JOYSTICK_BUTTON);
         rightStick.addInputListener(this);
+        dpadUp = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_DPAD_UP);
+        dpadUp.addInputListener(this); 
 
         }
 
@@ -101,91 +217,13 @@ public class LedSubsystem implements Subsystem {
     @Override
     public void update() {
         // TODO Auto-generated method stub
-        if (doRand == 1){
-            doFlash = 0;
-            if (startRand == 1){ 
-                startRand = 0;
-                for (int i = 0; i < length; i++){
-                    int randBlue = (int)((Math.random() * 155) + 100);
-                    ledBuffer.setRGB(i, 0, 0, randBlue);
-                }
-            }
-            else if (startRand == 0){
-                for (int i = 0; i < length; i++){
-                    double plusOrCheck = Math.random();
-                    if (plusOrCheck >= 0.5){
-                        plusOr = 1;
-                    }
-                    else if (plusOrCheck < 0.5){
-                        plusOr = -1;
-                    }
-                    double numVal = Math.random() * changeSpeed * plusOr;
-                    int currentBlue = (int)Math.abs(ledBuffer.getBlue(i) + numVal);
-                    if (currentBlue > 255){
-                        currentBlue = currentBlue - changeSpeed;
-                    }
-                    if (currentBlue < 50){
-                        currentBlue = currentBlue + changeSpeed / 2;
-                    }
-                    ledBuffer.setRGB(i, 0, 0, currentBlue);
-                }
-            }
+        if (colorFn == 0){
+            NormalBlue();
+        }
+        else if (colorFn == 1){
+            Flash();
         }
 
-        if (doFlash == 1){
-            doRand = 0;
-            if (flashHalf == 1){
-                if (k <= 255 / (1 + flashSpeedOne)){
-                    k++;
-                    for (int i = 0; i < length; i++){
-                        if (flashColor == 1){
-                            currentColor = (int)((Math.random() + 1) * flashSpeedOne) + ledBuffer.getRed(i);
-                            if (currentColor > 255){
-                                currentColor = 255;
-                            }
-                            ledBuffer.setRGB(i, currentColor, 0, ((int)((ledBuffer.getBlue(i))/1.5)));
-                        }
-                        if (flashColor == 2){
-                            currentColor = (int)((Math.random() + 1) * flashSpeedOne) + ledBuffer.getGreen(i);
-                            if (currentColor > 255){
-                                currentColor = 255;
-                            }
-                            ledBuffer.setRGB(i, 0, currentColor, ((int)((ledBuffer.getBlue(i))/1.5)));
-                        }
-                    }
-                }
-                else {
-                    flashHalf = 2;
-                }
-            }
-            else if (flashHalf == 2){
-                if (c <= 255 / (0.5 * flashSpeedTwo)){
-                    c++;
-                    for (int i = 0; i < length; i++){
-                            if (flashColor == 1){
-                                currentColor = (int)((Math.random() -1.5) * flashSpeedTwo) + ledBuffer.getRed(i);
-                                if (currentColor < 0){
-                                    currentColor = 0;
-                                }
-                                ledBuffer.setRGB(i, currentColor, 0, ledBuffer.getBlue(i));
-                            if (flashColor == 2){
-                                currentColor = (int)((Math.random() -1.5) * flashSpeedTwo) + ledBuffer.getGreen(i);
-                                if (currentColor < 0){
-                                    currentColor = 0;
-                                }
-                                ledBuffer.setRGB(i, 0, currentColor, ledBuffer.getBlue(i));
-                            }
-                        }
-                    }
-                }
-                else {
-                    doFlash = 0;
-                    doRand = 1;
-                    flashHalf = 1;
-                }
-            }
-        }
-        led.setData(ledBuffer);
     }
 
     @Override
