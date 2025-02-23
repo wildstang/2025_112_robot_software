@@ -50,6 +50,9 @@ public final class ArmLiftConstants {
     public static final double STORAGE_ANGLE = Math.PI;
     public static final double STORAGE_LIFT_HEIGHT = 0.10;
 
+    public static final double START_ANGLE = Math.PI;
+    public static final double START_LIFT_HEIGHT = 0.229;
+
     //Intaking
     public static final double GROUND_INTAKE_RIGHT_ANGLE = 1.2;  // radians
     public static final double GROUND_INTAKE_LIFT_HEIGHT = 0.05;  // meters

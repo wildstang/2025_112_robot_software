@@ -38,6 +38,7 @@ public class SwerveDrive extends SwerveDriveTemplate {
     private AnalogInput rightStickX;  // rot joystick
     private AnalogInput leftTrigger;  //speed derate 
     private DigitalInput select;  // gyro reset
+    private DigitalInput leftStickButton;
 
     private SparkLimitSwitch pixyDigital;
     private SparkAnalogSensor pixyAnalog;
@@ -72,6 +73,7 @@ public class SwerveDrive extends SwerveDriveTemplate {
     private static final double DEG_TO_RAD = Math.PI / 180.0;
     private static final double RAD_TO_DEG = 180.0 / Math.PI;
     private int counterRumble = 22;
+    private Boolean sensorOverride = false;
 
     @Override
     public void init() {
@@ -93,6 +95,8 @@ public class SwerveDrive extends SwerveDriveTemplate {
         leftTrigger.addInputListener(this);
         select = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_SELECT);
         select.addInputListener(this);
+        leftStickButton = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_LEFT_JOYSTICK_BUTTON);
+        leftStickButton.addInputListener(this);
 
         WsSpark clawMotor = (WsSpark) Core.getOutputManager().getOutput(WsOutputs.CLAWMOTOR);
         pixyDigital = clawMotor.getController().getForwardLimitSwitch();
@@ -124,6 +128,7 @@ public class SwerveDrive extends SwerveDriveTemplate {
 
     @Override
     public void inputUpdate(Input source) {
+        if (source == leftStickButton && leftStickButton.getValue()) sensorOverride = !sensorOverride;
         // reset gyro when facing away from alliance station
         if (source == select && select.getValue()) {
             if (Core.isBlueAlliance()) {
@@ -150,10 +155,10 @@ public class SwerveDrive extends SwerveDriveTemplate {
         // drivetrain positive value corresponds to ccw rotation
         rotOutput = swerveHelper.scaleDeadband(-rightStickX.getValue(), DriveConstants.DEADBAND);  // negate joystick value so positive on the joystick (right) commands a negative rot speed (turn cw) and vice versa
         
-        if(leftTrigger.getValue() != 0){
+        if(leftTrigger.getValue() != 0 && !sensorOverride){
+            driveState = driveType.GROUND_INTAKE;
             if (algaeInView()){
                 counterRumble = 0;
-                 driveState = driveType.GROUND_INTAKE;
             }
          }else if(rotOutput != 0){
              driveState = driveType.TELEOP;
@@ -204,6 +209,7 @@ public class SwerveDrive extends SwerveDriveTemplate {
                 }
                 else{
                     counterRumble = 22;
+                    controller.setRumble(RumbleType.kBothRumble,0.0);
                 }
                 
                 if(claw.algaeInClaw){

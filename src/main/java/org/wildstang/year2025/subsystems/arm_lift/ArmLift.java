@@ -42,7 +42,7 @@ public class ArmLift implements Subsystem {
     private SparkAnalogSensor liftPot;
     private double currentLiftPos, currentLiftVel;
     public enum gameStates {GROUND_INTAKE, L2_ALGAE_REEF, L3_ALGAE_REEF, STORAGE, SCORE_PRELOAD, SHOOT_NET, START}; // Our Arm/Lift States
-    private gameStates gameState = gameStates.STORAGE;
+    private gameStates gameState = gameStates.START;
     
     /* Arm Variables */
     private double currentArmAngle, currentArmVel;
@@ -202,7 +202,7 @@ public class ArmLift implements Subsystem {
     private double getLiftHeight(){
         // double slope = (ArmLiftConstants.MAX_LIFT_HEIGHT-ArmLiftConstants.MIN_LIFT_HEIGHT) / (ArmLiftConstants.MAX_POTENTIOMETER_VOLTAGE - ArmLiftConstants.MIN_POTENTIOMETER_VOLTAGE);
         // return (liftMotor1.getController().getAnalog().getVoltage() - ArmLiftConstants.MIN_POTENTIOMETER_VOLTAGE) * slope + ArmLiftConstants.MIN_LIFT_HEIGHT;
-        return liftMotor1.getPosition() / ArmLiftConstants.LIFT_GEAR_RATIO * 2.0 * Math.PI * ArmLiftConstants.LIFT_PULLEY_RADIUS;
+        return liftMotor1.getPosition() / ArmLiftConstants.LIFT_GEAR_RATIO * 2.0 * Math.PI * ArmLiftConstants.LIFT_PULLEY_RADIUS + ArmLiftConstants.START_LIFT_HEIGHT;
     }
 
     private double getLiftVel() {
@@ -210,7 +210,7 @@ public class ArmLift implements Subsystem {
     }
 
     private double getArmAngle() {
-        return (armMotor.getPosition() / ArmLiftConstants.ARM_GEAR_RATO * 2.0 * Math.PI + Math.PI + 2.0 * Math.PI) % (2.0 * Math.PI);
+        return (armMotor.getPosition() / ArmLiftConstants.ARM_GEAR_RATO * 2.0 * Math.PI);
     }
 
     private double getArmVel() {
@@ -354,7 +354,7 @@ public class ArmLift implements Subsystem {
 
     @Override
     public void resetState() {
-        gameState = gameStates.STORAGE;
+        // gameState = gameStates.;
     }
 
     @Override
