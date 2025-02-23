@@ -19,7 +19,7 @@ public class WsPV {
 
     public PhotonCamera camera;
     public String cameraID;
-    AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
+    AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
     public PhotonTrackedTarget target;
     public List<PhotonPipelineResult> result;
     private Transform3d robotToCamera = new Transform3d(new Translation3d(0.0, 0.0, 0.0), new Rotation3d(0,0,0));

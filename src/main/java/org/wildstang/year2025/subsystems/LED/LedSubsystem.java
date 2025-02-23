@@ -61,31 +61,32 @@ public class LedSubsystem implements Subsystem {
     @Override
     public void inputUpdate(Input source) {
         // TODO Auto-generated method stub
-        if (leftStick.getValue() == true){
-            NormalBlue();
-        }
+        // if (leftStick.getValue() == true){
+        //     NormalBlue();
+        // }
         
-        else if (rightStick.getValue() == true){
-            k = 0;
-            c = 0;
-            colorFn = 1;
-            if (flashColor == 1){
-                flashColor = 2;
-            }
-            else if (flashColor == 2){
-                flashColor = 1;
-            }
-            timer.stop();
-            timer.reset();
-            timer.start();
-            controller.setRumble(RumbleType.kBothRumble, 0.5);
-        }
-        else if (dpadUp.getValue() == true){
-            NormalGreen();
-        }
+        // else if (rightStick.getValue() == true){
+        //     k = 0;
+        //     c = 0;
+        //     colorFn = 1;
+        //     if (flashColor == 1){
+        //         flashColor = 2;
+        //     }
+        //     else if (flashColor == 2){
+        //         flashColor = 1;
+        //     }
+        //     timer.stop();
+        //     timer.reset();
+        //     timer.start();
+        //     controller.setRumble(RumbleType.kBothRumble, 0.5);
+        // }
+        // else if (dpadUp.getValue() == true){
+        //     setGreen();
+        // }
     }
 
     public void NormalBlue(){
+        colorFn = 0;
         clock1.start();
             if(clock1.hasElapsed(0.05)){
                 for(int i = 0; i < length; i++){
@@ -105,6 +106,21 @@ public class LedSubsystem implements Subsystem {
                 clock1.stop();
                 clock1.reset();
             }
+        led.setData(ledBuffer);
+    }
+
+    public void setGreen(){
+        colorFn = 2;
+        for(int i = 0; i < length; i++){
+            ledBuffer.setRGB(i, 61,255,179);
+        }
+        led.setData(ledBuffer);
+    }
+
+    public void setBlack(){
+        for(int i = 0; i < length; i++){
+            ledBuffer.setRGB(i, 0, 0, 0);
+        }
         led.setData(ledBuffer);
     }
 
@@ -232,7 +248,7 @@ public class LedSubsystem implements Subsystem {
             Flash();
         }
         else if (colorFn == 2){ //Vision detects algae
-            NormalGreen();
+            setGreen();
         }
 
     }

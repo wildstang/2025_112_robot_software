@@ -11,6 +11,8 @@ import org.wildstang.year2025.robot.WsInputs;
 import org.wildstang.year2025.robot.WsOutputs;
 
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Claw implements Subsystem{
@@ -28,6 +30,8 @@ public class Claw implements Subsystem{
     private Timer timer; 
     public boolean algaeInClaw;
     private int algaeHoldCount;
+    private int controllerCount = 0;
+    XboxController controller = new XboxController(0);
 
     @Override
     //Called everytime an input/buttons is pressed
@@ -75,6 +79,14 @@ public class Claw implements Subsystem{
                 algaeHoldCount = 0;
             }
             if(algaeInClaw){
+                // if(controllerCount < 20){
+                //     controllerCount++;
+                //     controller.setRumble(RumbleType.kBothRumble, 0.5);
+                // }
+                // else{
+                //     controllerCount = 22;
+                //     controller.setRumble(RumbleType.kBothRumble, 0);
+                // }
                 clawMotor.setSpeed(ClawConstants.CLAW_HOLD_SPEED);
                 clawMotor2.setSpeed(-ClawConstants.CLAW_HOLD_SPEED);
             }

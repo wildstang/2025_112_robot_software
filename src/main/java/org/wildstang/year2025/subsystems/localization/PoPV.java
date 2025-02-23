@@ -13,7 +13,7 @@ import edu.wpi.first.math.geometry.Transform3d;
 
 public class PoPV {
 
-    AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
+    AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
 
     PhotonCamera liftTopCamera;
     List<PhotonPipelineResult> cameraResults;
