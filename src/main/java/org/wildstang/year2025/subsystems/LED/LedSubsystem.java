@@ -60,7 +60,6 @@ public class LedSubsystem implements Subsystem {
 
     @Override
     public void inputUpdate(Input source) {
-        // TODO Auto-generated method stub
         if (leftStick.getValue() == true){
             NormalBlue();
         }
