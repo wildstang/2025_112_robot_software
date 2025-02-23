@@ -9,6 +9,8 @@ import org.wildstang.framework.subsystems.Subsystem;
 import org.wildstang.hardware.roborio.outputs.WsSpark;
 import org.wildstang.year2025.robot.WsInputs;
 import org.wildstang.year2025.robot.WsOutputs;
+import org.wildstang.year2025.subsystems.LED.LedSubsystem;
+import org.wildstang.year2025.subsystems.LED.LedSubsystem.LEDstates;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
@@ -38,6 +40,7 @@ public class Claw implements Subsystem{
     public void inputUpdate(Input source) {
         if(leftTrigger.getValue() != 0){
             setGameState(clawStates.INTAKE);
+            LedSubsystem.ledState = LEDstates.INTAKE;
         }
         else if (rightBumper.getValue()){
             setGameState(clawStates.OUTTAKE);
@@ -87,6 +90,7 @@ public class Claw implements Subsystem{
                 //     controllerCount = 22;
                 //     controller.setRumble(RumbleType.kBothRumble, 0);
                 // }
+                LedSubsystem.ledState = LEDstates.INTAKE;
                 clawMotor.setSpeed(ClawConstants.CLAW_HOLD_SPEED);
                 clawMotor2.setSpeed(-ClawConstants.CLAW_HOLD_SPEED);
             }

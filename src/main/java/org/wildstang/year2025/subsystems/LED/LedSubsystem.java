@@ -22,6 +22,9 @@ public class LedSubsystem implements Subsystem {
     private Timer timer =  new Timer();
     private Timer clock1 = new Timer();
     private Timer clock2 = new Timer();
+
+    public static enum LEDstates {NORMAL, INTAKE, SHOOT, HOLD, ALGAE_DETECT};
+    public static LEDstates ledState;
     
 
     private int[] white = {255,255,255};
@@ -61,29 +64,35 @@ public class LedSubsystem implements Subsystem {
     @Override
     public void inputUpdate(Input source) {
         // TODO Auto-generated method stub
-        if (leftStick.getValue() == true){
-            NormalBlue();
+        
+        
+        
+    }
+
+
+
+    @Override
+    public void update() {
+        if(timer.hasElapsed(0.65)){
+            controller.setRumble(RumbleType.kBothRumble, 0);
+            timer.stop();
+            timer.reset();
+            
+        }
+
+        switch(ledState){  
+            case INTAKE:
+                Flash();
+            case ALGAE_DETECT:
+                setGreen();
+            default:
+                NormalBlue();
         }
         
-        // else if (rightStick.getValue() == true){
-        //     k = 0;
-        //     c = 0;
-        //     colorFn = 1;
-        //     if (flashColor == 1){
-        //         flashColor = 2;
-        //     }
-        //     else if (flashColor == 2){
-        //         flashColor = 1;
-        //     }
-        //     timer.stop();
-        //     timer.reset();
-        //     timer.start();
-        //     controller.setRumble(RumbleType.kBothRumble, 0.5);
-        // }
-        // else if (dpadUp.getValue() == true){
-        //     setGreen();
-        // }
+
     }
+
+
 
     public void NormalBlue(){
         colorFn = 0;
@@ -232,27 +241,7 @@ public class LedSubsystem implements Subsystem {
         throw new UnsupportedOperationException("Unimplemented method 'selfTest'");
     }
 
-    @Override
-    public void update() {
-        if(timer.hasElapsed(0.65)){
-            controller.setRumble(RumbleType.kBothRumble, 0);
-            timer.stop();
-            timer.reset();
-            
-        }
-        // TODO Auto-generated method stub
-        if (colorFn == 0){ //Standard coloring
-            NormalBlue();
-        }
-        else if (colorFn == 1){ //Intake State, maybe outtake with red
-            Flash();
-        }
-        else if (colorFn == 2){ //Vision detects algae
-            setGreen();
-        }
-
-    }
-
+   
     @Override
     public void resetState() {
         // TODO Auto-generated method stub
