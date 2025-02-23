@@ -143,6 +143,8 @@ public class ArmLift implements Subsystem {
         // }
         validArmAngle = armSetpoint;
         validLiftHeight = liftSetpoint;
+        armPIDC.resetIVal();
+        liftPIDC.resetIVal();
 
         //generate a motion profile for the arm and the lift
         armProfile.calculate(currentArmAngle,validArmAngle);

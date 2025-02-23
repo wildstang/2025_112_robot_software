@@ -65,6 +65,10 @@ public class PIDController {
         return vP;
     }
 
+    public void resetIVal(){
+        pI = 0;
+    }
+
 
 
 

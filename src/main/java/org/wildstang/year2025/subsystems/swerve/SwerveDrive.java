@@ -15,6 +15,7 @@ import org.wildstang.year2025.robot.WsInputs;
 import org.wildstang.year2025.robot.WsOutputs;
 import org.wildstang.year2025.robot.WsSubsystems;
 import org.wildstang.year2025.subsystems.Claw.Claw;
+import org.wildstang.year2025.subsystems.LED.LedSubsystem;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
@@ -65,6 +66,7 @@ public class SwerveDrive extends SwerveDriveTemplate {
 
     SwerveDriveKinematics swerveKinematics;
     private Claw claw;
+    private LedSubsystem LED;
 
     public enum driveType {TELEOP, AUTO, GROUND_INTAKE};
     public driveType driveState;
@@ -81,7 +83,9 @@ public class SwerveDrive extends SwerveDriveTemplate {
         initOutputs();
         resetState();
         gyro.setYaw(0.0);
+        LED = (LedSubsystem) Core.getSubsystemManager().getSubsystem(WsSubsystems.LED);
         claw = (Claw) Core.getSubsystemManager().getSubsystem(WsSubsystems.CLAW);
+
     }
 
     public void initInputs() {
@@ -160,6 +164,7 @@ public class SwerveDrive extends SwerveDriveTemplate {
             if (algaeInView()){
                 counterRumble = 0;
             }
+            driveState = driveType.GROUND_INTAKE;
          }else if(rotOutput != 0){
              driveState = driveType.TELEOP;
          } 
@@ -297,6 +302,7 @@ public class SwerveDrive extends SwerveDriveTemplate {
 
     private boolean algaeInView(){
         return pixyDigital.isPressed();
+        
     }
 
     /**
