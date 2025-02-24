@@ -5,47 +5,49 @@ import org.wildstang.framework.io.inputs.DigitalInput;
 import org.wildstang.framework.io.inputs.Input;
 import org.wildstang.framework.subsystems.Subsystem;
 import org.wildstang.year2025.robot.WsInputs;
-import org.wildstang.year2025.subsystems.localization.WsVision;
+import org.wildstang.year2025.robot.WsSubsystems;
+// import org.wildstang.year2025.subsystems.localization.WsVision;
+import org.wildstang.year2025.subsystems.swerve.SwerveDrive;
 
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+// import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class LedSubsystem implements Subsystem {
 
     private AddressableLED led;
     private AddressableLEDBuffer ledBuffer;
-    private WsVision vision;
+    // private WsVision vision;
     private Timer timer =  new Timer();
     private Timer clock1 = new Timer();
     private Timer clock2 = new Timer();
 
     public static enum LEDstates {NORMAL, INTAKE, SHOOT, HOLD, ALGAE_DETECT};
-    public static LEDstates ledState;
-    
+    public LEDstates ledState = LEDstates.NORMAL;
 
-    private int[] white = {255,255,255};
-    private int[] blue = {0,0,255};
-    private int[] red = {255,0,0};
-    private int[] green = {0,255,0};
-    private int[] orange = {255,100,0};
-    private int[] cyan = {0,155,155};
-    private int[] purple = {128,0,128};
+    // private int[] white = {255,255,255};
+    // private int[] blue = {0,0,255};
+    // private int[] red = {255,0,0};
+    // private int[] green = {0,255,0};
+    // private int[] orange = {255,100,0};
+    // private int[] cyan = {0,155,155};
+    // private int[] purple = {128,0,128};
 
     private int port = 0;//port
     private int length = 39;//length
-    private int initialHue = 0;
-    private int initialRed = 0;
-    private int initialBlue = 0;
+    // private int initialHue = 0;
+    // private int initialRed = 0;
+    // private int initialBlue = 0;
     
-    private int colorFn;
-    private int startRand = 1;
-    private int startRandG = 1;
-    private int changeSpeed = 12;
-    private int plusOr;
+    // private int colorFn;
+    // private int startRand = 1;
+    // private int startRandG = 1;
+    // private int changeSpeed = 12;
+    // private int plusOr;
     private int flashColor = 2;
     private int flashHalf = 1;
     private int flashSpeedOne = 10;
@@ -56,51 +58,59 @@ public class LedSubsystem implements Subsystem {
     private DigitalInput dpadUp;
     private int k = 0;
     private int c = 0;
-    private int s = 0;
-    private int shiftSpeed = 20;
+    private int initialHue = 0;
+    // private int s = 0;
+    // private int shiftSpeed = 20;
 
     XboxController controller = new XboxController(0);
+    SwerveDrive drive;
 
     @Override
     public void inputUpdate(Input source) {
-        // TODO Auto-generated method stub
-        
-        
-        
     }
-
-
 
     @Override
     public void update() {
+        // override all other signals during last 15 to last 13 seconds of the match
+        // to provide end of match signal
+        if (DriverStation.getMatchTime() < 15 && DriverStation.getMatchTime() > 13){
+            controller.setRumble(RumbleType.kBothRumble, 0.5);
+            rainbow();
+            return;
+        }
         if(timer.hasElapsed(0.65)){
             controller.setRumble(RumbleType.kBothRumble, 0);
             timer.stop();
             timer.reset();
-            
+            ledState = LEDstates.NORMAL;
         }
 
         switch(ledState){  
             case INTAKE:
+                timer.start();
+                controller.setRumble(RumbleType.kBothRumble, 0.5);
                 Flash();
+                break;
             case ALGAE_DETECT:
-                setGreen();
+                if (drive.algaeInView()){
+                    setGreen();
+                } else {
+                    NormalGreen();
+                }
+                break;
             default:
                 NormalBlue();
+                break;
         }
-        
-
     }
 
-
-
     public void NormalBlue(){
-        colorFn = 0;
+        // colorFn = 0;
         clock1.start();
-            if(clock1.hasElapsed(0.05)){
-                for(int i = 0; i < length; i++){
-                    int randomNum = (int)(Math.random()*2);
-                    switch(randomNum){
+        if(clock1.hasElapsed(0.05)){
+            for(int i = 0; i < length; i++){
+                int randomNum = (int)(Math.random() * 2);
+                switch(randomNum){
                     case 0:
                         ledBuffer.setRGB(i, 0, 0, 153);
                         break;
@@ -110,16 +120,24 @@ public class LedSubsystem implements Subsystem {
                     case 2:
                         ledBuffer.setRGB(i, 200, 153, 200);
                         break;
-                    }
                 }
-                clock1.stop();
-                clock1.reset();
             }
+            clock1.stop();
+            clock1.reset();
+        }
+        led.setData(ledBuffer);
+    }
+
+    private void rainbow(){
+        for (int i = 0; i < ledBuffer.getLength(); i++){
+            ledBuffer.setHSV(i, 180-(initialHue + (i*180/ledBuffer.getLength()))%180, 255, 128);
+        }
+        initialHue = (initialHue + 3) % 180;
         led.setData(ledBuffer);
     }
 
     public void setGreen(){
-        colorFn = 2;
+        // colorFn = 2;
         for(int i = 0; i < length; i++){
             ledBuffer.setRGB(i, 61,255,179);
         }
@@ -134,7 +152,6 @@ public class LedSubsystem implements Subsystem {
     }
 
     public void NormalGreen(){
-        
         clock2.start();
             if(clock2.hasElapsed(0.05)){
                 for(int i = 0; i < length; i++){
@@ -156,6 +173,7 @@ public class LedSubsystem implements Subsystem {
             }
         led.setData(ledBuffer);
     }
+
     public void Flash(){
         if (flashHalf == 1){
             if (k <= 255 / (1 + flashSpeedOne)){
@@ -200,8 +218,7 @@ public class LedSubsystem implements Subsystem {
                         ledBuffer.setRGB(i, (int)(0.5 * currentColor), currentColor, (int)(0.675 * currentColor));
                     }
                 }
-            }
-            else {
+            } else {
                 flashHalf = 1;
                 NormalBlue();
             }
@@ -211,7 +228,6 @@ public class LedSubsystem implements Subsystem {
 
     @Override
     public void init() {
-        // TODO Auto-generated method stub
         led = new AddressableLED(port);
         ledBuffer = new AddressableLEDBuffer(length);
         led.setLength(ledBuffer.getLength());
@@ -219,7 +235,7 @@ public class LedSubsystem implements Subsystem {
         led.setData(ledBuffer);
         led.start();
         resetState();
-        timer.start();
+        // timer.start();
         for (int i = 0; i < length; i++){
             ledBuffer.setRGB(i, 0, 0, 0);
         }
@@ -232,29 +248,24 @@ public class LedSubsystem implements Subsystem {
         rightStick.addInputListener(this);
         dpadUp = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_DPAD_UP);
         dpadUp.addInputListener(this); 
-
-        }
+    }
 
     @Override
     public void selfTest() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'selfTest'");
     }
 
    
     @Override
     public void resetState() {
-        // TODO Auto-generated method stub
     }
 
     @Override
     public void initSubsystems() {
-        // TODO Auto-generated method stub
+        drive = (SwerveDrive) Core.getSubsystemManager().getSubsystem(WsSubsystems.SWERVE_DRIVE);
     }
 
     @Override
     public String getName() {
-        // TODO Auto-generated method stub
         return ("LED");
     }
 

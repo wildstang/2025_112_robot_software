@@ -80,7 +80,6 @@ public class ArmLift implements Subsystem {
         liftMotor2 = (WsSpark) Core.getOutputManager().getOutput(WsOutputs.LIFTTWO);
         liftMotor1.setBrake();
         liftMotor2.setBrake();
-// liftMotor1.setCurrentLimit(armDirection, armDirection, armDirection);
        
         armMotor = (WsSpark) Core.getOutputManager().getOutput(WsOutputs.ARMMOTOR);
     }
@@ -141,8 +140,6 @@ public class ArmLift implements Subsystem {
         if (armSetpoint != validArmAngle) {
             armRecalculateFlag = true;
         }
-        // validArmAngle = armSetpoint;
-        // validLiftHeight = liftSetpoint;
         armPIDC.resetIVal();
         liftPIDC.resetIVal();
 
@@ -151,10 +148,7 @@ public class ArmLift implements Subsystem {
         liftProfile.calculate(currentLiftPos, validLiftHeight);
     }
 
-    // Press sensetive lift (not done)
     private void testAnalogSubsystem(){
-        // liftMotor1.getController().setVoltage(leftJoyStickY.getValue()*6);
-        liftMotor2.getController().setVoltage(-leftJoyStickY.getValue()*6);
         liftMotor1.setSpeed(leftJoyStickY.getValue());
         liftMotor2.setSpeed(-leftJoyStickY.getValue());
         SmartDashboard.putNumber("Lift Speed", leftJoyStickY.getValue());
@@ -171,16 +165,16 @@ public class ArmLift implements Subsystem {
          currentLiftVel = getLiftVel();
 
          if(liftRecalculateFlag && liftProfile.profileDone){
-                double[] validSetpoints = getValidSeptpoints(liftSetpoint, currentLiftPos, armSetpoint, currentArmAngle);
-                liftRecalculateFlag = validSetpoints[1] != liftSetpoint;
-                liftPIDC.resetIVal();
-                liftProfile.calculate(currentLiftPos, validSetpoints[1]);
+            double[] validSetpoints = getValidSeptpoints(liftSetpoint, currentLiftPos, armSetpoint, currentArmAngle);
+            liftRecalculateFlag = validSetpoints[1] != liftSetpoint;
+            liftPIDC.resetIVal();
+            liftProfile.calculate(currentLiftPos, validSetpoints[1]);
         }
         if (armRecalculateFlag && armProfile.profileDone){
             double[] validSetpoints = getValidSeptpoints(liftSetpoint, currentLiftPos, armSetpoint, currentArmAngle);
-                armRecalculateFlag = validSetpoints[0] != armSetpoint;
-                armPIDC.resetIVal();
-                armProfile.calculate(currentArmAngle, validSetpoints[0]);
+            armRecalculateFlag = validSetpoints[0] != armSetpoint;
+            armPIDC.resetIVal();
+            armProfile.calculate(currentArmAngle, validSetpoints[0]);
         }
 
         armMotor.setSpeed(armControlOutput(currentArmAngle, currentArmVel));
@@ -199,8 +193,6 @@ public class ArmLift implements Subsystem {
         SmartDashboard.putNumber("Lift setpoint", liftSetpoint);
         SmartDashboard.putNumber("Lift Velocity", currentLiftVel);
         SmartDashboard.putNumber("Arm Velocity", currentArmVel);
-        SmartDashboard.putNumber("Lift Target Vel", liftPIDC.positionPIController(liftSetpoint, currentLiftPos));
-        SmartDashboard.putNumber("Arm Target Vel", armPIDC.positionPIController(armSetpoint, currentArmAngle));
         SmartDashboard.putNumber("Valid arm angle", validArmAngle);
         SmartDashboard.putNumber("Valid Lift Height", validLiftHeight);
     }
@@ -232,7 +224,6 @@ public class ArmLift implements Subsystem {
         double goalAcc = curTarget[2];
         SmartDashboard.putNumber("Arm GoalPos", goalPos);
         SmartDashboard.putNumber("Arm GoalVel", goalVel);
-
         double FF = getCurrentArmTorque(goalAcc, currentAngle) / getMaxArmTorque(goalVel);
         return armPIDC.velocityPController(goalVel, curVel) + FF;
     }
@@ -306,12 +297,12 @@ public class ArmLift implements Subsystem {
     }
 
     private double getMaxArmTorque(double goalVel){
-         //mx + b where b is stall force and slope is change in force over angular velocity
+         //mx + b where b is stall torque and slope is change in torque over angular velocity
         return ArmLiftConstants.ARM_STALL * (1 - goalVel/ArmLiftConstants.ARM_FREE_SPEED);
     }
 
     private double getCurrentArmTorque(double goalAccel, double currentAngle){
-        //rotational inertia +  (moment of intertia * accleration)
+        //gravitational torque +  (moment of intertia * accleration)
         return (ArmLiftConstants.ARM_MASS * ArmLiftConstants.GRAVITY * ArmLiftConstants.ARM_COM_RADIUS * Math.sin(currentAngle)) 
         + (ArmLiftConstants.ARM_MOI * goalAccel);
     }
@@ -352,7 +343,6 @@ public class ArmLift implements Subsystem {
                     break;
             }
             calculateValidProfile();
-
         }
     }
 
@@ -361,7 +351,6 @@ public class ArmLift implements Subsystem {
 
     @Override
     public void resetState() {
-        // gameState = gameStates.;
     }
 
     @Override

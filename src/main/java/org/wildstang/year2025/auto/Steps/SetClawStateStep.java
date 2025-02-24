@@ -5,7 +5,6 @@ import org.wildstang.framework.core.Core;
 import org.wildstang.year2025.robot.WsSubsystems;
 import org.wildstang.year2025.subsystems.Claw.Claw;
 import org.wildstang.year2025.subsystems.Claw.Claw.clawStates;
-import org.wildstang.year2025.subsystems.arm_lift.ArmLift;
 
 public class SetClawStateStep extends AutoStep {
 
@@ -24,7 +23,13 @@ public class SetClawStateStep extends AutoStep {
     @Override
     public void update() {
         claw.setGameState(newState);
-        setFinished();
+        if (newState == clawStates.INTAKE){
+            if (claw.algaeInClaw) {
+                setFinished();
+            }
+        } else {
+            setFinished();
+        }
     }
 
     @Override

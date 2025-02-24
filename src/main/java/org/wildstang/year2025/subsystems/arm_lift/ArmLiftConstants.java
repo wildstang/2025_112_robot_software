@@ -75,8 +75,8 @@ public final class ArmLiftConstants {
     public static final double MAX_LOW_ARM_ANGLE = 5.0;
     public static final double MIN_LOW_ARM_ANGLE = 1.2;
 
-    public static final double POWER_CHAIN_LIFT_HEIGHT = 0.28;
-    public static final double POWER_CHAIN_LIFT_HEIGHT_MIN = 0.25;
+    public static final double POWER_CHAIN_LIFT_HEIGHT = 0.30;
+    public static final double POWER_CHAIN_LIFT_HEIGHT_MIN = 0.28;
     public static final double POWER_CHAIN_LIFT_HEIGHT_MAX = 0.34;
     public static final double ARM_POWER_CHAIN_LOW_LIMIT = 0;
     public static final double ARM_POWER_CHAIN_HIGH_ANGLE = 5.4;
