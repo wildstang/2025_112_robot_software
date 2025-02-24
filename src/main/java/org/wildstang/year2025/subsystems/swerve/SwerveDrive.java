@@ -16,6 +16,7 @@ import org.wildstang.year2025.robot.WsOutputs;
 import org.wildstang.year2025.robot.WsSubsystems;
 import org.wildstang.year2025.subsystems.Claw.Claw;
 import org.wildstang.year2025.subsystems.LED.LedSubsystem;
+import org.wildstang.year2025.subsystems.LED.LedSubsystem.LEDstates;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
@@ -66,7 +67,7 @@ public class SwerveDrive extends SwerveDriveTemplate {
 
     SwerveDriveKinematics swerveKinematics;
     private Claw claw;
-    private LedSubsystem LED;
+    private LedSubsystem led;
 
     public enum driveType {TELEOP, AUTO, GROUND_INTAKE};
     public driveType driveState;
@@ -74,7 +75,6 @@ public class SwerveDrive extends SwerveDriveTemplate {
 
     private static final double DEG_TO_RAD = Math.PI / 180.0;
     private static final double RAD_TO_DEG = 180.0 / Math.PI;
-    private int counterRumble = 22;
     private Boolean sensorOverride = false;
 
     @Override
@@ -83,8 +83,6 @@ public class SwerveDrive extends SwerveDriveTemplate {
         initOutputs();
         resetState();
         gyro.setYaw(0.0);
-        LED = (LedSubsystem) Core.getSubsystemManager().getSubsystem(WsSubsystems.LED);
-        claw = (Claw) Core.getSubsystemManager().getSubsystem(WsSubsystems.CLAW);
 
     }
 
@@ -128,6 +126,8 @@ public class SwerveDrive extends SwerveDriveTemplate {
 
     @Override
     public void initSubsystems(){
+        led = (LedSubsystem) Core.getSubsystemManager().getSubsystem(WsSubsystems.LED);
+        claw = (Claw) Core.getSubsystemManager().getSubsystem(WsSubsystems.CLAW);
     }
 
     @Override
@@ -160,10 +160,6 @@ public class SwerveDrive extends SwerveDriveTemplate {
         rotOutput = swerveHelper.scaleDeadband(-rightStickX.getValue(), DriveConstants.DEADBAND);  // negate joystick value so positive on the joystick (right) commands a negative rot speed (turn cw) and vice versa
         
         if(leftTrigger.getValue() != 0 && !sensorOverride){
-            driveState = driveType.GROUND_INTAKE;
-            if (algaeInView()){
-                counterRumble = 0;
-            }
             driveState = driveType.GROUND_INTAKE;
          }else if(rotOutput != 0){
              driveState = driveType.TELEOP;
@@ -208,18 +204,10 @@ public class SwerveDrive extends SwerveDriveTemplate {
                 yOutput = ySpeed * DriveConstants.DRIVE_F_K + (pathYTarget - curPose.getY()) * DriveConstants.POS_P;
                 break;
             case GROUND_INTAKE:
-                if(counterRumble < 20){
-                    counterRumble ++;
-                    controller.setRumble(RumbleType.kBothRumble,0.5);
-                }
-                else{
-                    counterRumble = 22;
-                    controller.setRumble(RumbleType.kBothRumble,0.0);
-                }
-                
                 if(claw.algaeInClaw){
                     driveState = driveType.TELEOP;
                 }
+                if (algaeInView()) led.ledState = LEDstates.INTAKE;
                 rotLocked = true;
                 rotTarget =  ((1.0 - pixyAnalog.getVoltage()) * 0.524 + getGyroAngle() + 2.0 * Math.PI) % (2.0 * Math.PI);
                 rotOutput = swerveHelper.getRotControl(rotTarget, getGyroAngle());
@@ -300,7 +288,7 @@ public class SwerveDrive extends SwerveDriveTemplate {
         rotTarget = headingTarget;
     }
 
-    private boolean algaeInView(){
+    public boolean algaeInView(){
         return pixyDigital.isPressed();
         
     }

@@ -130,19 +130,19 @@ public class ArmLift implements Subsystem {
 
     private void calculateValidProfile(){
         //getting setpoints within proper bounds
-        // double[] validSetpoints = getValidSeptpoints(liftSetpoint, currentLiftPos, armSetpoint, currentArmAngle);
-        // validArmAngle = validSetpoints[0];
-        // validLiftHeight = validSetpoints[1];
+        double[] validSetpoints = getValidSeptpoints(liftSetpoint, currentLiftPos, armSetpoint, currentArmAngle);
+        validArmAngle = validSetpoints[0];
+        validLiftHeight = validSetpoints[1];
 
-        // //multiple stage profile 
-        // if (liftSetpoint != validLiftHeight) {
-        //     liftRecalculateFlag = true;
-        // }
-        // if (armSetpoint != validArmAngle) {
-        //     armRecalculateFlag = true;
-        // }
-        validArmAngle = armSetpoint;
-        validLiftHeight = liftSetpoint;
+        //multiple stage profile 
+        if (liftSetpoint != validLiftHeight) {
+            liftRecalculateFlag = true;
+        }
+        if (armSetpoint != validArmAngle) {
+            armRecalculateFlag = true;
+        }
+        // validArmAngle = armSetpoint;
+        // validLiftHeight = liftSetpoint;
         armPIDC.resetIVal();
         liftPIDC.resetIVal();
 
@@ -152,7 +152,7 @@ public class ArmLift implements Subsystem {
     }
 
     // Press sensetive lift (not done)
-    public void testAnalogSubsystem(){
+    private void testAnalogSubsystem(){
         // liftMotor1.getController().setVoltage(leftJoyStickY.getValue()*6);
         liftMotor2.getController().setVoltage(-leftJoyStickY.getValue()*6);
         liftMotor1.setSpeed(leftJoyStickY.getValue());
@@ -171,13 +171,16 @@ public class ArmLift implements Subsystem {
          currentLiftVel = getLiftVel();
 
          if(liftRecalculateFlag && liftProfile.profileDone){
-                double[] validSetpoints = getValidSeptpoints(currentLiftPos, liftSetpoint, currentArmAngle, armSetpoint);
+                double[] validSetpoints = getValidSeptpoints(liftSetpoint, currentLiftPos, armSetpoint, currentArmAngle);
+                liftRecalculateFlag = validSetpoints[1] != liftSetpoint;
+                liftPIDC.resetIVal();
                 liftProfile.calculate(currentLiftPos, validSetpoints[1]);
         }
         if (armRecalculateFlag && armProfile.profileDone){
-                double[] validSetpoints = getValidSeptpoints(currentLiftPos, liftSetpoint, currentArmAngle, armSetpoint);
+            double[] validSetpoints = getValidSeptpoints(liftSetpoint, currentLiftPos, armSetpoint, currentArmAngle);
+                armRecalculateFlag = validSetpoints[0] != armSetpoint;
+                armPIDC.resetIVal();
                 armProfile.calculate(currentArmAngle, validSetpoints[0]);
-
         }
 
         armMotor.setSpeed(armControlOutput(currentArmAngle, currentArmVel));
@@ -198,6 +201,8 @@ public class ArmLift implements Subsystem {
         SmartDashboard.putNumber("Arm Velocity", currentArmVel);
         SmartDashboard.putNumber("Lift Target Vel", liftPIDC.positionPIController(liftSetpoint, currentLiftPos));
         SmartDashboard.putNumber("Arm Target Vel", armPIDC.positionPIController(armSetpoint, currentArmAngle));
+        SmartDashboard.putNumber("Valid arm angle", validArmAngle);
+        SmartDashboard.putNumber("Valid Lift Height", validLiftHeight);
     }
 
     //calculating lift height from a function of voltage
@@ -244,7 +249,9 @@ public class ArmLift implements Subsystem {
         return liftPIDC.velocityPController(goalVel, curVel) + FF;
     }
 
-    //returns valid setpoints for the arm and lift based on current positions 
+    /** returns valid setpoints for the arm and lift based on current positions 
+     * @return {arm angle, lift height}
+     */
     public double[] getValidSeptpoints(double goalLiftPos, double curLiftPos, double goalArmAngle, double curArmAngle){
         double validArmAngle = goalArmAngle;
         double validLiftHeight = goalLiftPos;
@@ -284,8 +291,6 @@ public class ArmLift implements Subsystem {
                 validArmAngle = Math.max(Math.min(validArmAngle, ArmLiftConstants.ARM_POWER_CHAIN_HIGH_ANGLE), ArmLiftConstants.ARM_POWER_CHAIN_LOW_ANGLE);
             }
         }
-        SmartDashboard.putNumber("Valid arm angle", validArmAngle);
-        SmartDashboard.putNumber("Valid Lift Height", validLiftHeight);
         return new double[]{validArmAngle, validLiftHeight};
     }
 
