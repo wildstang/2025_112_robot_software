@@ -9,8 +9,12 @@ import org.wildstang.framework.subsystems.Subsystem;
 import org.wildstang.hardware.roborio.outputs.WsSpark;
 import org.wildstang.year2025.robot.WsInputs;
 import org.wildstang.year2025.robot.WsOutputs;
+import org.wildstang.year2025.subsystems.LED.LedSubsystem;
+import org.wildstang.year2025.subsystems.LED.LedSubsystem.LEDstates;
 
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Claw implements Subsystem{
@@ -23,28 +27,24 @@ public class Claw implements Subsystem{
     //outputs
     private WsSpark clawMotor, clawMotor2;
 
-    private enum clawStates {INTAKE, OUTTAKE, IDLE}; 
+    public enum clawStates {INTAKE, OUTTAKE, IDLE, HOLD}; 
     private clawStates currentState;
     private Timer timer; 
-    public static boolean algaeInClaw;
-
-
-
+    public boolean algaeInClaw;
+    private int algaeHoldCount;
+    private int controllerCount = 0;
+    XboxController controller = new XboxController(0);
 
     @Override
     //Called everytime an input/buttons is pressed
     public void inputUpdate(Input source) {
-       if(leftBumper.getValue()){
-        currentState = clawStates.INTAKE;
-       }
-       else if (rightBumper.getValue()){
-        currentState = clawStates.OUTTAKE;
-        timer.reset();
-        timer.start();
-       }
-       else{
-        currentState = clawStates.IDLE;
-       }
+        if(leftTrigger.getValue() != 0){
+            setGameState(clawStates.INTAKE);
+            LedSubsystem.ledState = LEDstates.INTAKE;
+        }
+        else if (rightBumper.getValue()){
+            setGameState(clawStates.OUTTAKE);
+        }
     }
 
     @Override
@@ -63,25 +63,48 @@ public class Claw implements Subsystem{
 
         algaeInClaw = false;
         currentState = clawStates.IDLE;
+        algaeHoldCount = 0;
     }
 
     @Override
     //  runs every 20 MS
     public void update() {
+        SmartDashboard.putNumber("claw velocity", clawMotor.getVelocity());
+        SmartDashboard.putNumber("claw current", clawMotor.getOutputCurrent());
        switch(currentState){
         case INTAKE:
-            if(Math.abs(clawMotor.getVelocity()) < ClawConstants.CLAW_HOLD_SPEED && clawMotor.getOutputCurrent() > ClawConstants.CLAW_CURRENT_HOLD){
-                algaeInClaw = true; 
+            if(Math.abs(clawMotor.getVelocity()) < 1.0 && clawMotor.getOutputCurrent() > ClawConstants.CLAW_CURRENT_HOLD){
+                algaeHoldCount++;
+                if (algaeHoldCount >= 10){
+                    algaeInClaw = true;
+                }
+            } else {
+                algaeHoldCount = 0;
             }
+            if(algaeInClaw){
+                // if(controllerCount < 20){
+                //     controllerCount++;
+                //     controller.setRumble(RumbleType.kBothRumble, 0.5);
+                // }
+                // else{
+                //     controllerCount = 22;
+                //     controller.setRumble(RumbleType.kBothRumble, 0);
+                // }
+                LedSubsystem.ledState = LEDstates.INTAKE;
+                clawMotor.setSpeed(ClawConstants.CLAW_HOLD_SPEED);
+                clawMotor2.setSpeed(-ClawConstants.CLAW_HOLD_SPEED);
+            }
+            else{
             // clawMotor.setCurrentLimit(5, 10, 3);
             clawMotor.setSpeed(ClawConstants.CLAW_INTAKE_SPEED);
             clawMotor2.setSpeed(-ClawConstants.CLAW_INTAKE_SPEED);
+            }
             break;
 
         case OUTTAKE:
             // clawMotor.setCurrentLimit(10, 15, 3);
             if(timer.get() > ClawConstants.OUTTAKE_TIME){
-                currentState = clawStates.IDLE;
+                setGameState(clawStates.IDLE);
                 timer.reset();
                 algaeInClaw = false;
             }
@@ -102,10 +125,35 @@ public class Claw implements Subsystem{
        putDashboard();
     }
 
+    public void setGameState(clawStates desiredState){
+        if(desiredState != currentState){
+            switch(desiredState){
+                case INTAKE:
+                    currentState = clawStates.INTAKE;
+                    break;
+                case OUTTAKE:
+                    currentState = clawStates.OUTTAKE;
+                    timer.reset();
+                    timer.start();
+                    break;
+                case IDLE:
+                    currentState = clawStates.IDLE;
+                    break;
+                case HOLD:
+                    currentState = clawStates.HOLD; 
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
 
     private void putDashboard(){
         SmartDashboard.putString("Claw State", currentState.name());
+        SmartDashboard.putBoolean("Algae in claw", algaeInClaw);
+        
     }
+
     @Override
     //reseting everything
     public void resetState() {
@@ -114,15 +162,11 @@ public class Claw implements Subsystem{
 
     @Override
     public void selfTest() {
-        // TODO Auto-generated method stub
-        // throw new UnsupportedOperationException("Unimplemented method 'selfTest'");
         return;
     }
 
     @Override
     public void initSubsystems() {
-        // TODO Auto-generated method stub
-        // throw new UnsupportedOperationException("Unimplemented method 'initSubsystems'");
         return;
     }
 

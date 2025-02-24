@@ -9,8 +9,6 @@ import org.wildstang.hardware.roborio.inputs.config.WsJSButtonInputConfig;
 import org.wildstang.hardware.roborio.inputs.config.WsDPadButtonInputConfig;
 import org.wildstang.hardware.roborio.inputs.config.WsJSJoystickInputConfig;
 
-import edu.wpi.first.wpilibj.AnalogInput;
-
 /**
  * Input mappings are stored here.
  * We currently use two Xbox controller for input, driver and operator, plus additional sensors.
@@ -97,38 +95,38 @@ public enum WsInputs implements Inputs {
     // ---------------------------------
     // Operator Joysticks
     // ---------------------------------
-    OPERATOR_LEFT_JOYSTICK_Y  ("Operator left joystick y",  new WsJSJoystickInputConfig(1, JoystickConstants.LEFT_JOYSTICK_Y)),
-    OPERATOR_LEFT_JOYSTICK_X  ("Operator left joystick x",  new WsJSJoystickInputConfig(1, JoystickConstants.LEFT_JOYSTICK_X)),
-    OPERATOR_RIGHT_JOYSTICK_Y ("Operator right joystick y", new WsJSJoystickInputConfig(1, JoystickConstants.RIGHT_JOYSTICK_Y)),
-    OPERATOR_RIGHT_JOYSTICK_X ("Operator right joystick x", new WsJSJoystickInputConfig(1, JoystickConstants.RIGHT_JOYSTICK_X)),
+    // OPERATOR_LEFT_JOYSTICK_Y  ("Operator left joystick y",  new WsJSJoystickInputConfig(1, JoystickConstants.LEFT_JOYSTICK_Y)),
+    // OPERATOR_LEFT_JOYSTICK_X  ("Operator left joystick x",  new WsJSJoystickInputConfig(1, JoystickConstants.LEFT_JOYSTICK_X)),
+    // OPERATOR_RIGHT_JOYSTICK_Y ("Operator right joystick y", new WsJSJoystickInputConfig(1, JoystickConstants.RIGHT_JOYSTICK_Y)),
+    // OPERATOR_RIGHT_JOYSTICK_X ("Operator right joystick x", new WsJSJoystickInputConfig(1, JoystickConstants.RIGHT_JOYSTICK_X)),
 
-    // ---------------------------------
-    // Operator DPAD Buttons
-    // ---------------------------------
-    OPERATOR_DPAD_DOWN  ("Operator dpad down",  new WsDPadButtonInputConfig(1, JoystickConstants.DPAD_Y_DOWN)),
-    OPERATOR_DPAD_LEFT  ("Operator dpad left",  new WsDPadButtonInputConfig(1, JoystickConstants.DPAD_X_LEFT)),
-    OPERATOR_DPAD_RIGHT ("Operator dpad right", new WsDPadButtonInputConfig(1, JoystickConstants.DPAD_X_RIGHT)),
-    OPERATOR_DPAD_UP    ("Operator dpad up",    new WsDPadButtonInputConfig(1, JoystickConstants.DPAD_Y_UP)),
+    // // ---------------------------------
+    // // Operator DPAD Buttons
+    // // ---------------------------------
+    // OPERATOR_DPAD_DOWN  ("Operator dpad down",  new WsDPadButtonInputConfig(1, JoystickConstants.DPAD_Y_DOWN)),
+    // OPERATOR_DPAD_LEFT  ("Operator dpad left",  new WsDPadButtonInputConfig(1, JoystickConstants.DPAD_X_LEFT)),
+    // OPERATOR_DPAD_RIGHT ("Operator dpad right", new WsDPadButtonInputConfig(1, JoystickConstants.DPAD_X_RIGHT)),
+    // OPERATOR_DPAD_UP    ("Operator dpad up",    new WsDPadButtonInputConfig(1, JoystickConstants.DPAD_Y_UP)),
 
-    // ---------------------------------
-    // Operator Buttons
-    // ---------------------------------
-    OPERATOR_FACE_DOWN             ("Operator face down",             new WsJSButtonInputConfig(1, 0)),
-    OPERATOR_FACE_LEFT             ("Operator face left",             new WsJSButtonInputConfig(1, 2)),
-    OPERATOR_FACE_RIGHT            ("Operator face right",            new WsJSButtonInputConfig(1, 1)),
-    OPERATOR_FACE_UP               ("Operator face up",               new WsJSButtonInputConfig(1, 3)),
-    OPERATOR_LEFT_SHOULDER         ("Operator left shoulder",         new WsJSButtonInputConfig(1, 4)),
-    OPERATOR_RIGHT_SHOULDER        ("Operator right shoulder",        new WsJSButtonInputConfig(1, 5)),
-    OPERATOR_SELECT                ("Operator select",                new WsJSButtonInputConfig(1, 6)),
-    OPERATOR_START                 ("Operator start",                 new WsJSButtonInputConfig(1, 7)),
-    OPERATOR_LEFT_JOYSTICK_BUTTON  ("Operator left joystick button",  new WsJSButtonInputConfig(1, 8)),
-    OPERATOR_RIGHT_JOYSTICK_BUTTON ("Operator right joystick button", new WsJSButtonInputConfig(1, 9)),
+    // // ---------------------------------
+    // // Operator Buttons
+    // // ---------------------------------
+    // OPERATOR_FACE_DOWN             ("Operator face down",             new WsJSButtonInputConfig(1, 0)),
+    // OPERATOR_FACE_LEFT             ("Operator face left",             new WsJSButtonInputConfig(1, 2)),
+    // OPERATOR_FACE_RIGHT            ("Operator face right",            new WsJSButtonInputConfig(1, 1)),
+    // OPERATOR_FACE_UP               ("Operator face up",               new WsJSButtonInputConfig(1, 3)),
+    // OPERATOR_LEFT_SHOULDER         ("Operator left shoulder",         new WsJSButtonInputConfig(1, 4)),
+    // OPERATOR_RIGHT_SHOULDER        ("Operator right shoulder",        new WsJSButtonInputConfig(1, 5)),
+    // OPERATOR_SELECT                ("Operator select",                new WsJSButtonInputConfig(1, 6)),
+    // OPERATOR_START                 ("Operator start",                 new WsJSButtonInputConfig(1, 7)),
+    // OPERATOR_LEFT_JOYSTICK_BUTTON  ("Operator left joystick button",  new WsJSButtonInputConfig(1, 8)),
+    // OPERATOR_RIGHT_JOYSTICK_BUTTON ("Operator right joystick button", new WsJSButtonInputConfig(1, 9)),
 
-    // ---------------------------------
-    // Operator Triggers
-    // ---------------------------------
-    OPERATOR_LEFT_TRIGGER  ("Operator left trigger",  new WsJSJoystickInputConfig(1, JoystickConstants.LEFT_TRIGGER)),
-    OPERATOR_RIGHT_TRIGGER ("Operator right trigger", new WsJSJoystickInputConfig(1, JoystickConstants.RIGHT_TRIGGER)),
+    // // ---------------------------------
+    // // Operator Triggers
+    // // ---------------------------------
+    // OPERATOR_LEFT_TRIGGER  ("Operator left trigger",  new WsJSJoystickInputConfig(1, JoystickConstants.LEFT_TRIGGER)),
+    // OPERATOR_RIGHT_TRIGGER ("Operator right trigger", new WsJSJoystickInputConfig(1, JoystickConstants.RIGHT_TRIGGER)),
 
     // ********************************
     // Digital IOs

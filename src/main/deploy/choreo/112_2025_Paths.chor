@@ -1,0 +1,213 @@
+{
+ "name":"112_2025_Paths",
+ "version":1,
+ "type":"Swerve",
+ "variables":{
+  "expressions":{
+   "KeepOutR":{
+    "dimension":"Length",
+    "var":{
+     "exp":"1 m",
+     "val":1.0
+    }
+   }
+  },
+  "poses":{
+   "AlgaeEF":{
+    "x":{
+     "exp":"5.22 m",
+     "val":5.22
+    },
+    "y":{
+     "exp":"2.81 m",
+     "val":2.81
+    },
+    "heading":{
+     "exp":"-1.05 rad",
+     "val":-1.05
+    }
+   },
+   "AlgaeGH":{
+    "x":{
+     "exp":"5.9 m",
+     "val":5.9
+    },
+    "y":{
+     "exp":"4.026 m",
+     "val":4.026
+    },
+    "heading":{
+     "exp":"0 rad",
+     "val":0.0
+    }
+   },
+   "AlgaeIJ":{
+    "x":{
+     "exp":"5.22 m",
+     "val":5.22
+    },
+    "y":{
+     "exp":"5.24 m",
+     "val":5.24
+    },
+    "heading":{
+     "exp":"1.05 rad",
+     "val":1.05
+    }
+   },
+   "AlgaeKL":{
+    "x":{
+     "exp":"3.75 m",
+     "val":3.75
+    },
+    "y":{
+     "exp":"5.23 m",
+     "val":5.23
+    },
+    "heading":{
+     "exp":"2.09 rad",
+     "val":2.09
+    }
+   },
+   "BargeScore":{
+    "x":{
+     "exp":"7.75 m",
+     "val":7.75
+    },
+    "y":{
+     "exp":"5.6 m",
+     "val":5.6
+    },
+    "heading":{
+     "exp":"0 rad",
+     "val":0.0
+    }
+   },
+   "CenterStart":{
+    "x":{
+     "exp":"7.25 m",
+     "val":7.25
+    },
+    "y":{
+     "exp":"4.026 m",
+     "val":4.026
+    },
+    "heading":{
+     "exp":"0 rad",
+     "val":0.0
+    }
+   },
+   "EFStart":{
+    "x":{
+     "exp":"7.25 m",
+     "val":7.25
+    },
+    "y":{
+     "exp":"AlgaeEF.y",
+     "val":2.81
+    },
+    "heading":{
+     "exp":"0 rad",
+     "val":0.0
+    }
+   },
+   "IJStart":{
+    "x":{
+     "exp":"7.25 m",
+     "val":7.25
+    },
+    "y":{
+     "exp":"AlgaeIJ.y",
+     "val":5.24
+    },
+    "heading":{
+     "exp":"0 rad",
+     "val":0.0
+    }
+   },
+   "KeepOutReef":{
+    "x":{
+     "exp":"4.48945 m",
+     "val":4.48945
+    },
+    "y":{
+     "exp":"4.026 m",
+     "val":4.026
+    },
+    "heading":{
+     "exp":"0 rad",
+     "val":0.0
+    }
+   }
+  }
+ },
+ "config":{
+  "frontLeft":{
+   "x":{
+    "exp":"11 in",
+    "val":0.2794
+   },
+   "y":{
+    "exp":"11 in",
+    "val":0.2794
+   }
+  },
+  "backLeft":{
+   "x":{
+    "exp":"-11 in",
+    "val":-0.2794
+   },
+   "y":{
+    "exp":"11 in",
+    "val":0.2794
+   }
+  },
+  "mass":{
+   "exp":"150 lbs",
+   "val":68.0388555
+  },
+  "inertia":{
+   "exp":"6 kg m ^ 2",
+   "val":6.0
+  },
+  "gearing":{
+   "exp":"6.5",
+   "val":6.5
+  },
+  "radius":{
+   "exp":"2 in",
+   "val":0.0508
+  },
+  "vmax":{
+   "exp":"6000 RPM",
+   "val":628.3185307179587
+  },
+  "tmax":{
+   "exp":"1.2 N * m",
+   "val":1.2
+  },
+  "cof":{
+   "exp":"1.5",
+   "val":1.5
+  },
+  "bumper":{
+   "front":{
+    "exp":"16 in",
+    "val":0.4064
+   },
+   "side":{
+    "exp":"16 in",
+    "val":0.4064
+   },
+   "back":{
+    "exp":"16 in",
+    "val":0.4064
+   }
+  },
+  "differentialTrackWidth":{
+   "exp":"22 in",
+   "val":0.5588
+  }
+ },
+ "generationFeatures":[]
+}

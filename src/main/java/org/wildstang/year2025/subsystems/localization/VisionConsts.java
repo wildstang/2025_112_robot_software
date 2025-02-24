@@ -2,8 +2,6 @@ package org.wildstang.year2025.subsystems.localization;
 
 import java.util.List;
 
-import org.wildstang.framework.core.Core;
-
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 
@@ -12,15 +10,6 @@ public class VisionConsts {
 
     public static final double inToM = 1/39.71;
     public final double mToIn = 39.71;
-
-    public static final TargetCoordinate speaker = new TargetCoordinate
-        (9.5, 208);
-
-    public static final TargetCoordinate truss = new TargetCoordinate
-        (140, 218);
-
-    public static final TargetCoordinate shot = new TargetCoordinate
-        (67, 218);
 
     //TODO: what are the actual pipeline indices?
     public final int notePipelineIndex = 0;

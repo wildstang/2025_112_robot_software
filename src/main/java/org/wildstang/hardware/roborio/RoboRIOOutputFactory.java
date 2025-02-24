@@ -8,7 +8,6 @@ import org.wildstang.framework.io.outputs.Output;
 import org.wildstang.hardware.roborio.outputs.WsDigitalOutput;
 import org.wildstang.hardware.roborio.outputs.WsDoubleSolenoid;
 import org.wildstang.hardware.roborio.outputs.WsI2COutput;
-// import org.wildstang.hardware.roborio.outputs.WsPhoenix;
 import org.wildstang.hardware.roborio.outputs.WsRelay;
 import org.wildstang.hardware.roborio.outputs.WsServo;
 import org.wildstang.hardware.roborio.outputs.WsSolenoid;
@@ -18,8 +17,6 @@ import org.wildstang.hardware.roborio.outputs.WsRemoteDigitalOutput;
 import org.wildstang.hardware.roborio.outputs.config.WsDigitalOutputConfig;
 import org.wildstang.hardware.roborio.outputs.config.WsDoubleSolenoidConfig;
 import org.wildstang.hardware.roborio.outputs.config.WsI2COutputConfig;
-import org.wildstang.hardware.roborio.outputs.config.WsPhoenixConfig;
-import org.wildstang.hardware.roborio.outputs.config.WsPhoenixFollowerConfig;
 import org.wildstang.hardware.roborio.outputs.config.WsRelayConfig;
 import org.wildstang.hardware.roborio.outputs.config.WsServoConfig;
 import org.wildstang.hardware.roborio.outputs.config.WsSolenoidConfig;
@@ -66,19 +63,6 @@ public class RoboRIOOutputFactory implements OutputFactory {
             WsRelayConfig c = (WsRelayConfig) config;
             out = new WsRelay(p_output.getName(), c.getChannel());
         }
-        // else if (config instanceof WsPhoenixConfig) {
-        //     WsPhoenixConfig c = (WsPhoenixConfig) config;
-        //     out = new WsPhoenix(p_output.getName(), c.getChannel(), c.getDefault(),
-        //                         c.getType(), c.isInverted());
-        // }
-        // Note a WsPhoenixFollower must be defined after its corresponding WsPhoenix
-        // else if (config instanceof WsPhoenixFollowerConfig) {
-        //     WsPhoenixFollowerConfig c = (WsPhoenixFollowerConfig) config;
-        //     // Returns the follwed WsPhoenix because a return is required
-        //     // and duplicate outputs are thrown out when encountered.
-        //     out = Core.getOutputManager().getOutput(c.getFollowing());
-        //     ((WsPhoenix) out).addFollower(c.getChannel(), c.getType(), c.isOpposing());
-        // }
         else if (config instanceof WsSparkConfig) {
             WsSparkConfig c = (WsSparkConfig) config;
             out = new WsSpark(p_output.getName(), c.getChannel(), c.getType(), c.getDefault(), c.isInverted());

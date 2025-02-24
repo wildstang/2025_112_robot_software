@@ -1,7 +1,6 @@
 package org.wildstang.year2025.subsystems.arm_lift;
 
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class MotionProfile {
    private Timer timer = new Timer(); // Timer function (Sort of like a stopwatch/clock)
@@ -43,7 +42,6 @@ public class MotionProfile {
       //totalTime =  cruiseTime + 2*maxAccelerationTime or time it takes to finish profile
       //samples = (int)(totalTime/sampleTime)
       setArrayLengths((int) (((Math.abs(desPos - curPos) - 2 * minDistanceForMaxVel) / maxVel + 2 * maxAccelerationTime) / sampleTime)+1);
-      System.out.println("foo");
       setTrapezoidArrays(curPos, desPos);
    }
 
@@ -72,8 +70,6 @@ public class MotionProfile {
             accel = -maxAccel * dir;  // deceleration
             velocity = -accel * sampleTime * (profileArray.length - 1 - i);
          }
-
-         System.out.println(velocity);
 
          // Integrate velocity to get position
          position += velocity * sampleTime;
@@ -111,7 +107,7 @@ public class MotionProfile {
 
    public double[] getSamples(){
       if (profileDone) {
-         return profileArray[profileArray.length - 1];
+         return profileArray[0];
       }
 
       if(!timer.isRunning()){
@@ -124,8 +120,8 @@ public class MotionProfile {
          curIndex = profileArray.length - 1;
          timer.stop();
          profileDone = true;
-         // profileArray = new double[][] {profileArray[profileArray.length - 1]};
-         // return profileArray[0];
+         profileArray = new double[][] {profileArray[profileArray.length - 1]};
+         return profileArray[0];
       }
 
       return profileArray[curIndex];
