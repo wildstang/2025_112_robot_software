@@ -1,0 +1,66 @@
+package org.wildstang.year2025.subsystems.climb;
+
+import org.wildstang.framework.core.Core;
+import org.wildstang.framework.io.inputs.AnalogInput;
+import org.wildstang.framework.io.inputs.Input;
+import org.wildstang.framework.subsystems.Subsystem;
+import org.wildstang.hardware.roborio.outputs.WsSpark;
+import org.wildstang.year2025.robot.WsInputs;
+import org.wildstang.year2025.robot.WsOutputs;
+import org.wildstang.year2025.robot.WsSubsystems;
+
+
+public class Climb implements Subsystem {
+
+    private AnalogInput rightTrigger;
+    private WsSpark climbMotor;
+    private double climbMotorSpeed;
+
+    @Override
+    public void inputUpdate(Input source) {
+       if(rightTrigger.getValue() > 0.3){
+        climbMotorSpeed = rightTrigger.getValue();
+       }
+       else{
+        climbMotorSpeed = 0.0;
+       }
+    }
+
+    @Override
+    public void init() {
+        rightTrigger = (AnalogInput) Core.getInputManager().getInput(WsInputs.DRIVER_RIGHT_TRIGGER);
+        rightTrigger.addInputListener(this);
+        climbMotor = (WsSpark) Core.getOutputManager().getOutput(WsOutputs.CLIMBMOTOR); 
+        climbMotorSpeed = 0.0;
+    }
+
+    @Override
+    public void selfTest() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'selfTest'");
+    }
+
+    @Override
+    public void update() {
+       climbMotor.setSpeed(climbMotorSpeed);
+    }
+
+    @Override
+    public void resetState() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'resetState'");
+    }
+
+    @Override
+    public void initSubsystems() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'initSubsystems'");
+    }
+
+    @Override
+    public String getName() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getName'");
+    }
+    
+}
