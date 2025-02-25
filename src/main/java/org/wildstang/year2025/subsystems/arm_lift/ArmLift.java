@@ -235,7 +235,9 @@ public class ArmLift implements Subsystem {
         double goalAcc = curTarget[2];
         SmartDashboard.putNumber("Arm GoalPos", goalPos);
         SmartDashboard.putNumber("Arm GoalVel", goalVel);
+        SmartDashboard.putNumber("Arm GoalAcc", goalAcc);
         double FF = getCurrentArmTorque(goalAcc, currentAngle) / getMaxArmTorque(goalVel);
+        SmartDashboard.putNumber("Arm FF", FF);
         return armPIDC.velocityPController(goalVel, curVel) + FF;
     }
 
@@ -247,7 +249,9 @@ public class ArmLift implements Subsystem {
         double goalAcc = curTarget[2];
         SmartDashboard.putNumber("Lift GoalPos", goalPos);
         SmartDashboard.putNumber("Lift GoalVel", goalVel);
+        SmartDashboard.putNumber("Lift GoalAcc", goalAcc);
         double FF = getCurrentLiftForce(goalAcc) / getMaxLiftForce(goalVel);
+        SmartDashboard.putNumber("Lift FF", FF);
         return liftPIDC.velocityPController(goalVel, curVel) + FF;
     }
 
