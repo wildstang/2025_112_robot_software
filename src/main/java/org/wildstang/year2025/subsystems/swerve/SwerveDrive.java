@@ -17,6 +17,7 @@ import org.wildstang.year2025.robot.WsSubsystems;
 import org.wildstang.year2025.subsystems.Claw.Claw;
 import org.wildstang.year2025.subsystems.LED.LedSubsystem;
 import org.wildstang.year2025.subsystems.LED.LedSubsystem.LEDstates;
+import org.wildstang.year2025.subsystems.arm_lift.ArmLift;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
@@ -63,6 +64,7 @@ public class SwerveDrive extends SwerveDriveTemplate {
 
     SwerveDriveKinematics swerveKinematics;
     private Claw claw;
+    private ArmLift armLift;
     private LedSubsystem led;
 
     public enum driveType {TELEOP, AUTO, GROUND_INTAKE};
@@ -124,6 +126,7 @@ public class SwerveDrive extends SwerveDriveTemplate {
     public void initSubsystems(){
         led = (LedSubsystem) Core.getSubsystemManager().getSubsystem(WsSubsystems.LED);
         claw = (Claw) Core.getSubsystemManager().getSubsystem(WsSubsystems.CLAW);
+        armLift = (ArmLift) Core.getSubsystemManager().getSubsystem(WsSubsystems.ARMLIFT);
     }
 
     @Override
@@ -204,7 +207,7 @@ public class SwerveDrive extends SwerveDriveTemplate {
                 if(claw.algaeInClaw){
                     driveState = driveType.TELEOP;
                 }
-                if (algaeInView()) {
+                if (algaeInView() && armLift.isAtSetpoint()) {
                     rotLocked = true;
                     rotTarget =  ((1.0 - pixyAnalog.getVoltage()) * 0.524 + getGyroAngle() + 2.0 * Math.PI) % (2.0 * Math.PI);
                     rotOutput = swerveHelper.getRotControl(rotTarget, getGyroAngle());

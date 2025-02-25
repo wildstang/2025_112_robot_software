@@ -43,7 +43,7 @@ public class ArmLift implements Subsystem {
     private SparkAnalogSensor liftPot;
     private double currentLiftPos, currentLiftVel;
     public enum gameStates {GROUND_INTAKE, L2_ALGAE_REEF, L3_ALGAE_REEF, STORAGE, SCORE_PRELOAD, SHOOT_NET, START, CORAL_INTAKE}; // Our Arm/Lift States
-    private gameStates gameState = gameStates.START;
+    public gameStates gameState = gameStates.START;
     
     /* Arm Variables */
     private double currentArmAngle, currentArmVel;
@@ -236,7 +236,7 @@ public class ArmLift implements Subsystem {
         SmartDashboard.putNumber("Arm GoalPos", goalPos);
         SmartDashboard.putNumber("Arm GoalVel", goalVel);
         SmartDashboard.putNumber("Arm GoalAcc", goalAcc);
-        double FF = getCurrentArmTorque(goalAcc, currentAngle) / getMaxArmTorque(goalVel);
+        double FF = Math.max(Math.min(getCurrentArmTorque(goalAcc, currentAngle) / getMaxArmTorque(goalVel), 1), -1);
         SmartDashboard.putNumber("Arm FF", FF);
         return armPIDC.velocityPController(goalVel, curVel) + FF;
     }
@@ -250,7 +250,7 @@ public class ArmLift implements Subsystem {
         SmartDashboard.putNumber("Lift GoalPos", goalPos);
         SmartDashboard.putNumber("Lift GoalVel", goalVel);
         SmartDashboard.putNumber("Lift GoalAcc", goalAcc);
-        double FF = getCurrentLiftForce(goalAcc) / getMaxLiftForce(goalVel);
+        double FF = Math.max(Math.min(getCurrentLiftForce(goalAcc) / getMaxLiftForce(goalVel), 1), -1);
         SmartDashboard.putNumber("Lift FF", FF);
         return liftPIDC.velocityPController(goalVel, curVel) + FF;
     }
@@ -259,8 +259,8 @@ public class ArmLift implements Subsystem {
      * @return {arm angle, lift height}
      */
     public double[] getValidSeptpoints(double goalLiftPos, double curLiftPos, double goalArmAngle, double curArmAngle){
-        double validArmAngle = goalArmAngle;
-        double validLiftHeight = goalLiftPos;
+        double validArmAngle = Math.min(Math.max(goalArmAngle, ArmLiftConstants.MIN_ARM_ANGLE), ArmLiftConstants.MAX_ARM_ANGLE);
+        double validLiftHeight = Math.min(Math.max(goalLiftPos, ArmLiftConstants.MIN_LIFT_HEIGHT), ArmLiftConstants.MAX_LIFT_HEIGHT);
         if (curArmAngle < ArmLiftConstants.ARM_POWER_CHAIN_LOW_ANGLE || curArmAngle > ArmLiftConstants.ARM_POWER_CHAIN_HIGH_ANGLE) {
             if (curLiftPos < ArmLiftConstants.POWER_CHAIN_LIFT_HEIGHT_MIN || curLiftPos > ArmLiftConstants.POWER_CHAIN_LIFT_HEIGHT_MAX){
                 validArmAngle = curArmAngle;
@@ -323,14 +323,19 @@ public class ArmLift implements Subsystem {
     }
 
     public void setGameState(gameStates newState) {
-        setGameState(newState, !isFront);
+        // if we are going to storage, don't invert
+        if (newState == gameStates.STORAGE) {
+            setGameState(newState, isFront);
+        } else {
+            setGameState(newState, !isFront);
+        }
     }
 
     public void setGameState(gameStates newState, boolean isFront){
         this.isFront = isFront;
         switch (newState) {
             case GROUND_INTAKE:
-                this.isFront = true;
+                this.isFront = true;  // ground intake can only happen from the front
                 gameState = gameStates.GROUND_INTAKE;
                 armSetpoint = ArmLiftConstants.GROUND_INTAKE_RIGHT_ANGLE;
                 liftSetpoint = ArmLiftConstants.GROUND_INTAKE_LIFT_HEIGHT;
@@ -356,7 +361,7 @@ public class ArmLift implements Subsystem {
                 liftSetpoint = ArmLiftConstants.SHOOT_NET_LIFT_HEIGHT;
                 break;
             case CORAL_INTAKE:
-                this.isFront = false;
+                this.isFront = false;  // coral intake can only happen from the back
                 gameState = gameStates.CORAL_INTAKE;
                 armSetpoint = ArmLiftConstants.CORAL_STATION_ANGLE;
                 liftSetpoint = ArmLiftConstants.CORAL_STATION_HEIGHT;
@@ -365,6 +370,10 @@ public class ArmLift implements Subsystem {
                 break;
         }
         calculateValidProfile();
+    }
+
+    public boolean isAtSetpoint() {
+        return armProfile.profileDone && Math.abs(currentArmAngle - armSetpoint) < ArmLiftConstants.ARM_TOL && liftProfile.profileDone && Math.abs(currentLiftPos - liftSetpoint) < ArmLiftConstants.LIFT_TOL;
     }
 
     public void selfTest(){

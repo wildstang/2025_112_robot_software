@@ -14,17 +14,19 @@ public final class ArmLiftConstants {
     public static final double ARM_POS_P_GAIN = 8.0;
     public static final double ARM_POS_I_GAIN = 0.7;
     public static final double ARM_VEL_P_GAIN = 0.15;
+    public static final double ARM_TOL = 0.09;
 
     public static final double LIFT_POS_P_GAIN = 8.0;
     public static final double LIFT_POS_I_GAIN = 2.0;
     public static final double LIFT_VEL_P_GAIN = 0.4;
+    public static final double LIFT_TOL = 0.01;
     /* ------------------------------------------------------- */
 
     /* -------------------- Game Positions -------------------------------*/
     public static final double MAX_LIFT_HEIGHT = 0.650;  // meters
     public static final double MIN_LIFT_HEIGHT = 0;  // meters
     public static final double MIN_ARM_ANGLE = 0;
-    public static final double MAX_ARM_ANGLE = 2 * Math.PI;
+    public static final double MAX_ARM_ANGLE = 5.5;
 
     public static final double L2_SCORE_ANGLE = 1.03;
     public static final double L2_SCORE_LIFT_HEIGHT = 0.317;
