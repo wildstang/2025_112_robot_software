@@ -24,7 +24,7 @@ public final class ArmLiftConstants {
     public static final double MAX_LIFT_HEIGHT = 0.650;  // meters
     public static final double MIN_LIFT_HEIGHT = 0;  // meters
     public static final double MIN_ARM_ANGLE = 0;
-    public static final double MAX_ARM_ANGLE = 2*Math.PI;
+    public static final double MAX_ARM_ANGLE = 2 * Math.PI;
 
     public static final double L2_SCORE_ANGLE = 1.03;
     public static final double L2_SCORE_LIFT_HEIGHT = 0.317;
@@ -35,16 +35,16 @@ public final class ArmLiftConstants {
     public static final double L4_SCORE_ANGLE = 3.42;
     public static final double L4_SCORE_LIFT_HEIGHT = MAX_LIFT_HEIGHT;
 
-    public static final double L2_INTAKE_ANGLE = 1.94;
-    public static final double L2_INTAKE_LIFT_HEIGHT = 0.0;
+    public static final double L2_INTAKE_ANGLE = 1.65;
+    public static final double L2_INTAKE_LIFT_HEIGHT = 0.5;
 
-    public static final double L3_INTAKE_ANGLE = 1.94;
-    public static final double L3_INTAKE_LIFT_HEIGHT = .404;
+    public static final double L3_INTAKE_ANGLE = 1.65;
+    public static final double L3_INTAKE_LIFT_HEIGHT = 0.7;
     
     public static final double CORAL_STATION_ANGLE = 4.17;
     public static final double CORAL_STATION_HEIGHT = 0.286;
     
-    public static final double SHOOT_NET_ANGLE = 3.32;
+    public static final double SHOOT_NET_ANGLE = 2.88;
     public static final double SHOOT_NET_LIFT_HEIGHT = MAX_LIFT_HEIGHT;
 
     public static final double STORAGE_ANGLE = Math.PI;
@@ -54,7 +54,7 @@ public final class ArmLiftConstants {
     public static final double START_LIFT_HEIGHT = 0.229;
 
     //Intaking
-    public static final double GROUND_INTAKE_RIGHT_ANGLE = 1.2;  // radians
+    public static final double GROUND_INTAKE_RIGHT_ANGLE = 1.1;  // radians
     public static final double GROUND_INTAKE_LIFT_HEIGHT = 0.05;  // meters
 /* ------------------------------------------------------------------- */
 
@@ -73,7 +73,7 @@ public final class ArmLiftConstants {
 
     //bounds  when the lift is at a low position so the arm doesn't hit bumpers or lift
     public static final double MAX_LOW_ARM_ANGLE = 5.0;
-    public static final double MIN_LOW_ARM_ANGLE = 1.2;
+    public static final double MIN_LOW_ARM_ANGLE = 1.1;
 
     public static final double POWER_CHAIN_LIFT_HEIGHT = 0.30;
     public static final double POWER_CHAIN_LIFT_HEIGHT_MIN = 0.28;

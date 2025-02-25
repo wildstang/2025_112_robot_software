@@ -3,6 +3,7 @@ package org.wildstang.year2025.subsystems.arm_lift;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import org.wildstang.framework.io.inputs.Input;
+import org.wildstang.framework.logger.Log;
 import org.wildstang.framework.io.inputs.AnalogInput;
 import org.wildstang.framework.io.inputs.DigitalInput;
 
@@ -41,7 +42,7 @@ public class ArmLift implements Subsystem {
     private WsSpark liftMotor2;
     private SparkAnalogSensor liftPot;
     private double currentLiftPos, currentLiftVel;
-    public enum gameStates {GROUND_INTAKE, L2_ALGAE_REEF, L3_ALGAE_REEF, STORAGE, SCORE_PRELOAD, SHOOT_NET, START}; // Our Arm/Lift States
+    public enum gameStates {GROUND_INTAKE, L2_ALGAE_REEF, L3_ALGAE_REEF, STORAGE, SCORE_PRELOAD, SHOOT_NET, START, CORAL_INTAKE}; // Our Arm/Lift States
     private gameStates gameState = gameStates.START;
     
     /* Arm Variables */
@@ -55,6 +56,7 @@ public class ArmLift implements Subsystem {
     private double validArmAngle;
     private double validLiftHeight;
     private Claw claw;
+    private boolean isFront;
 
      @Override
     public void init(){
@@ -107,9 +109,9 @@ public class ArmLift implements Subsystem {
     }
 
     public void inputUpdate(Input source){
-        System.out.println(source.getName());
+        Log.warn(source.getName());
         if (faceDown.getValue()) {
-            setGameState(gameStates.STORAGE);
+            setGameState(gameStates.STORAGE, isFront);
         } else if (faceLeft.getValue()) {
             setGameState(gameStates.L2_ALGAE_REEF);
         } else if (faceRight.getValue()) {
@@ -143,9 +145,17 @@ public class ArmLift implements Subsystem {
         armPIDC.resetIVal();
         liftPIDC.resetIVal();
 
+        if ( armProfile.profileDone){
         //generate a motion profile for the arm and the lift
-        armProfile.calculate(currentArmAngle,validArmAngle);
-        liftProfile.calculate(currentLiftPos, validLiftHeight);
+            armProfile.calculate(currentArmAngle,validArmAngle);
+        } else {
+            armRecalculateFlag = true;
+        }
+        if (liftProfile.profileDone) {
+            liftProfile.calculate(currentLiftPos, validLiftHeight);
+        } else {
+            liftRecalculateFlag = true;
+        }
     }
 
     private void testAnalogSubsystem(){
@@ -195,6 +205,7 @@ public class ArmLift implements Subsystem {
         SmartDashboard.putNumber("Arm Velocity", currentArmVel);
         SmartDashboard.putNumber("Valid arm angle", validArmAngle);
         SmartDashboard.putNumber("Valid Lift Height", validLiftHeight);
+        SmartDashboard.putBoolean("Score Front", isFront);
     }
 
     //calculating lift height from a function of voltage
@@ -307,43 +318,49 @@ public class ArmLift implements Subsystem {
         + (ArmLiftConstants.ARM_MOI * goalAccel);
     }
 
-    public void setGameState(gameStates newState){
-        if (newState != gameState) {
-            switch (newState) {
-                case GROUND_INTAKE:
-                    gameState = gameStates.GROUND_INTAKE;
-                    armSetpoint = ArmLiftConstants.GROUND_INTAKE_RIGHT_ANGLE;
-                    liftSetpoint = ArmLiftConstants.GROUND_INTAKE_LIFT_HEIGHT;
-                    break;
-                case STORAGE:
-                    gameState = gameStates.STORAGE;
-                    armSetpoint = ArmLiftConstants.STORAGE_ANGLE;
-                    liftSetpoint = ArmLiftConstants.STORAGE_LIFT_HEIGHT;
-                    break;
+    public void setGameState(gameStates newState) {
+        setGameState(newState, !isFront);
+    }
 
-                case L2_ALGAE_REEF:
-                    gameState = gameStates.L2_ALGAE_REEF;
-                    armSetpoint = ArmLiftConstants.L2_INTAKE_ANGLE;
-                    liftSetpoint = ArmLiftConstants.L2_INTAKE_LIFT_HEIGHT;
-                    break;
-
-                case L3_ALGAE_REEF:
-                    gameState = gameStates.L3_ALGAE_REEF;
-                    armSetpoint = ArmLiftConstants.L3_INTAKE_ANGLE;
-                    liftSetpoint = ArmLiftConstants.L3_INTAKE_ANGLE;
-                    break;
-
-                case SHOOT_NET:
-                    gameState = gameStates.SHOOT_NET;
-                    armSetpoint = ArmLiftConstants.SHOOT_NET_ANGLE;
-                    liftSetpoint = ArmLiftConstants.SHOOT_NET_LIFT_HEIGHT;
-                    break;
-
-                default:
-                    break;
-            }
-            calculateValidProfile();
+    public void setGameState(gameStates newState, boolean isFront){
+        this.isFront = isFront;
+        switch (newState) {
+            case GROUND_INTAKE:
+                this.isFront = true;
+                gameState = gameStates.GROUND_INTAKE;
+                armSetpoint = ArmLiftConstants.GROUND_INTAKE_RIGHT_ANGLE;
+                liftSetpoint = ArmLiftConstants.GROUND_INTAKE_LIFT_HEIGHT;
+                break;
+            case STORAGE:
+                gameState = gameStates.STORAGE;
+                armSetpoint = ArmLiftConstants.STORAGE_ANGLE;
+                liftSetpoint = ArmLiftConstants.STORAGE_LIFT_HEIGHT;
+                break;
+            case L2_ALGAE_REEF:
+                gameState = gameStates.L2_ALGAE_REEF;
+                armSetpoint = this.isFront ? ArmLiftConstants.L2_INTAKE_ANGLE : 2 * Math.PI - ArmLiftConstants.L2_INTAKE_ANGLE;
+                liftSetpoint = ArmLiftConstants.L2_INTAKE_LIFT_HEIGHT;
+                break;
+            case L3_ALGAE_REEF:
+                gameState = gameStates.L3_ALGAE_REEF;
+                armSetpoint = this.isFront ? ArmLiftConstants.L3_INTAKE_ANGLE : 2 * Math.PI - ArmLiftConstants.L3_INTAKE_ANGLE;
+                liftSetpoint = ArmLiftConstants.L3_INTAKE_LIFT_HEIGHT;
+                break;
+            case SHOOT_NET:
+                gameState = gameStates.SHOOT_NET;
+                armSetpoint = this.isFront ? ArmLiftConstants.SHOOT_NET_ANGLE : 2 * Math.PI - ArmLiftConstants.SHOOT_NET_ANGLE;
+                liftSetpoint = ArmLiftConstants.SHOOT_NET_LIFT_HEIGHT;
+                break;
+            case CORAL_INTAKE:
+                this.isFront = false;
+                gameState = gameStates.CORAL_INTAKE;
+                armSetpoint = ArmLiftConstants.CORAL_STATION_ANGLE;
+                liftSetpoint = ArmLiftConstants.CORAL_STATION_HEIGHT;
+                break;
+            default:
+                break;
         }
+        calculateValidProfile();
     }
 
     public void selfTest(){

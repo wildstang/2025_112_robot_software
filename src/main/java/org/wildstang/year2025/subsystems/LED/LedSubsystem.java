@@ -73,14 +73,14 @@ public class LedSubsystem implements Subsystem {
     public void update() {
         // override all other signals during last 15 to last 13 seconds of the match
         // to provide end of match signal
-        if (DriverStation.getMatchTime() < 15 && DriverStation.getMatchTime() > 13){
+        if (DriverStation.isFMSAttached() && (DriverStation.getMatchTime() < 15 && DriverStation.getMatchTime() > 13)){
             controller.setRumble(RumbleType.kBothRumble, 0.5);
             rainbow();
             return;
         }
         if(timer.hasElapsed(0.65)){
             controller.setRumble(RumbleType.kBothRumble, 0);
-            timer.stop();
+            // timer.stop();
             timer.reset();
             ledState = LEDstates.NORMAL;
         }

@@ -19,7 +19,7 @@ public class MotionProfile {
       this.maxVel = maxVelocity;
       this.maxAccelerationTime = maxVelocity/maxAcceleration; // time it takes to reach max velocity
       this.minDistanceForMaxVel = 0.5 * maxAcceleration * Math.pow(maxAccelerationTime, 2.0); //mininum distance required to reach maxVelocity
-      profileDone = false;
+      profileDone = true;
       profileArray = new double[][] {{curPos, 0, 0}};
    }
 
