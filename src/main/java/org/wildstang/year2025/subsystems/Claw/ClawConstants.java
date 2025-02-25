@@ -7,4 +7,6 @@ public class ClawConstants{
     public static final double OUTTAKE_TIME = 1;
 
     public static final double CLAW_CURRENT_HOLD = 4;
+    public static final double CLAW_CURRENT_VEL = 1.0;
+    public static final int CLAW_HOLD_COUNT = 10;
 }

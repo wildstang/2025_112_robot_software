@@ -24,8 +24,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
-import edu.wpi.first.wpilibj.GenericHID.RumbleType;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**Class: SwerveDrive
@@ -62,8 +60,6 @@ public class SwerveDrive extends SwerveDriveTemplate {
     private SwerveSignal swerveSignal;
     private WsSwerveHelper swerveHelper = new WsSwerveHelper();
     private SwerveDrivePoseEstimator poseEstimator;
-    
-    XboxController controller = new XboxController(0);
 
     SwerveDriveKinematics swerveKinematics;
     private Claw claw;
@@ -204,13 +200,15 @@ public class SwerveDrive extends SwerveDriveTemplate {
                 yOutput = ySpeed * DriveConstants.DRIVE_F_K + (pathYTarget - curPose.getY()) * DriveConstants.POS_P;
                 break;
             case GROUND_INTAKE:
+                led.ledState = LEDstates.ALGAE_DETECT;
                 if(claw.algaeInClaw){
                     driveState = driveType.TELEOP;
                 }
-                if (algaeInView()) led.ledState = LEDstates.INTAKE;
-                rotLocked = true;
-                rotTarget =  ((1.0 - pixyAnalog.getVoltage()) * 0.524 + getGyroAngle() + 2.0 * Math.PI) % (2.0 * Math.PI);
-                rotOutput = swerveHelper.getRotControl(rotTarget, getGyroAngle());
+                if (algaeInView()) {
+                    rotLocked = true;
+                    rotTarget =  ((1.0 - pixyAnalog.getVoltage()) * 0.524 + getGyroAngle() + 2.0 * Math.PI) % (2.0 * Math.PI);
+                    rotOutput = swerveHelper.getRotControl(rotTarget, getGyroAngle());
+                }
                 break; 
         }
         
@@ -235,6 +233,7 @@ public class SwerveDrive extends SwerveDriveTemplate {
         SmartDashboard.putString("cur pose", curPose.toString());
         SmartDashboard.putNumber("Pixy Voltage", pixyAnalog.getVoltage());
         SmartDashboard.putBoolean("Pixy Obj Det", pixyDigital.isPressed());
+        SmartDashboard.putBoolean("Swerve Override", sensorOverride);
     }
 
     /** sets the drive to teleop/cross, and sets drive motors to coast */
