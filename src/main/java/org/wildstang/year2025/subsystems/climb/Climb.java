@@ -7,7 +7,7 @@ import org.wildstang.framework.subsystems.Subsystem;
 import org.wildstang.hardware.roborio.outputs.WsSpark;
 import org.wildstang.year2025.robot.WsInputs;
 import org.wildstang.year2025.robot.WsOutputs;
-import org.wildstang.year2025.robot.WsSubsystems;
+// import org.wildstang.year2025.robot.WsSubsystems;
 
 
 public class Climb implements Subsystem {
@@ -36,8 +36,6 @@ public class Climb implements Subsystem {
 
     @Override
     public void selfTest() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'selfTest'");
     }
 
     @Override
@@ -47,20 +45,15 @@ public class Climb implements Subsystem {
 
     @Override
     public void resetState() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'resetState'");
     }
 
     @Override
     public void initSubsystems() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'initSubsystems'");
     }
 
     @Override
     public String getName() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getName'");
+        return "Climb";
     }
     
 }
