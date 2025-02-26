@@ -9,6 +9,8 @@ import org.wildstang.year2025.robot.WsInputs;
 import org.wildstang.year2025.robot.WsOutputs;
 // import org.wildstang.year2025.robot.WsSubsystems;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 
 public class Climb implements Subsystem {
 
@@ -18,12 +20,7 @@ public class Climb implements Subsystem {
 
     @Override
     public void inputUpdate(Input source) {
-       if(rightTrigger.getValue() > 0.3){
         climbMotorSpeed = rightTrigger.getValue();
-       }
-       else{
-        climbMotorSpeed = 0.0;
-       }
     }
 
     @Override
@@ -41,6 +38,7 @@ public class Climb implements Subsystem {
     @Override
     public void update() {
        climbMotor.setSpeed(climbMotorSpeed);
+       SmartDashboard.putNumber("climb speed", climbMotorSpeed);
     }
 
     @Override
