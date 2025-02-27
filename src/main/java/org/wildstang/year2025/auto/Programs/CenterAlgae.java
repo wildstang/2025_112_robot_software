@@ -21,15 +21,16 @@ public class CenterAlgae extends AutoProgram {
 
         AutoParallelStepGroup group1 = new AutoParallelStepGroup();
         group1.addStep(new SwervePathFollowerStep("CenterStartToGH", swerve, true));
-        group1.addStep(new SetArmLiftStateStep(gameStates.GROUND_INTAKE));
+        group1.addStep(new SetArmLiftStateStep(gameStates.L2_ALGAE_REEF, true));
         group1.addStep(new SetClawStateStep(clawStates.INTAKE));
         addStep(group1);
 
         AutoParallelStepGroup group2 = new AutoParallelStepGroup();
         group2.addStep(new SwervePathFollowerStep("GHToBarge", swerve));
-        group2.addStep(new SetArmLiftStateStep(gameStates.SHOOT_NET));
-        group2.addStep(new SetClawStateStep(clawStates.OUTTAKE));
+        group2.addStep(new SetArmLiftStateStep(gameStates.SHOOT_NET, false));
         addStep(group2);
+
+        addStep(new SetClawStateStep(clawStates.OUTTAKE));
     }
 
     @Override

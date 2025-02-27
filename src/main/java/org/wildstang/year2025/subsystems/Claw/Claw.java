@@ -30,7 +30,7 @@ public class Claw implements Subsystem{
     private WsSpark clawMotor, clawMotor2;
 
     public static enum clawStates {INTAKE, OUTTAKE, IDLE, HOLD}; 
-    private clawStates currentState;
+    public clawStates currentState;
     private Timer timer; 
     public boolean algaeInClaw;
     private int algaeHoldCount;
@@ -87,12 +87,17 @@ public class Claw implements Subsystem{
                 if (algaeInClaw) {
                     led.ledState = LEDstates.INTAKE;
                     armLift.setGameState(gameStates.STORAGE);
-                    clawMotor.setSpeed(ClawConstants.CLAW_HOLD_SPEED);
-                    clawMotor2.setSpeed(-ClawConstants.CLAW_HOLD_SPEED);
+                    algaeInClaw = false;
+                    setGameState(clawStates.HOLD);
                 } else {
                     clawMotor.setSpeed(ClawConstants.CLAW_INTAKE_SPEED);
                     clawMotor2.setSpeed(-ClawConstants.CLAW_INTAKE_SPEED);
                 }
+                break;
+
+            case HOLD:
+                clawMotor.setSpeed(ClawConstants.CLAW_HOLD_SPEED);
+                clawMotor2.setSpeed(-ClawConstants.CLAW_HOLD_SPEED);
                 break;
 
             case OUTTAKE:

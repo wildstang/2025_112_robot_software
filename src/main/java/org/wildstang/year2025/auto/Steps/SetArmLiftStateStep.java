@@ -10,9 +10,11 @@ public class SetArmLiftStateStep extends AutoStep {
 
     private ArmLift armLift;
     private gameStates newState;
+    private boolean isFront;
 
-    public SetArmLiftStateStep(gameStates newState){
+    public SetArmLiftStateStep(gameStates newState, boolean isFront){
         this.newState = newState;
+        this.isFront = isFront;
     }
 
     @Override
@@ -22,8 +24,10 @@ public class SetArmLiftStateStep extends AutoStep {
 
     @Override
     public void update() {
-        armLift.setGameState(newState);
-        setFinished();
+        armLift.setGameState(newState, isFront);
+        if (armLift.isAtSetpoint()){
+            setFinished();
+        }
     }
 
     @Override

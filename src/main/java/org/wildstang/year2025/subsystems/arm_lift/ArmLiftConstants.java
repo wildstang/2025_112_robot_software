@@ -44,9 +44,12 @@ public final class ArmLiftConstants {
     public static final double L3_INTAKE_LIFT_HEIGHT = 0.7;
     
     public static final double CORAL_STATION_ANGLE = 4.17;
-    public static final double CORAL_STATION_HEIGHT = 0.286;
+    public static final double CORAL_STATION_HEIGHT = 0.31;
+
+    public static final double PROCESSOR_ANGLE = 1.2;
+    public static final double PROCESSOR_HEIGHT = 0.06;
     
-    public static final double SHOOT_NET_ANGLE = 2.88;
+    public static final double SHOOT_NET_ANGLE = 2.80;
     public static final double SHOOT_NET_LIFT_HEIGHT = MAX_LIFT_HEIGHT;
 
     public static final double STORAGE_ANGLE = Math.PI;

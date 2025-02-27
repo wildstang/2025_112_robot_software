@@ -33,6 +33,7 @@ public class ArmLift implements Subsystem {
     private DigitalInput faceLeft; // L2 Algae Reef Intake
     private DigitalInput faceRight; // L3 Algae Reef Intake
     private DigitalInput faceUp; // Shoot Net
+    private DigitalInput dpadDown, dpadLeft, dpadRight, dpadUp;
     private AnalogInput leftJoyStickY;
     private AnalogInput rightJoyStickX;
     private AnalogInput leftTrigger;
@@ -42,7 +43,7 @@ public class ArmLift implements Subsystem {
     private WsSpark liftMotor2;
     private SparkAnalogSensor liftPot;
     private double currentLiftPos, currentLiftVel;
-    public enum gameStates {GROUND_INTAKE, L2_ALGAE_REEF, L3_ALGAE_REEF, STORAGE, SCORE_PRELOAD, SHOOT_NET, START, CORAL_INTAKE}; // Our Arm/Lift States
+    public enum gameStates {GROUND_INTAKE, L2_ALGAE_REEF, L3_ALGAE_REEF, STORAGE, SCORE_PRELOAD, SHOOT_NET, START, CORAL_INTAKE, CORAL_L2, CORAL_L3, PROCESSOR}; // Our Arm/Lift States
     public gameStates gameState = gameStates.START;
     
     /* Arm Variables */
@@ -101,6 +102,14 @@ public class ArmLift implements Subsystem {
         // leftJoyStickY.addInputListener(this);
         rightJoyStickX = (AnalogInput) Core.getInputManager().getInput(WsInputs.DRIVER_RIGHT_JOYSTICK_X);
         // rightJoyStickX.addInputListener(this);
+        dpadDown = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_DPAD_DOWN);
+        dpadDown.addInputListener(this);
+        dpadLeft = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_DPAD_LEFT);
+        dpadLeft.addInputListener(this);
+        dpadRight = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_DPAD_RIGHT);
+        dpadRight.addInputListener(this);
+        dpadUp = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_DPAD_UP);
+        dpadUp.addInputListener(this);
     }
 
     @Override
@@ -120,6 +129,14 @@ public class ArmLift implements Subsystem {
             setGameState(gameStates.SHOOT_NET);
         } else if (leftTrigger.getValue() != 0) {
             setGameState(gameStates.GROUND_INTAKE);
+        } else if (dpadDown.getValue()) {
+            setGameState(gameStates.CORAL_INTAKE);
+        } else if (dpadLeft.getValue()) {
+            setGameState(gameStates.CORAL_L2);
+        } else if (dpadRight.getValue()) {
+            setGameState(gameStates.CORAL_L3);
+        } else if(dpadUp.getValue()){
+            setGameState(gameStates.PROCESSOR);
         }
     }
 
@@ -145,7 +162,7 @@ public class ArmLift implements Subsystem {
         armPIDC.resetIVal();
         liftPIDC.resetIVal();
 
-        if ( armProfile.profileDone){
+        if (armProfile.profileDone){
         //generate a motion profile for the arm and the lift
             armProfile.calculate(currentArmAngle,validArmAngle);
         } else {
@@ -206,6 +223,7 @@ public class ArmLift implements Subsystem {
         SmartDashboard.putNumber("Valid arm angle", validArmAngle);
         SmartDashboard.putNumber("Valid Lift Height", validLiftHeight);
         SmartDashboard.putBoolean("Score Front", isFront);
+        SmartDashboard.putBoolean("is at setpoint", isAtSetpoint());
     }
 
     //calculating lift height from a function of voltage
@@ -365,6 +383,21 @@ public class ArmLift implements Subsystem {
                 gameState = gameStates.CORAL_INTAKE;
                 armSetpoint = ArmLiftConstants.CORAL_STATION_ANGLE;
                 liftSetpoint = ArmLiftConstants.CORAL_STATION_HEIGHT;
+                break;
+            case CORAL_L2:
+                gameState = gameStates.CORAL_L2;
+                armSetpoint = ArmLiftConstants.L2_SCORE_ANGLE;
+                liftSetpoint = ArmLiftConstants.L2_SCORE_LIFT_HEIGHT;
+                break;
+            case CORAL_L3:
+                gameState = gameStates.CORAL_L3;
+                armSetpoint = ArmLiftConstants.L3_SCORE_ANGLE;
+                liftSetpoint = ArmLiftConstants.L3_SCORE_LIFT_HEIGHT;
+                break;
+            case PROCESSOR:
+                gameState = gameStates.PROCESSOR;
+                armSetpoint = this.isFront ? ArmLiftConstants.PROCESSOR_ANGLE : 2 * Math.PI - ArmLiftConstants.PROCESSOR_ANGLE;;
+                liftSetpoint = ArmLiftConstants.PROCESSOR_HEIGHT;
                 break;
             default:
                 break;

@@ -12,10 +12,11 @@ import org.wildstang.framework.subsystems.swerve.SwerveDriveTemplate;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.Timer;
-
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import choreo.*;
 import choreo.trajectory.SwerveSample;
 import choreo.trajectory.Trajectory;
@@ -89,7 +90,10 @@ public class SwervePathFollowerStep extends AutoStep {
             sampleVel = ChassisSpeeds.discretize(sample.getChassisSpeeds(), 0.02);
             drivePose = m_drive.returnPose();
 
-            m_drive.setAutoValues(sampleVel.vxMetersPerSecond, sampleVel.vyMetersPerSecond, sampleVel.omegaRadiansPerSecond, sample.x - drivePose.getX(), sample.y - drivePose.getY(), (((2.0 * Math.PI)+sample.heading)%(2.0 * Math.PI)));
+            // SmartDashboard.putData("auto pose", (Sendable) sample.getPose());
+            // SmartDashboard.putData("auto speed", (Sendable) sample.getChassisSpeeds());
+
+            m_drive.setAutoValues(sampleVel.vxMetersPerSecond, sampleVel.vyMetersPerSecond, sampleVel.omegaRadiansPerSecond, sample.x, sample.y, (((2.0 * Math.PI)+sample.heading)%(2.0 * Math.PI)));
         }
     }
 

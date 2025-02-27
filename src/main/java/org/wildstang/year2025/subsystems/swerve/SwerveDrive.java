@@ -1,5 +1,6 @@
 package org.wildstang.year2025.subsystems.swerve;
 
+import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.revrobotics.spark.SparkAnalogSensor;
 import com.revrobotics.spark.SparkLimitSwitch;
@@ -25,6 +26,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**Class: SwerveDrive
@@ -75,12 +78,15 @@ public class SwerveDrive extends SwerveDriveTemplate {
     private static final double RAD_TO_DEG = 180.0 / Math.PI;
     private Boolean sensorOverride = false;
 
+    public final Field2d m_field = new Field2d();
+
     @Override
     public void init() {
         initInputs();
         initOutputs();
         resetState();
         gyro.setYaw(0.0);
+        SmartDashboard.putData("Field", m_field);
 
     }
 
@@ -237,6 +243,7 @@ public class SwerveDrive extends SwerveDriveTemplate {
         SmartDashboard.putNumber("Pixy Voltage", pixyAnalog.getVoltage());
         SmartDashboard.putBoolean("Pixy Obj Det", pixyDigital.isPressed());
         SmartDashboard.putBoolean("Swerve Override", sensorOverride);
+        m_field.setRobotPose(curPose);
     }
 
     /** sets the drive to teleop/cross, and sets drive motors to coast */
@@ -301,7 +308,8 @@ public class SwerveDrive extends SwerveDriveTemplate {
      * @param degrees the current value the gyro should read
      */
     public void setGyro(double radians) {
-        gyro.setYaw(radians * RAD_TO_DEG);
+        StatusCode code = gyro.setYaw(radians * RAD_TO_DEG);
+        SmartDashboard.putString("gyro status code", code.getName());
         rotTarget = radians;
     }
 
