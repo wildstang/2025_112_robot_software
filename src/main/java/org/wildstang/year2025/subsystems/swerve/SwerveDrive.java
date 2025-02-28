@@ -15,9 +15,9 @@ import org.wildstang.year2025.robot.CANConstants;
 import org.wildstang.year2025.robot.WsInputs;
 import org.wildstang.year2025.robot.WsOutputs;
 import org.wildstang.year2025.robot.WsSubsystems;
-import org.wildstang.year2025.subsystems.Claw.Claw;
-import org.wildstang.year2025.subsystems.LED.LedSubsystem;
-import org.wildstang.year2025.subsystems.LED.LedSubsystem.LEDstates;
+// import org.wildstang.year2025.subsystems.Claw.Claw;
+// import org.wildstang.year2025.subsystems.LED.LedSubsystem;
+// import org.wildstang.year2025.subsystems.LED.LedSubsystem.LEDstates;
 import org.wildstang.year2025.subsystems.arm_lift.ArmLift;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -54,7 +54,7 @@ public class SwerveDrive extends SwerveDriveTemplate {
     private double xSpeed;
     private double ySpeed;
     private double wSpeed;
-    private double derateValue = 1.0;
+    // private double derateValue = 1.0;
     private boolean rotLocked;
     private double rotTarget;
     private double pathXTarget;
@@ -67,9 +67,9 @@ public class SwerveDrive extends SwerveDriveTemplate {
     private SwerveDrivePoseEstimator poseEstimator;
 
     SwerveDriveKinematics swerveKinematics;
-    private Claw claw;
+    // private Claw claw;
     private ArmLift armLift;
-    private LedSubsystem led;
+    // private LedSubsystem led;
 
     public enum driveType {TELEOP, AUTO};
     public driveType driveState;
@@ -133,8 +133,8 @@ public class SwerveDrive extends SwerveDriveTemplate {
 
     @Override
     public void initSubsystems(){
-        led = (LedSubsystem) Core.getSubsystemManager().getSubsystem(WsSubsystems.LED);
-        claw = (Claw) Core.getSubsystemManager().getSubsystem(WsSubsystems.CLAW);
+        // led = (LedSubsystem) Core.getSubsystemManager().getSubsystem(WsSubsystems.LED);
+        // claw = (Claw) Core.getSubsystemManager().getSubsystem(WsSubsystems.CLAW);
         armLift = (ArmLift) Core.getSubsystemManager().getSubsystem(WsSubsystems.ARMLIFT);
     }
 
@@ -210,26 +210,26 @@ public class SwerveDrive extends SwerveDriveTemplate {
                         case GROUND_INTAKE:
                             if (algaeInView() && armLift.isAtSetpoint()) {
                                 // rotLocked = true;
-                                derateValue = 0.75;
+                                // derateValue = 0.75;
                                 rotTarget =  ((1.0 - pixyAnalog.getVoltage()) * 0.70 + getGyroAngle() + 2.0 * Math.PI) % (2.0 * Math.PI);
                                 rotOutput = swerveHelper.getRotControl(rotTarget, getGyroAngle());
                             }
                             break;
                         case L2_ALGAE_REEF:
                         case L3_ALGAE_REEF:
-                            derateValue = 0.75;
+                            // derateValue = 0.75;
                             rotTarget = (Math.round(getGyroAngle() / (Math.PI / 3.0)) % 6) * (Math.PI / 3.0);
                             rotOutput = swerveHelper.getRotControl(rotTarget, getGyroAngle());
                             break;
                         case PROCESSOR:
-                            derateValue = 0.75;
+                            // derateValue = 0.75;
                             rotTarget = (getGyroAngle() <= Math.PI) ? Math.PI / 2.0 : 3.0 * Math.PI / 2.0;
                             rotOutput = swerveHelper.getRotControl(rotTarget, getGyroAngle());
                             break;
                         case SHOOT_NET:
-                            derateValue = 0.5;
+                            // derateValue = 0.5;
                         default:
-                            derateValue = 1.0;
+                            // derateValue = 1.0;
                             break;
                     }
                 }
