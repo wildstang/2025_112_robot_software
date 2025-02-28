@@ -18,8 +18,8 @@ public final class ArmLiftConstants {
 
     public static final double LIFT_POS_P_GAIN = 8.0;
     public static final double LIFT_POS_I_GAIN = 2.0;
-    public static final double LIFT_VEL_P_GAIN = 0.4;
-    public static final double LIFT_TOL = 0.01;
+    public static final double LIFT_VEL_P_GAIN = 0.6;
+    public static final double LIFT_TOL = 0.02;
     /* ------------------------------------------------------- */
 
     /* -------------------- Game Positions -------------------------------*/
@@ -41,7 +41,7 @@ public final class ArmLiftConstants {
     public static final double L2_INTAKE_LIFT_HEIGHT = 0.42;
 
     public static final double L3_INTAKE_ANGLE = 1.65;
-    public static final double L3_INTAKE_LIFT_HEIGHT = 0.7;
+    public static final double L3_INTAKE_LIFT_HEIGHT = MAX_LIFT_HEIGHT;
     
     public static final double CORAL_STATION_ANGLE = 4.17;
     public static final double CORAL_STATION_HEIGHT = 0.31;
@@ -65,7 +65,7 @@ public final class ArmLiftConstants {
 
 /* ---------------ARM AND LIFT BOUND CHECKING -------------*/
     public static final double LOW_LIFT_HEIGHT = 0.2;
-    public static final double HIGH_LIFT_HEIGHT = 15;
+    public static final double HIGH_LIFT_HEIGHT = 0.22;
 
     //threshold angles where the lift can move down without hitting algae
     public static final double MAX_LIFT_DOWN_ANGLE = 3.62;

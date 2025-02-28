@@ -7,6 +7,7 @@ import com.revrobotics.spark.SparkLimitSwitch;
 
 import org.wildstang.framework.core.Core;
 import org.wildstang.framework.io.inputs.Input;
+import org.wildstang.framework.logger.Log;
 import org.wildstang.framework.io.inputs.AnalogInput;
 import org.wildstang.framework.io.inputs.DigitalInput;
 import org.wildstang.framework.subsystems.swerve.SwerveDriveTemplate;
@@ -206,6 +207,7 @@ public class SwerveDrive extends SwerveDriveTemplate {
         switch (driveState) {
             case TELEOP:
                 if (!rotHelperOverride && rotLocked) {
+                    Log.warn("bar");
                     switch (armLift.gameState){
                         case GROUND_INTAKE:
                             if (algaeInView() && armLift.isAtSetpoint()) {
@@ -220,7 +222,17 @@ public class SwerveDrive extends SwerveDriveTemplate {
                             // derateValue = 0.75;
                             rotTarget = (Math.round(getGyroAngle() / (Math.PI / 3.0)) % 6) * (Math.PI / 3.0);
                             rotOutput = swerveHelper.getRotControl(rotTarget, getGyroAngle());
-                            break;
+                            // if (algaeInView() && armLift.isAtSetpoint()){
+                            //     yOutput = (1.0 - pixyAnalog.getVoltage()) * 0.70;// * derateValue;
+                            //     rotOutput = Math.min(Math.max(rotOutput, -1.0), 1.0);
+                            //     xOutput = Math.min(Math.max(xOutput, -1.0), 1.0);// * derateValue;
+                            //     yOutput = Math.min(Math.max(yOutput, -1.0), 1.0);// * derateValue;
+                            //     Log.warn("foo");
+                            //     this.swerveSignal = swerveHelper.setDrive(xOutput , yOutput, rotOutput, 0);
+                            //     drive();
+                            //     putDashboard();
+                            //     return;
+                            // }
                         case PROCESSOR:
                             // derateValue = 0.75;
                             rotTarget = (getGyroAngle() <= Math.PI) ? Math.PI / 2.0 : 3.0 * Math.PI / 2.0;
@@ -258,7 +270,11 @@ public class SwerveDrive extends SwerveDriveTemplate {
         yOutput = Math.min(Math.max(yOutput, -1.0), 1.0);// * derateValue;
         this.swerveSignal = swerveHelper.setDrive(xOutput , yOutput, rotOutput, getGyroAngle());
         drive();
+        putDashboard();
 
+    }
+
+    private void putDashboard() {
         SmartDashboard.putNumber("Gyro Reading", getGyroAngle());
         SmartDashboard.putNumber("X output", xOutput);
         SmartDashboard.putNumber("Y output", yOutput);
@@ -271,13 +287,13 @@ public class SwerveDrive extends SwerveDriveTemplate {
         SmartDashboard.putNumber("Auto y pos", pathYTarget);
         SmartDashboard.putNumber("rot target", rotTarget);
         SmartDashboard.putBoolean("Blue Alliance", Core.isBlueAlliance());
-        SmartDashboard.putString("cur pose", curPose.toString());
+        // SmartDashboard.putString("cur pose", curPose.toString());
         SmartDashboard.putNumber("Pixy Voltage", pixyAnalog.getVoltage());
         SmartDashboard.putBoolean("Pixy Obj Det", pixyDigital.isPressed());
         SmartDashboard.putBoolean("Rot Control Override", rotHelperOverride);
+        SmartDashboard.putBoolean("rot lock", rotLocked);
         publisher.set(curPose);
         m_field.setRobotPose(curPose);
-        
     }
 
     /** sets the drive to teleop/cross, and sets drive motors to coast */
