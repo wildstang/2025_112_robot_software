@@ -12,11 +12,11 @@ import org.wildstang.framework.subsystems.swerve.SwerveDriveTemplate;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import choreo.*;
 import choreo.trajectory.SwerveSample;
 import choreo.trajectory.Trajectory;
@@ -37,6 +37,7 @@ public class SwervePathFollowerStep extends AutoStep {
     private Boolean isBlue;
 
     private final double endTime;
+    StructArrayPublisher<Pose2d> trajPublisher;
 
     /** Sets the robot to track a new path
      * finishes after all values have been read to robot
@@ -44,10 +45,12 @@ public class SwervePathFollowerStep extends AutoStep {
      * @param drive the swerveDrive subsystem
      */
     public SwervePathFollowerStep(String pathData, SwerveDriveTemplate drive) {
-        this.pathtraj = Choreo.loadTrajectory(pathData);
+        pathtraj = Choreo.loadTrajectory(pathData);
         m_drive = drive;
         timer = new Timer();
         endTime = pathtraj.get().getTotalTime();
+        trajPublisher = NetworkTableInstance.getDefault().getStructArrayTopic("Traj Pose", Pose2d.struct).publish();
+
     }
 
     /** Sets the robot to track a new path
@@ -57,10 +60,7 @@ public class SwervePathFollowerStep extends AutoStep {
      * @param isFirstPath if true, resets swerveDrive gyro and pose estimator using the initial pose of the path
      */
     public SwervePathFollowerStep(String pathData, SwerveDriveTemplate drive, Boolean isFirstPath) {
-        pathtraj = Choreo.loadTrajectory(pathData);
-        m_drive = drive;
-        timer = new Timer();
-        endTime = pathtraj.get().getTotalTime();
+        this(pathData, drive);
         isBlue = Core.isBlueAlliance();
         if (isFirstPath) {
             m_drive.setGyro(pathtraj.get().getInitialPose(!isBlue).get().getRotation().getRadians());
@@ -73,6 +73,7 @@ public class SwervePathFollowerStep extends AutoStep {
         //start path
         m_drive.setToAuto();
         timer.start();
+        trajPublisher.set(pathtraj.get().getPoses());
     }
 
     @Override

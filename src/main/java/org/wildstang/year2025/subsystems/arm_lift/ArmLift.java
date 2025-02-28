@@ -3,7 +3,6 @@ package org.wildstang.year2025.subsystems.arm_lift;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import org.wildstang.framework.io.inputs.Input;
-import org.wildstang.framework.logger.Log;
 import org.wildstang.framework.io.inputs.AnalogInput;
 import org.wildstang.framework.io.inputs.DigitalInput;
 
@@ -16,7 +15,7 @@ import org.wildstang.year2025.robot.WsOutputs;
 import org.wildstang.year2025.robot.WsSubsystems;
 import org.wildstang.year2025.subsystems.Claw.Claw;
 
-import com.revrobotics.spark.SparkAnalogSensor;
+// import com.revrobotics.spark.SparkAnalogSensor;
 
 /**
  * Interface describing a subsystem class.
@@ -33,7 +32,8 @@ public class ArmLift implements Subsystem {
     private DigitalInput faceLeft; // L2 Algae Reef Intake
     private DigitalInput faceRight; // L3 Algae Reef Intake
     private DigitalInput faceUp; // Shoot Net
-    private DigitalInput dpadDown, dpadLeft, dpadRight, dpadUp;
+    private DigitalInput dpadDown, dpadUp;
+    // private DigitalInput dpadLeft, dpadRight;
     private AnalogInput leftJoyStickY;
     private AnalogInput rightJoyStickX;
     private AnalogInput leftTrigger;
@@ -41,8 +41,8 @@ public class ArmLift implements Subsystem {
     /* Lift Variables */
     private WsSpark liftMotor1;
     private WsSpark liftMotor2;
-    private SparkAnalogSensor liftPot;
-    private double currentLiftPos, currentLiftVel;
+    // private SparkAnalogSensor liftPot;
+    private double currentLiftHeight, currentLiftVel;
     public enum gameStates {GROUND_INTAKE, L2_ALGAE_REEF, L3_ALGAE_REEF, STORAGE, SCORE_PRELOAD, SHOOT_NET, START, CORAL_INTAKE, CORAL_L2, CORAL_L3, PROCESSOR}; // Our Arm/Lift States
     public gameStates gameState = gameStates.START;
     
@@ -58,24 +58,26 @@ public class ArmLift implements Subsystem {
     private double validLiftHeight;
     private Claw claw;
     private boolean isFront;
+    private double manualArmAdjust;
 
      @Override
     public void init(){
         initOutput();
         initInputs();
-        liftPot = liftMotor1.getController().getAnalog();
+        // liftPot = liftMotor1.getController().getAnalog();
         currentArmAngle = getArmAngle();
-        currentLiftPos = getLiftHeight();
+        currentLiftHeight = getLiftHeight();
         liftRecalculateFlag = false;
         armRecalculateFlag = false;
         armProfile = new MotionProfile(ArmLiftConstants.MAX_ARM_ACCELERATION
         , ArmLiftConstants.MAX_ARM_VELOCITY, currentArmAngle);
         liftProfile = new MotionProfile(ArmLiftConstants.MAX_LIFT_ACCELERATION
-        , ArmLiftConstants.MAX_LIFT_VELOCITY, currentLiftPos);
+        , ArmLiftConstants.MAX_LIFT_VELOCITY, currentLiftHeight);
         armPIDC = new PIDController(ArmLiftConstants.ARM_POS_P_GAIN, ArmLiftConstants.ARM_POS_I_GAIN
         , ArmLiftConstants.ARM_VEL_P_GAIN, 1.0);
         liftPIDC = new PIDController(ArmLiftConstants.LIFT_POS_P_GAIN, ArmLiftConstants.LIFT_POS_I_GAIN
         , ArmLiftConstants.LIFT_VEL_P_GAIN, 0.5);
+        manualArmAdjust = 0;
     }
 
     public void initOutput(){
@@ -104,10 +106,10 @@ public class ArmLift implements Subsystem {
         // rightJoyStickX.addInputListener(this);
         dpadDown = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_DPAD_DOWN);
         dpadDown.addInputListener(this);
-        dpadLeft = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_DPAD_LEFT);
-        dpadLeft.addInputListener(this);
-        dpadRight = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_DPAD_RIGHT);
-        dpadRight.addInputListener(this);
+        // dpadLeft = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_DPAD_LEFT);
+        // dpadLeft.addInputListener(this);
+        // dpadRight = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_DPAD_RIGHT);
+        // dpadRight.addInputListener(this);
         dpadUp = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_DPAD_UP);
         dpadUp.addInputListener(this);
     }
@@ -118,7 +120,7 @@ public class ArmLift implements Subsystem {
     }
 
     public void inputUpdate(Input source){
-        Log.warn(source.getName());
+        // Log.warn(source.getName());
         if (faceDown.getValue()) {
             setGameState(gameStates.STORAGE, isFront);
         } else if (faceLeft.getValue()) {
@@ -130,13 +132,15 @@ public class ArmLift implements Subsystem {
         } else if (leftTrigger.getValue() != 0) {
             setGameState(gameStates.GROUND_INTAKE);
         } else if (dpadDown.getValue()) {
-            setGameState(gameStates.CORAL_INTAKE);
-        } else if (dpadLeft.getValue()) {
-            setGameState(gameStates.CORAL_L2);
-        } else if (dpadRight.getValue()) {
-            setGameState(gameStates.CORAL_L3);
+            manualArmAdjust -= 0.05;
+            // setGameState(gameStates.CORAL_INTAKE);
         } else if(dpadUp.getValue()){
-            setGameState(gameStates.PROCESSOR);
+            manualArmAdjust += 0.05;
+            // setGameState(gameStates.PROCESSOR);
+        // } else if (dpadLeft.getValue()) {
+        //     setGameState(gameStates.CORAL_L2);
+        // } else if (dpadRight.getValue()) {
+        //     setGameState(gameStates.CORAL_L3);
         }
     }
 
@@ -148,7 +152,7 @@ public class ArmLift implements Subsystem {
 
     private void calculateValidProfile(){
         //getting setpoints within proper bounds
-        double[] validSetpoints = getValidSeptpoints(liftSetpoint, currentLiftPos, armSetpoint, currentArmAngle);
+        double[] validSetpoints = getValidSeptpoints(liftSetpoint, currentLiftHeight, armSetpoint, currentArmAngle);
         validArmAngle = validSetpoints[0];
         validLiftHeight = validSetpoints[1];
 
@@ -169,7 +173,7 @@ public class ArmLift implements Subsystem {
             armRecalculateFlag = true;
         }
         if (liftProfile.profileDone) {
-            liftProfile.calculate(currentLiftPos, validLiftHeight);
+            liftProfile.calculate(currentLiftHeight, validLiftHeight);
         } else {
             liftRecalculateFlag = true;
         }
@@ -188,35 +192,35 @@ public class ArmLift implements Subsystem {
          //get current positions of arm and lift
          currentArmAngle = getArmAngle(); // multiplies encode value of 0-1 by 2pi for radians
          currentArmVel = getArmVel();
-         currentLiftPos = getLiftHeight();
+         currentLiftHeight = getLiftHeight();
          currentLiftVel = getLiftVel();
 
          if(liftRecalculateFlag && liftProfile.profileDone){
-            double[] validSetpoints = getValidSeptpoints(liftSetpoint, currentLiftPos, armSetpoint, currentArmAngle);
+            double[] validSetpoints = getValidSeptpoints(liftSetpoint, currentLiftHeight, armSetpoint, currentArmAngle);
             liftRecalculateFlag = validSetpoints[1] != liftSetpoint;
             liftPIDC.resetIVal();
-            liftProfile.calculate(currentLiftPos, validSetpoints[1]);
+            liftProfile.calculate(currentLiftHeight, validSetpoints[1]);
         }
         if (armRecalculateFlag && armProfile.profileDone){
-            double[] validSetpoints = getValidSeptpoints(liftSetpoint, currentLiftPos, armSetpoint, currentArmAngle);
+            double[] validSetpoints = getValidSeptpoints(liftSetpoint, currentLiftHeight, armSetpoint, currentArmAngle);
             armRecalculateFlag = validSetpoints[0] != armSetpoint;
             armPIDC.resetIVal();
             armProfile.calculate(currentArmAngle, validSetpoints[0]);
         }
 
         armMotor.setSpeed(armControlOutput(currentArmAngle, currentArmVel));
-        liftMotor1.setSpeed(liftControlOutput(currentLiftPos, currentLiftVel));
-        liftMotor2.setSpeed(-liftControlOutput(currentLiftPos, currentLiftVel));
+        liftMotor1.setSpeed(liftControlOutput(currentLiftHeight, currentLiftVel));
+        liftMotor2.setSpeed(-liftControlOutput(currentLiftHeight, currentLiftVel));
     }
 
     private void putDashboard(){
-        SmartDashboard.putNumber("Lift Pot Voltage", liftPot.getPosition());
-        SmartDashboard.putNumber("Current Arm Angle", getArmAngle());
-        SmartDashboard.putNumber("Current Lift Height", getLiftHeight());
+        // SmartDashboard.putNumber("Lift Pot Voltage", liftPot.getPosition());
+        SmartDashboard.putNumber("Current Arm Angle", currentArmAngle);
+        SmartDashboard.putNumber("Current Lift Height", currentLiftHeight);
         SmartDashboard.putNumber("Arm control output", armControlOutput(currentArmAngle, currentArmVel));
-        SmartDashboard.putNumber("Lift Control Output", liftControlOutput(currentLiftPos, currentArmVel));
+        SmartDashboard.putNumber("Lift Control Output", liftControlOutput(currentLiftHeight, currentArmVel));
         SmartDashboard.putString("Current State", gameState.name());
-        SmartDashboard.putNumber("Arm set point", armSetpoint);
+        SmartDashboard.putNumber("Arm setpoint", armSetpoint);
         SmartDashboard.putNumber("Lift setpoint", liftSetpoint);
         SmartDashboard.putNumber("Lift Velocity", currentLiftVel);
         SmartDashboard.putNumber("Arm Velocity", currentArmVel);
@@ -224,6 +228,7 @@ public class ArmLift implements Subsystem {
         SmartDashboard.putNumber("Valid Lift Height", validLiftHeight);
         SmartDashboard.putBoolean("Score Front", isFront);
         SmartDashboard.putBoolean("is at setpoint", isAtSetpoint());
+        SmartDashboard.putNumber("Manual Arm Adjust", manualArmAdjust);
     }
 
     //calculating lift height from a function of voltage
@@ -238,7 +243,7 @@ public class ArmLift implements Subsystem {
     }
 
     private double getArmAngle() {
-        return (armMotor.getPosition() / ArmLiftConstants.ARM_GEAR_RATO * 2.0 * Math.PI);
+        return (armMotor.getPosition() / ArmLiftConstants.ARM_GEAR_RATO * 2.0 * Math.PI) - manualArmAdjust;
     }
 
     private double getArmVel() {
@@ -364,16 +369,19 @@ public class ArmLift implements Subsystem {
                 liftSetpoint = ArmLiftConstants.STORAGE_LIFT_HEIGHT;
                 break;
             case L2_ALGAE_REEF:
+                this.isFront = true;
                 gameState = gameStates.L2_ALGAE_REEF;
                 armSetpoint = this.isFront ? ArmLiftConstants.L2_INTAKE_ANGLE : 2 * Math.PI - ArmLiftConstants.L2_INTAKE_ANGLE;
                 liftSetpoint = ArmLiftConstants.L2_INTAKE_LIFT_HEIGHT;
                 break;
             case L3_ALGAE_REEF:
+                this.isFront = true;
                 gameState = gameStates.L3_ALGAE_REEF;
                 armSetpoint = this.isFront ? ArmLiftConstants.L3_INTAKE_ANGLE : 2 * Math.PI - ArmLiftConstants.L3_INTAKE_ANGLE;
                 liftSetpoint = ArmLiftConstants.L3_INTAKE_LIFT_HEIGHT;
                 break;
             case SHOOT_NET:
+                this.isFront = false;
                 gameState = gameStates.SHOOT_NET;
                 armSetpoint = this.isFront ? ArmLiftConstants.SHOOT_NET_ANGLE : 2 * Math.PI - ArmLiftConstants.SHOOT_NET_ANGLE;
                 liftSetpoint = ArmLiftConstants.SHOOT_NET_LIFT_HEIGHT;
@@ -385,16 +393,19 @@ public class ArmLift implements Subsystem {
                 liftSetpoint = ArmLiftConstants.CORAL_STATION_HEIGHT;
                 break;
             case CORAL_L2:
+                this.isFront = true;
                 gameState = gameStates.CORAL_L2;
                 armSetpoint = ArmLiftConstants.L2_SCORE_ANGLE;
                 liftSetpoint = ArmLiftConstants.L2_SCORE_LIFT_HEIGHT;
                 break;
             case CORAL_L3:
+                this.isFront = true;
                 gameState = gameStates.CORAL_L3;
                 armSetpoint = ArmLiftConstants.L3_SCORE_ANGLE;
                 liftSetpoint = ArmLiftConstants.L3_SCORE_LIFT_HEIGHT;
                 break;
             case PROCESSOR:
+                this.isFront = true;
                 gameState = gameStates.PROCESSOR;
                 armSetpoint = this.isFront ? ArmLiftConstants.PROCESSOR_ANGLE : 2 * Math.PI - ArmLiftConstants.PROCESSOR_ANGLE;;
                 liftSetpoint = ArmLiftConstants.PROCESSOR_HEIGHT;
@@ -406,7 +417,7 @@ public class ArmLift implements Subsystem {
     }
 
     public boolean isAtSetpoint() {
-        return armProfile.profileDone && Math.abs(currentArmAngle - armSetpoint) < ArmLiftConstants.ARM_TOL && liftProfile.profileDone && Math.abs(currentLiftPos - liftSetpoint) < ArmLiftConstants.LIFT_TOL;
+        return armProfile.profileDone && Math.abs(currentArmAngle - armSetpoint) < ArmLiftConstants.ARM_TOL && liftProfile.profileDone && Math.abs(currentLiftHeight - liftSetpoint) < ArmLiftConstants.LIFT_TOL;
     }
 
     public void selfTest(){

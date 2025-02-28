@@ -26,7 +26,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
-import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -79,6 +80,7 @@ public class SwerveDrive extends SwerveDriveTemplate {
     private Boolean sensorOverride = false;
 
     public final Field2d m_field = new Field2d();
+    StructPublisher<Pose2d> publisher;
 
     @Override
     public void init() {
@@ -87,6 +89,7 @@ public class SwerveDrive extends SwerveDriveTemplate {
         resetState();
         gyro.setYaw(0.0);
         SmartDashboard.putData("Field", m_field);
+        publisher = NetworkTableInstance.getDefault().getStructTopic("Pose Estimator", Pose2d.struct).publish();
 
     }
 
@@ -243,7 +246,9 @@ public class SwerveDrive extends SwerveDriveTemplate {
         SmartDashboard.putNumber("Pixy Voltage", pixyAnalog.getVoltage());
         SmartDashboard.putBoolean("Pixy Obj Det", pixyDigital.isPressed());
         SmartDashboard.putBoolean("Swerve Override", sensorOverride);
+        publisher.set(curPose);
         m_field.setRobotPose(curPose);
+        
     }
 
     /** sets the drive to teleop/cross, and sets drive motors to coast */

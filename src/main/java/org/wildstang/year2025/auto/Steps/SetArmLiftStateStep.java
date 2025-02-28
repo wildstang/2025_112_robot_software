@@ -20,11 +20,11 @@ public class SetArmLiftStateStep extends AutoStep {
     @Override
     public void initialize() {
         armLift = (ArmLift) Core.getSubsystemManager().getSubsystem(WsSubsystems.ARMLIFT);
+        armLift.setGameState(newState, isFront);
     }
 
     @Override
     public void update() {
-        armLift.setGameState(newState, isFront);
         if (armLift.isAtSetpoint()){
             setFinished();
         }

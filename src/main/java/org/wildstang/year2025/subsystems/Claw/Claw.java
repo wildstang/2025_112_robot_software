@@ -87,7 +87,6 @@ public class Claw implements Subsystem{
                 if (algaeInClaw) {
                     led.ledState = LEDstates.INTAKE;
                     armLift.setGameState(gameStates.STORAGE);
-                    algaeInClaw = false;
                     setGameState(clawStates.HOLD);
                 } else {
                     clawMotor.setSpeed(ClawConstants.CLAW_INTAKE_SPEED);
@@ -98,6 +97,7 @@ public class Claw implements Subsystem{
             case HOLD:
                 clawMotor.setSpeed(ClawConstants.CLAW_HOLD_SPEED);
                 clawMotor2.setSpeed(-ClawConstants.CLAW_HOLD_SPEED);
+                algaeInClaw = false;
                 break;
 
             case OUTTAKE:

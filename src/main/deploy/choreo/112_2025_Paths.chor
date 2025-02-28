@@ -15,12 +15,12 @@
   "poses":{
    "AlgaeEF":{
     "x":{
-     "exp":"5.22 m",
-     "val":5.22
+     "exp":"5.25 m",
+     "val":5.25
     },
     "y":{
-     "exp":"2.81 m",
-     "val":2.81
+     "exp":"2.78 m",
+     "val":2.78
     },
     "heading":{
      "exp":"-1.05 rad",
@@ -43,12 +43,12 @@
    },
    "AlgaeIJ":{
     "x":{
-     "exp":"5.22 m",
-     "val":5.22
+     "exp":"5.26 m",
+     "val":5.26
     },
     "y":{
-     "exp":"5.24 m",
-     "val":5.24
+     "exp":"5.27 m",
+     "val":5.27
     },
     "heading":{
      "exp":"1.05 rad",
@@ -61,8 +61,8 @@
      "val":3.75
     },
     "y":{
-     "exp":"5.23 m",
-     "val":5.23
+     "exp":"5.28 m",
+     "val":5.28
     },
     "heading":{
      "exp":"2.09 rad",
@@ -71,8 +71,8 @@
    },
    "BargeScore":{
     "x":{
-     "exp":"7.75 m",
-     "val":7.75
+     "exp":"7.6 m",
+     "val":7.6
     },
     "y":{
      "exp":"5.6 m",
@@ -85,8 +85,8 @@
    },
    "CenterStart":{
     "x":{
-     "exp":"7.25 m",
-     "val":7.25
+     "exp":"7.15 m",
+     "val":7.15
     },
     "y":{
      "exp":"4.026 m",
@@ -104,7 +104,7 @@
     },
     "y":{
      "exp":"AlgaeEF.y",
-     "val":2.81
+     "val":2.78
     },
     "heading":{
      "exp":"0 rad",
@@ -118,7 +118,7 @@
     },
     "y":{
      "exp":"AlgaeIJ.y",
-     "val":5.24
+     "val":5.27
     },
     "heading":{
      "exp":"0 rad",

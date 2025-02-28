@@ -147,8 +147,8 @@ public class SwerveModule {
      * @return boolean whether you should move towards that angle or the opposite
     */
     public boolean getDirection(double angle) {
-        double goalAngle = ((angle - getAngle()) % (2.0 * Math.PI) + 2.0 * Math.PI) % (2.0 * Math.PI);
-        return goalAngle < (Math.PI / 2.0) || goalAngle > (3.0 * Math.PI / 2.0);
+        double angleErr = ((angle - getAngle()) % (2.0 * Math.PI) + 2.0 * Math.PI) % (2.0 * Math.PI);
+        return angleErr < (Math.PI / 2.0) || angleErr > (3.0 * Math.PI / 2.0);
     }
 
     public WsSpark getDriveMotor() {
