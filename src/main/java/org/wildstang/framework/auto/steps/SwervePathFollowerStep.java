@@ -49,6 +49,7 @@ public class SwervePathFollowerStep extends AutoStep {
         m_drive = drive;
         timer = new Timer();
         endTime = pathtraj.get().getTotalTime();
+        isBlue = Core.isBlueAlliance();
         trajPublisher = NetworkTableInstance.getDefault().getStructArrayTopic("Traj Pose", Pose2d.struct).publish();
 
     }
@@ -61,10 +62,10 @@ public class SwervePathFollowerStep extends AutoStep {
      */
     public SwervePathFollowerStep(String pathData, SwerveDriveTemplate drive, Boolean isFirstPath) {
         this(pathData, drive);
-        isBlue = Core.isBlueAlliance();
         if (isFirstPath) {
             m_drive.setGyro(pathtraj.get().getInitialPose(!isBlue).get().getRotation().getRadians());
             m_drive.setPose(pathtraj.get().getInitialPose(!isBlue).get());
+            trajPublisher.set(pathtraj.get().getPoses());
         }
     }
 
@@ -79,20 +80,14 @@ public class SwervePathFollowerStep extends AutoStep {
     @Override
     public void update() {
         if (timer.get() >= endTime) {
-            sample = pathtraj.get().sampleAt(timer.get(), !isBlue).get();
+            sample = pathtraj.get().getFinalSample(!isBlue).get();
             drivePose = m_drive.returnPose();
             Log.warn(Double.toString(sample.x - drivePose.getX()) + Double.toString(sample.y - drivePose.getY()));
-            double heading = 0.0;
-            heading = ((2.0 * Math.PI) + pathtraj.get().getFinalPose(!isBlue).get().getRotation().getRadians()) % (2.0 * Math.PI);
-            m_drive.setAutoValues(0.0, 0.0, 0.0, 0.0, 0.0, heading);
+            m_drive.setAutoValues(0.0, 0.0, 0.0, sample.x, sample.y, (((2.0 * Math.PI)+sample.heading)%(2.0 * Math.PI)));
             setFinished();
         } else {
             sample = pathtraj.get().sampleAt(timer.get(), !isBlue).get();
             sampleVel = ChassisSpeeds.discretize(sample.getChassisSpeeds(), 0.02);
-            drivePose = m_drive.returnPose();
-
-            // SmartDashboard.putData("auto pose", (Sendable) sample.getPose());
-            // SmartDashboard.putData("auto speed", (Sendable) sample.getChassisSpeeds());
 
             m_drive.setAutoValues(sampleVel.vxMetersPerSecond, sampleVel.vyMetersPerSecond, sampleVel.omegaRadiansPerSecond, sample.x, sample.y, (((2.0 * Math.PI)+sample.heading)%(2.0 * Math.PI)));
         }

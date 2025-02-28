@@ -13,7 +13,7 @@ public final class ArmLiftConstants {
     /* -------------------- PID -------------------------------*/
     public static final double ARM_POS_P_GAIN = 8.0;
     public static final double ARM_POS_I_GAIN = 0.7;
-    public static final double ARM_VEL_P_GAIN = 0.15;
+    public static final double ARM_VEL_P_GAIN = 0.40;
     public static final double ARM_TOL = 0.09;
 
     public static final double LIFT_POS_P_GAIN = 8.0;
@@ -37,8 +37,8 @@ public final class ArmLiftConstants {
     public static final double L4_SCORE_ANGLE = 3.42;
     public static final double L4_SCORE_LIFT_HEIGHT = MAX_LIFT_HEIGHT;
 
-    public static final double L2_INTAKE_ANGLE = 1.65;
-    public static final double L2_INTAKE_LIFT_HEIGHT = 0.5;
+    public static final double L2_INTAKE_ANGLE = 1.55;
+    public static final double L2_INTAKE_LIFT_HEIGHT = 0.42;
 
     public static final double L3_INTAKE_ANGLE = 1.65;
     public static final double L3_INTAKE_LIFT_HEIGHT = 0.7;

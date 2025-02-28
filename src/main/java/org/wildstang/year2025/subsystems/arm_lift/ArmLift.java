@@ -33,7 +33,7 @@ public class ArmLift implements Subsystem {
     private DigitalInput faceRight; // L3 Algae Reef Intake
     private DigitalInput faceUp; // Shoot Net
     private DigitalInput dpadDown, dpadUp;
-    // private DigitalInput dpadLeft, dpadRight;
+    private DigitalInput dpadLeft, dpadRight;
     private AnalogInput leftJoyStickY;
     private AnalogInput rightJoyStickX;
     private AnalogInput leftTrigger;
@@ -106,10 +106,10 @@ public class ArmLift implements Subsystem {
         // rightJoyStickX.addInputListener(this);
         dpadDown = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_DPAD_DOWN);
         dpadDown.addInputListener(this);
-        // dpadLeft = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_DPAD_LEFT);
-        // dpadLeft.addInputListener(this);
-        // dpadRight = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_DPAD_RIGHT);
-        // dpadRight.addInputListener(this);
+        dpadLeft = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_DPAD_LEFT);
+        dpadLeft.addInputListener(this);
+        dpadRight = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_DPAD_RIGHT);
+        dpadRight.addInputListener(this);
         dpadUp = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_DPAD_UP);
         dpadUp.addInputListener(this);
     }
@@ -137,10 +137,10 @@ public class ArmLift implements Subsystem {
         } else if(dpadUp.getValue()){
             manualArmAdjust += 0.05;
             // setGameState(gameStates.PROCESSOR);
-        // } else if (dpadLeft.getValue()) {
-        //     setGameState(gameStates.CORAL_L2);
-        // } else if (dpadRight.getValue()) {
-        //     setGameState(gameStates.CORAL_L3);
+        } else if (dpadLeft.getValue()) {
+            setGameState(gameStates.PROCESSOR);
+        } else if (dpadRight.getValue()) {
+            setGameState(gameStates.PROCESSOR);
         }
     }
 
@@ -197,15 +197,17 @@ public class ArmLift implements Subsystem {
 
          if(liftRecalculateFlag && liftProfile.profileDone){
             double[] validSetpoints = getValidSeptpoints(liftSetpoint, currentLiftHeight, armSetpoint, currentArmAngle);
-            liftRecalculateFlag = validSetpoints[1] != liftSetpoint;
+            validLiftHeight = validSetpoints[1];
+            liftRecalculateFlag = validLiftHeight != liftSetpoint;
             liftPIDC.resetIVal();
-            liftProfile.calculate(currentLiftHeight, validSetpoints[1]);
+            liftProfile.calculate(currentLiftHeight, validLiftHeight);
         }
         if (armRecalculateFlag && armProfile.profileDone){
             double[] validSetpoints = getValidSeptpoints(liftSetpoint, currentLiftHeight, armSetpoint, currentArmAngle);
-            armRecalculateFlag = validSetpoints[0] != armSetpoint;
+            validArmAngle = validSetpoints[0];
+            armRecalculateFlag = validArmAngle != armSetpoint;
             armPIDC.resetIVal();
-            armProfile.calculate(currentArmAngle, validSetpoints[0]);
+            armProfile.calculate(currentArmAngle, validArmAngle);
         }
 
         armMotor.setSpeed(armControlOutput(currentArmAngle, currentArmVel));
@@ -215,20 +217,22 @@ public class ArmLift implements Subsystem {
 
     private void putDashboard(){
         // SmartDashboard.putNumber("Lift Pot Voltage", liftPot.getPosition());
-        SmartDashboard.putNumber("Current Arm Angle", currentArmAngle);
-        SmartDashboard.putNumber("Current Lift Height", currentLiftHeight);
+        SmartDashboard.putNumber("Arm Angle", currentArmAngle);
+        SmartDashboard.putNumber("Lift Height", currentLiftHeight);
         SmartDashboard.putNumber("Arm control output", armControlOutput(currentArmAngle, currentArmVel));
         SmartDashboard.putNumber("Lift Control Output", liftControlOutput(currentLiftHeight, currentArmVel));
-        SmartDashboard.putString("Current State", gameState.name());
+        SmartDashboard.putString("ArmLift State", gameState.name());
         SmartDashboard.putNumber("Arm setpoint", armSetpoint);
         SmartDashboard.putNumber("Lift setpoint", liftSetpoint);
         SmartDashboard.putNumber("Lift Velocity", currentLiftVel);
         SmartDashboard.putNumber("Arm Velocity", currentArmVel);
-        SmartDashboard.putNumber("Valid arm angle", validArmAngle);
-        SmartDashboard.putNumber("Valid Lift Height", validLiftHeight);
-        SmartDashboard.putBoolean("Score Front", isFront);
-        SmartDashboard.putBoolean("is at setpoint", isAtSetpoint());
+        SmartDashboard.putNumber("Arm valid angle", validArmAngle);
+        SmartDashboard.putNumber("Lift valid Height", validLiftHeight);
+        // SmartDashboard.putBoolean("Score Front", isFront);
+        SmartDashboard.putBoolean("ArmLift is at setpoint", isAtSetpoint());
         SmartDashboard.putNumber("Manual Arm Adjust", manualArmAdjust);
+        SmartDashboard.putBoolean("Arm Profile Done", armProfile.profileDone);
+        SmartDashboard.putBoolean("Lift Profile Done", liftProfile.profileDone);
     }
 
     //calculating lift height from a function of voltage
