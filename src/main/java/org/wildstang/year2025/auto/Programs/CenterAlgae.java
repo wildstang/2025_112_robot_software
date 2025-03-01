@@ -20,8 +20,8 @@ public class CenterAlgae extends AutoProgram {
     protected void defineSteps() {
         SwerveDrive swerve = (SwerveDrive) Core.getSubsystemManager().getSubsystem(WsSubsystems.SWERVE_DRIVE);
 
-        addStep(new SetArmLiftStateStep(gameStates.L2_ALGAE_REEF, true));
         AutoParallelStepGroup group1 = new AutoParallelStepGroup();
+        group1.addStep(new SetArmLiftStateStep(gameStates.L2_ALGAE_REEF, true));
         group1.addStep(new SwervePathFollowerStep("CenterStartToGH", swerve, true));
         group1.addStep(new SetClawStateStep(clawStates.INTAKE));
         addStep(group1);
@@ -33,7 +33,13 @@ public class CenterAlgae extends AutoProgram {
 
         addStep(new AutoStepDelay(200));
         addStep(new SetClawStateStep(clawStates.OUTTAKE));
-        addStep(new SwervePathFollowerStep("BargeToIJ", swerve));
+
+        AutoParallelStepGroup group3 = new AutoParallelStepGroup();
+        // group3.addStep(new SetArmLiftStateStep(gameStates.L3_ALGAE_REEF, true));
+        group3.addStep(new SwervePathFollowerStep("BargeToIJ", swerve));
+        // group3.addStep(new SetClawStateStep(clawStates.INTAKE));
+        addStep(group3);
+
     }
 
     @Override

@@ -21,7 +21,7 @@ public class IJ_KL_Algae extends AutoProgram {
         SwerveDrive swerve = (SwerveDrive) Core.getSubsystemManager().getSubsystem(WsSubsystems.SWERVE_DRIVE);
 
         AutoParallelStepGroup group1 = new AutoParallelStepGroup();
-        group1.addStep(new SetArmLiftStateStep(gameStates.L2_ALGAE_REEF, true));
+        group1.addStep(new SetArmLiftStateStep(gameStates.L3_ALGAE_REEF, true));
         group1.addStep(new SwervePathFollowerStep("IJStartToIJ", swerve, true));
         group1.addStep(new SetClawStateStep(clawStates.INTAKE));
         addStep(group1);
@@ -38,7 +38,7 @@ public class IJ_KL_Algae extends AutoProgram {
 
     @Override
     public String toString() {
-        return "Center Algae";
+        return "IJ KL Algae";
     }
     
 }

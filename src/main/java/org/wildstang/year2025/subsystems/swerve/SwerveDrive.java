@@ -233,27 +233,31 @@ public class SwerveDrive extends SwerveDriveTemplate {
                             else rotTarget = 10.0 * Math.PI / 6.0;
                             // rotTarget = ((double) Math.round(getGyroAngle() / (Math.PI / 3.0)) % 6.0) * (Math.PI / 3.0);
                             rotOutput = swerveHelper.getRotControl(rotTarget, getGyroAngle());
-                            if (algaeInView() && armLift.isAtSetpoint()){
-                                yOutput = (1.0 - pixyAnalog.getVoltage()) * 0.30;// * derateValue;
-                                rotOutput = Math.min(Math.max(rotOutput, -1.0), 1.0);
-                                //TODO: this is very janky and should be refactored to be more logical
-                                //undo red alliance inversion so while in robot relative mode forward always moves forward
-                                if (!Core.isBlueAlliance()) {
-                                    xOutput *= -1;
-                                }
-                                xOutput = Math.min(Math.max(xOutput, -1.0), 1.0);// * derateValue;
-                                yOutput = Math.min(Math.max(yOutput, -1.0), 1.0);// * derateValue;
-                                this.swerveSignal = swerveHelper.setDrive(xOutput , yOutput, rotOutput, 0);
-                                drive();
-                                putDashboard();
-                                return;
-                            }
+                            break;
+                        //     if (algaeInView() && armLift.isAtSetpoint()){
+                        //         yOutput = (1.0 - pixyAnalog.getVoltage()) * 0.30;// * derateValue;
+                        //         rotOutput = Math.min(Math.max(rotOutput, -1.0), 1.0);
+                        //         //TODO: this is very janky and should be refactored to be more logical
+                        //         //undo red alliance inversion so while in robot relative mode forward always moves forward
+                        //         if (!Core.isBlueAlliance()) {
+                        //             xOutput *= -1;
+                        //         }
+                        //         xOutput = Math.min(Math.max(xOutput, -1.0), 1.0);// * derateValue;
+                        //         yOutput = Math.min(Math.max(yOutput, -1.0), 1.0);// * derateValue;
+                        //         this.swerveSignal = swerveHelper.setDrive(xOutput , yOutput, rotOutput, 0);
+                        //         drive();
+                        //         putDashboard();
+                        //         return;
+                        //     }
                         case PROCESSOR:
                             // derateValue = 0.75;
                             rotTarget = (getGyroAngle() <= Math.PI) ? Math.PI / 2.0 : 3.0 * Math.PI / 2.0;
                             rotOutput = swerveHelper.getRotControl(rotTarget, getGyroAngle());
                             break;
                         case SHOOT_NET:
+                            rotTarget = (getGyroAngle() <= Math.PI / 2.0 || getGyroAngle() >= 3.0 * Math.PI / 2.0) ? 0 : Math.PI;
+                            rotOutput = swerveHelper.getRotControl(rotTarget, getGyroAngle());
+                            break;
                             // derateValue = 0.5;
                         default:
                             // derateValue = 1.0;
