@@ -111,8 +111,13 @@ public class Claw implements Subsystem{
                     timer.reset();
                     algaeInClaw = false;
                 }
-                clawMotor.setSpeed(ClawConstants.CLAW_OUTTAKE_SPEED);
-                clawMotor2.setSpeed(-ClawConstants.CLAW_OUTTAKE_SPEED);
+                if (armLift.gameState == gameStates.PROCESSOR){
+                    clawMotor.setSpeed(ClawConstants.CLAW_PROCESSOR_SPEED);
+                    clawMotor2.setSpeed(-ClawConstants.CLAW_PROCESSOR_SPEED);
+                } else {
+                    clawMotor.setSpeed(ClawConstants.CLAW_OUTTAKE_SPEED);
+                    clawMotor2.setSpeed(-ClawConstants.CLAW_OUTTAKE_SPEED * 0.8);
+                }
                 break;
 
             case IDLE:

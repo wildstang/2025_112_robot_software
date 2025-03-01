@@ -20,6 +20,7 @@ import org.wildstang.year2025.robot.WsSubsystems;
 // import org.wildstang.year2025.subsystems.LED.LedSubsystem;
 // import org.wildstang.year2025.subsystems.LED.LedSubsystem.LEDstates;
 import org.wildstang.year2025.subsystems.arm_lift.ArmLift;
+import org.wildstang.year2025.subsystems.arm_lift.ArmLift.gameStates;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
@@ -177,9 +178,13 @@ public class SwerveDrive extends SwerveDriveTemplate {
         // if the rotational joystick is being used, the robot should not be auto tracking heading
         // otherwise engage rotation lock at current heading
         if (rotOutput != 0) {
-            rotOutput *= Math.abs(rotOutput);
-            rotOutput *= DriveConstants.ROTATION_SPEED;
-            rotLocked = false;
+            // if (armLift.gameState == gameStates.L2_ALGAE_REEF || armLift.gameState == gameStates.L3_ALGAE_REEF) {
+
+            // } else {
+                rotOutput *= Math.abs(rotOutput);
+                rotOutput *= DriveConstants.ROTATION_SPEED;
+                rotLocked = false;
+            // }
         // }  else if (rotLocked == false) {
         //     rotTarget = getGyroAngle();
         //     rotLocked = true;
@@ -207,7 +212,6 @@ public class SwerveDrive extends SwerveDriveTemplate {
         switch (driveState) {
             case TELEOP:
                 if (!rotHelperOverride && rotLocked) {
-                    Log.warn("bar");
                     switch (armLift.gameState){
                         case GROUND_INTAKE:
                             if (algaeInView() && armLift.isAtSetpoint()) {
@@ -220,19 +224,30 @@ public class SwerveDrive extends SwerveDriveTemplate {
                         case L2_ALGAE_REEF:
                         case L3_ALGAE_REEF:
                             // derateValue = 0.75;
-                            rotTarget = (Math.round(getGyroAngle() / (Math.PI / 3.0)) % 6) * (Math.PI / 3.0);
+                            double curAngle = getGyroAngle();
+                            if (curAngle > 11.0 * Math.PI / 6.0 || curAngle < Math.PI / 6.0) rotTarget = 0.0;
+                            else if (curAngle < 3.0 * Math.PI / 6.0) rotTarget = 2.0 * Math.PI / 6.0;
+                            else if (curAngle < 5.0 * Math.PI / 6.0) rotTarget = 4.0 * Math.PI / 6.0;
+                            else if (curAngle < 7.0 * Math.PI / 6.0) rotTarget = 6.0 * Math.PI / 6.0;
+                            else if (curAngle < 9.0 * Math.PI / 6.0) rotTarget = 8.0 * Math.PI / 6.0;
+                            else rotTarget = 10.0 * Math.PI / 6.0;
+                            // rotTarget = ((double) Math.round(getGyroAngle() / (Math.PI / 3.0)) % 6.0) * (Math.PI / 3.0);
                             rotOutput = swerveHelper.getRotControl(rotTarget, getGyroAngle());
-                            // if (algaeInView() && armLift.isAtSetpoint()){
-                            //     yOutput = (1.0 - pixyAnalog.getVoltage()) * 0.70;// * derateValue;
-                            //     rotOutput = Math.min(Math.max(rotOutput, -1.0), 1.0);
-                            //     xOutput = Math.min(Math.max(xOutput, -1.0), 1.0);// * derateValue;
-                            //     yOutput = Math.min(Math.max(yOutput, -1.0), 1.0);// * derateValue;
-                            //     Log.warn("foo");
-                            //     this.swerveSignal = swerveHelper.setDrive(xOutput , yOutput, rotOutput, 0);
-                            //     drive();
-                            //     putDashboard();
-                            //     return;
-                            // }
+                            if (algaeInView() && armLift.isAtSetpoint()){
+                                yOutput = (1.0 - pixyAnalog.getVoltage()) * 0.30;// * derateValue;
+                                rotOutput = Math.min(Math.max(rotOutput, -1.0), 1.0);
+                                //TODO: this is very janky and should be refactored to be more logical
+                                //undo red alliance inversion so while in robot relative mode forward always moves forward
+                                if (!Core.isBlueAlliance()) {
+                                    xOutput *= -1;
+                                }
+                                xOutput = Math.min(Math.max(xOutput, -1.0), 1.0);// * derateValue;
+                                yOutput = Math.min(Math.max(yOutput, -1.0), 1.0);// * derateValue;
+                                this.swerveSignal = swerveHelper.setDrive(xOutput , yOutput, rotOutput, 0);
+                                drive();
+                                putDashboard();
+                                return;
+                            }
                         case PROCESSOR:
                             // derateValue = 0.75;
                             rotTarget = (getGyroAngle() <= Math.PI) ? Math.PI / 2.0 : 3.0 * Math.PI / 2.0;

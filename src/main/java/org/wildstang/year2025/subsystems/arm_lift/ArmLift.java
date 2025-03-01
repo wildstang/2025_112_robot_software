@@ -34,6 +34,7 @@ public class ArmLift implements Subsystem {
     private DigitalInput faceUp; // Shoot Net
     private DigitalInput dpadDown, dpadUp;
     private DigitalInput dpadLeft, dpadRight;
+    private DigitalInput leftJoyStickButton;
     private AnalogInput leftJoyStickY;
     private AnalogInput rightJoyStickX;
     private AnalogInput leftTrigger;
@@ -43,7 +44,7 @@ public class ArmLift implements Subsystem {
     private WsSpark liftMotor2;
     // private SparkAnalogSensor liftPot;
     private double currentLiftHeight, currentLiftVel;
-    public enum gameStates {GROUND_INTAKE, L2_ALGAE_REEF, L3_ALGAE_REEF, STORAGE, SCORE_PRELOAD, SHOOT_NET, START, CORAL_INTAKE, CORAL_L2, CORAL_L3, PROCESSOR}; // Our Arm/Lift States
+    public enum gameStates {GROUND_INTAKE, L2_ALGAE_REEF, L3_ALGAE_REEF, STORAGE, SCORE_PRELOAD, SHOOT_NET, START, CORAL_INTAKE, CORAL_L2, CORAL_L3, PROCESSOR, DEFENSE}; // Our Arm/Lift States
     public gameStates gameState = gameStates.START;
     
     /* Arm Variables */
@@ -112,6 +113,8 @@ public class ArmLift implements Subsystem {
         dpadRight.addInputListener(this);
         dpadUp = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_DPAD_UP);
         dpadUp.addInputListener(this);
+        leftJoyStickButton = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_LEFT_JOYSTICK_BUTTON);
+        leftJoyStickButton.addInputListener(this);
     }
 
     @Override
@@ -141,6 +144,9 @@ public class ArmLift implements Subsystem {
             setGameState(gameStates.PROCESSOR);
         } else if (dpadRight.getValue()) {
             setGameState(gameStates.PROCESSOR);
+        }
+        else if(leftJoyStickButton.getValue()){
+            setGameState(gameStates.DEFENSE);
         }
     }
 
@@ -351,7 +357,7 @@ public class ArmLift implements Subsystem {
 
     public void setGameState(gameStates newState) {
         // if we are going to storage, don't invert
-        if (newState == gameStates.STORAGE) {
+        if (newState == gameStates.STORAGE || newState == gameStates.DEFENSE) {
             setGameState(newState, isFront);
         } else {
             setGameState(newState, !isFront);
@@ -413,6 +419,11 @@ public class ArmLift implements Subsystem {
                 gameState = gameStates.PROCESSOR;
                 armSetpoint = this.isFront ? ArmLiftConstants.PROCESSOR_ANGLE : 2 * Math.PI - ArmLiftConstants.PROCESSOR_ANGLE;;
                 liftSetpoint = ArmLiftConstants.PROCESSOR_HEIGHT;
+                break;
+            case DEFENSE:
+                gameState = gameStates.DEFENSE;
+                armSetpoint = ArmLiftConstants.DEFENSE_ANGLE;
+                liftSetpoint = ArmLiftConstants.DEFENSE_LIFT_HEIGHT;
                 break;
             default:
                 break;
