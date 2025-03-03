@@ -1,5 +1,7 @@
 package org.wildstang.year2025.subsystems.arm_lift;
 
+import org.wildstang.framework.logger.Log;
+
 import edu.wpi.first.wpilibj.Timer;
 
 public class MotionProfile {
@@ -24,6 +26,7 @@ public class MotionProfile {
    }
 
    public void calculate(double curPos, double desPos){
+      Log.warn("Profile Calculating");
       timer.reset();
       profileDone = false;
       

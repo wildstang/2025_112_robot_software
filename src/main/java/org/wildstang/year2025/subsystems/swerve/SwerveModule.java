@@ -46,7 +46,7 @@ public class SwerveModule {
     }
 
     /** return double for cancoder position 
-     * @return double for cancoder value (degrees)
+     * @return double for cancoder value (radians)
     */
     public double getAngle() {
         return (((absEncoder.getPosition() + chassisOffset) % (2.0 * Math.PI)) + 2.0 * Math.PI) % (2.0 * Math.PI);
@@ -147,7 +147,8 @@ public class SwerveModule {
      * @return boolean whether you should move towards that angle or the opposite
     */
     public boolean getDirection(double angle) {
-        return Math.abs(angle - getAngle()) < (Math.PI / 2.0) || Math.abs(angle - getAngle()) > (3.0 * Math.PI / 2.0);
+        double angleErr = ((angle - getAngle()) % (2.0 * Math.PI) + 2.0 * Math.PI) % (2.0 * Math.PI);
+        return angleErr < (Math.PI / 2.0) || angleErr > (3.0 * Math.PI / 2.0);
     }
 
     public WsSpark getDriveMotor() {

@@ -14,37 +14,31 @@ import org.wildstang.year2025.subsystems.swerve.SwerveDrive;
 
 /**
  */
-public class CenterAlgae extends AutoProgram {
+public class IJ_KL_Algae extends AutoProgram {
 
     @Override
     protected void defineSteps() {
         SwerveDrive swerve = (SwerveDrive) Core.getSubsystemManager().getSubsystem(WsSubsystems.SWERVE_DRIVE);
 
         AutoParallelStepGroup group1 = new AutoParallelStepGroup();
-        group1.addStep(new SetArmLiftStateStep(gameStates.L2_ALGAE_REEF, true));
-        group1.addStep(new SwervePathFollowerStep("CenterStartToGH", swerve, true));
+        group1.addStep(new SetArmLiftStateStep(gameStates.L3_ALGAE_REEF, true));
+        group1.addStep(new SwervePathFollowerStep("IJStartToIJ", swerve, true));
         group1.addStep(new SetClawStateStep(clawStates.INTAKE));
         addStep(group1);
 
         AutoParallelStepGroup group2 = new AutoParallelStepGroup();
-        group2.addStep(new SwervePathFollowerStep("GHToBarge", swerve));
+        group2.addStep(new SwervePathFollowerStep("IJToBarge", swerve));
         group2.addStep(new SetArmLiftStateStep(gameStates.SHOOT_NET, false));
         addStep(group2);
 
         addStep(new AutoStepDelay(200));
         addStep(new SetClawStateStep(clawStates.OUTTAKE));
-
-        AutoParallelStepGroup group3 = new AutoParallelStepGroup();
-        group3.addStep(new SetArmLiftStateStep(gameStates.L3_ALGAE_REEF, true));
-        group3.addStep(new SwervePathFollowerStep("BargeToIJ", swerve));
-        group3.addStep(new SetClawStateStep(clawStates.INTAKE));
-        addStep(group3);
-
+        addStep(new SwervePathFollowerStep("BargeToKL", swerve));
     }
 
     @Override
     public String toString() {
-        return "Center Algae";
+        return "IJ KL Algae";
     }
     
 }

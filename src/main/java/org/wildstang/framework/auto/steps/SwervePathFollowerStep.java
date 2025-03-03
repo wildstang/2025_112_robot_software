@@ -12,10 +12,11 @@ import org.wildstang.framework.subsystems.swerve.SwerveDriveTemplate;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.Timer;
-
 import choreo.*;
 import choreo.trajectory.SwerveSample;
 import choreo.trajectory.Trajectory;
@@ -36,6 +37,7 @@ public class SwervePathFollowerStep extends AutoStep {
     private Boolean isBlue;
 
     private final double endTime;
+    StructArrayPublisher<Pose2d> trajPublisher;
 
     /** Sets the robot to track a new path
      * finishes after all values have been read to robot
@@ -43,10 +45,13 @@ public class SwervePathFollowerStep extends AutoStep {
      * @param drive the swerveDrive subsystem
      */
     public SwervePathFollowerStep(String pathData, SwerveDriveTemplate drive) {
-        this.pathtraj = Choreo.loadTrajectory(pathData);
+        pathtraj = Choreo.loadTrajectory(pathData);
         m_drive = drive;
         timer = new Timer();
         endTime = pathtraj.get().getTotalTime();
+        isBlue = Core.isBlueAlliance();
+        trajPublisher = NetworkTableInstance.getDefault().getStructArrayTopic("Traj Pose", Pose2d.struct).publish();
+
     }
 
     /** Sets the robot to track a new path
@@ -56,14 +61,11 @@ public class SwervePathFollowerStep extends AutoStep {
      * @param isFirstPath if true, resets swerveDrive gyro and pose estimator using the initial pose of the path
      */
     public SwervePathFollowerStep(String pathData, SwerveDriveTemplate drive, Boolean isFirstPath) {
-        pathtraj = Choreo.loadTrajectory(pathData);
-        m_drive = drive;
-        timer = new Timer();
-        endTime = pathtraj.get().getTotalTime();
-        isBlue = Core.isBlueAlliance();
+        this(pathData, drive);
         if (isFirstPath) {
             m_drive.setGyro(pathtraj.get().getInitialPose(!isBlue).get().getRotation().getRadians());
             m_drive.setPose(pathtraj.get().getInitialPose(!isBlue).get());
+            trajPublisher.set(pathtraj.get().getPoses());
         }
     }
 
@@ -72,24 +74,22 @@ public class SwervePathFollowerStep extends AutoStep {
         //start path
         m_drive.setToAuto();
         timer.start();
+        trajPublisher.set(pathtraj.get().getPoses());
     }
 
     @Override
     public void update() {
         if (timer.get() >= endTime) {
-            sample = pathtraj.get().sampleAt(timer.get(), !isBlue).get();
+            sample = pathtraj.get().getFinalSample(!isBlue).get();
             drivePose = m_drive.returnPose();
             Log.warn(Double.toString(sample.x - drivePose.getX()) + Double.toString(sample.y - drivePose.getY()));
-            double heading = 0.0;
-            heading = ((2.0 * Math.PI) + pathtraj.get().getFinalPose(!isBlue).get().getRotation().getRadians()) % (2.0 * Math.PI);
-            m_drive.setAutoValues(0.0, 0.0, 0.0, 0.0, 0.0, heading);
+            m_drive.setAutoValues(0.0, 0.0, 0.0, sample.x, sample.y, (((2.0 * Math.PI)+sample.heading)%(2.0 * Math.PI)));
             setFinished();
         } else {
             sample = pathtraj.get().sampleAt(timer.get(), !isBlue).get();
             sampleVel = ChassisSpeeds.discretize(sample.getChassisSpeeds(), 0.02);
-            drivePose = m_drive.returnPose();
 
-            m_drive.setAutoValues(sampleVel.vxMetersPerSecond, sampleVel.vyMetersPerSecond, sampleVel.omegaRadiansPerSecond, sample.x - drivePose.getX(), sample.y - drivePose.getY(), (((2.0 * Math.PI)+sample.heading)%(2.0 * Math.PI)));
+            m_drive.setAutoValues(sampleVel.vxMetersPerSecond, sampleVel.vyMetersPerSecond, sampleVel.omegaRadiansPerSecond, sample.x, sample.y, (((2.0 * Math.PI)+sample.heading)%(2.0 * Math.PI)));
         }
     }
 

@@ -12,6 +12,8 @@ import org.wildstang.year2025.robot.WsOutputs;
 import org.wildstang.year2025.robot.WsSubsystems;
 import org.wildstang.year2025.subsystems.LED.LedSubsystem;
 import org.wildstang.year2025.subsystems.LED.LedSubsystem.LEDstates;
+import org.wildstang.year2025.subsystems.arm_lift.ArmLift;
+import org.wildstang.year2025.subsystems.arm_lift.ArmLift.gameStates;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
@@ -28,13 +30,14 @@ public class Claw implements Subsystem{
     private WsSpark clawMotor, clawMotor2;
 
     public static enum clawStates {INTAKE, OUTTAKE, IDLE, HOLD}; 
-    private clawStates currentState;
+    public clawStates currentState;
     private Timer timer; 
     public boolean algaeInClaw;
     private int algaeHoldCount;
     XboxController controller = new XboxController(0);
 
     LedSubsystem led;
+    ArmLift armLift;
 
     @Override
     //Called everytime an input/buttons is pressed
@@ -73,36 +76,48 @@ public class Claw implements Subsystem{
         SmartDashboard.putNumber("claw current", clawMotor.getOutputCurrent());
         switch(currentState){
             case INTAKE:
-                if(Math.abs(clawMotor.getVelocity()) < ClawConstants.CLAW_CURRENT_VEL && clawMotor.getOutputCurrent() > ClawConstants.CLAW_CURRENT_HOLD){
+                if (Math.abs(clawMotor.getVelocity()) < ClawConstants.CLAW_CURRENT_VEL && clawMotor.getOutputCurrent() > ClawConstants.CLAW_CURRENT_HOLD) {
                     algaeHoldCount++;
                     if (algaeHoldCount >= ClawConstants.CLAW_HOLD_COUNT){
                         algaeInClaw = true;
-                        
                     }
                 } else {
                     algaeHoldCount = 0;
                 }
-                if(algaeInClaw){
+                if (algaeInClaw) {
                     led.ledState = LEDstates.INTAKE;
-                    clawMotor.setSpeed(ClawConstants.CLAW_HOLD_SPEED);
-                    clawMotor2.setSpeed(-ClawConstants.CLAW_HOLD_SPEED);
+                    armLift.setGameState(gameStates.STORAGE);
+                    setGameState(clawStates.HOLD);
+                } else {
+                    clawMotor.setSpeed(ClawConstants.CLAW_INTAKE_SPEED);
+                    clawMotor2.setSpeed(-ClawConstants.CLAW_INTAKE_SPEED);
                 }
-                else{
-                // clawMotor.setCurrentLimit(5, 10, 3);
-                clawMotor.setSpeed(ClawConstants.CLAW_INTAKE_SPEED);
-                clawMotor2.setSpeed(-ClawConstants.CLAW_INTAKE_SPEED);
-                }
+                break;
+
+            case HOLD:
+                clawMotor.setSpeed(ClawConstants.CLAW_HOLD_SPEED);
+                clawMotor2.setSpeed(-ClawConstants.CLAW_HOLD_SPEED);
+                algaeInClaw = false;
                 break;
 
             case OUTTAKE:
                 // clawMotor.setCurrentLimit(10, 15, 3);
                 if(timer.get() > ClawConstants.OUTTAKE_TIME){
+                    // if we are in scoring position and finished outtaking, go to storage
+                    if (armLift.gameState == gameStates.SHOOT_NET) {
+                        armLift.setGameState(gameStates.STORAGE);
+                    }
                     setGameState(clawStates.IDLE);
                     timer.reset();
                     algaeInClaw = false;
                 }
-                clawMotor.setSpeed(ClawConstants.CLAW_OUTTAKE_SPEED);
-                clawMotor2.setSpeed(-ClawConstants.CLAW_OUTTAKE_SPEED);
+                if (armLift.gameState == gameStates.PROCESSOR){
+                    clawMotor.setSpeed(ClawConstants.CLAW_PROCESSOR_SPEED);
+                    clawMotor2.setSpeed(-ClawConstants.CLAW_PROCESSOR_SPEED);
+                } else {
+                    clawMotor.setSpeed(ClawConstants.CLAW_OUTTAKE_SPEED);
+                    clawMotor2.setSpeed(-ClawConstants.CLAW_OUTTAKE_SPEED);
+                }
                 break;
 
             case IDLE:
@@ -160,6 +175,7 @@ public class Claw implements Subsystem{
     @Override
     public void initSubsystems() {
         led = (LedSubsystem) Core.getSubsystemManager().getSubsystem(WsSubsystems.LED);
+        armLift = (ArmLift) Core.getSubsystemManager().getSubsystem(WsSubsystems.ARMLIFT);
     }
 
 

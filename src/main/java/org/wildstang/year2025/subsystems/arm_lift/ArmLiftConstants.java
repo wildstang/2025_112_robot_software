@@ -13,18 +13,20 @@ public final class ArmLiftConstants {
     /* -------------------- PID -------------------------------*/
     public static final double ARM_POS_P_GAIN = 8.0;
     public static final double ARM_POS_I_GAIN = 0.7;
-    public static final double ARM_VEL_P_GAIN = 0.15;
+    public static final double ARM_VEL_P_GAIN = 0.40;
+    public static final double ARM_TOL = 0.09;
 
     public static final double LIFT_POS_P_GAIN = 8.0;
     public static final double LIFT_POS_I_GAIN = 2.0;
-    public static final double LIFT_VEL_P_GAIN = 0.4;
+    public static final double LIFT_VEL_P_GAIN = 0.6;
+    public static final double LIFT_TOL = 0.02;
     /* ------------------------------------------------------- */
 
     /* -------------------- Game Positions -------------------------------*/
     public static final double MAX_LIFT_HEIGHT = 0.650;  // meters
     public static final double MIN_LIFT_HEIGHT = 0;  // meters
     public static final double MIN_ARM_ANGLE = 0;
-    public static final double MAX_ARM_ANGLE = 2 * Math.PI;
+    public static final double MAX_ARM_ANGLE = 5.5;
 
     public static final double L2_SCORE_ANGLE = 1.03;
     public static final double L2_SCORE_LIFT_HEIGHT = 0.317;
@@ -35,16 +37,19 @@ public final class ArmLiftConstants {
     public static final double L4_SCORE_ANGLE = 3.42;
     public static final double L4_SCORE_LIFT_HEIGHT = MAX_LIFT_HEIGHT;
 
-    public static final double L2_INTAKE_ANGLE = 1.65;
-    public static final double L2_INTAKE_LIFT_HEIGHT = 0.5;
+    public static final double L2_INTAKE_ANGLE = 1.55;
+    public static final double L2_INTAKE_LIFT_HEIGHT = 0.42;
 
     public static final double L3_INTAKE_ANGLE = 1.65;
-    public static final double L3_INTAKE_LIFT_HEIGHT = 0.7;
+    public static final double L3_INTAKE_LIFT_HEIGHT = MAX_LIFT_HEIGHT;
     
     public static final double CORAL_STATION_ANGLE = 4.17;
-    public static final double CORAL_STATION_HEIGHT = 0.286;
+    public static final double CORAL_STATION_HEIGHT = 0.31;
+
+    public static final double PROCESSOR_ANGLE = 1.2;
+    public static final double PROCESSOR_HEIGHT = 0.06;
     
-    public static final double SHOOT_NET_ANGLE = 2.88;
+    public static final double SHOOT_NET_ANGLE = 2.80;
     public static final double SHOOT_NET_LIFT_HEIGHT = MAX_LIFT_HEIGHT;
 
     public static final double STORAGE_ANGLE = Math.PI;
@@ -53,6 +58,9 @@ public final class ArmLiftConstants {
     public static final double START_ANGLE = Math.PI;
     public static final double START_LIFT_HEIGHT = 0.229;
 
+    public static final double DEFENSE_ANGLE = Math.PI;
+    public static final double DEFENSE_LIFT_HEIGHT = 0;
+
     //Intaking
     public static final double GROUND_INTAKE_RIGHT_ANGLE = 1.1;  // radians
     public static final double GROUND_INTAKE_LIFT_HEIGHT = 0.05;  // meters
@@ -60,7 +68,7 @@ public final class ArmLiftConstants {
 
 /* ---------------ARM AND LIFT BOUND CHECKING -------------*/
     public static final double LOW_LIFT_HEIGHT = 0.2;
-    public static final double HIGH_LIFT_HEIGHT = 15;
+    public static final double HIGH_LIFT_HEIGHT = 0.22;
 
     //threshold angles where the lift can move down without hitting algae
     public static final double MAX_LIFT_DOWN_ANGLE = 3.62;

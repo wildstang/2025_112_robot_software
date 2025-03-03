@@ -12,13 +12,13 @@ public final class DriveConstants {
     public static final double ROBOT_WIDTH = 0.5715;
     /**speed with which the robot rotates relative to drive speed */
     public static final double ROTATION_SPEED = 0.75;
-    /**offset of module 1, the front left module, in degrees */
+    /**offset of module 1, the front left module, in radians */
     public static final double FRONT_LEFT_OFFSET = Math.PI / 2.0;
-    /**offset of module 2, the front right module, in degrees */
+    /**offset of module 2, the front right module, in radians */
     public static final double FRONT_RIGHT_OFFSET = 0;
-    /**offset of module 3, the rear left module, in degrees */
+    /**offset of module 3, the rear left module, in radians */
     public static final double REAR_LEFT_OFFSET = Math.PI;
-    /**offset of module 4, the rear right module, in degrees */
+    /**offset of module 4, the rear right module, in radians */
     public static final double REAR_RIGHT_OFFSET = 3.0 * Math.PI / 2.0;
     /**deadband of the controller's joysticks */
     public static final double DEADBAND = 0.07;

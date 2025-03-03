@@ -18,17 +18,19 @@ public class SetClawStateStep extends AutoStep {
     @Override
     public void initialize() {
         claw = (Claw) Core.getSubsystemManager().getSubsystem(WsSubsystems.CLAW);
+        claw.setGameState(newState);
     }
 
     @Override
     public void update() {
-        claw.setGameState(newState);
         if (newState == clawStates.INTAKE){
             if (claw.algaeInClaw) {
                 setFinished();
             }
-        } else {
-            setFinished();
+        } else if (newState == clawStates.OUTTAKE) {
+            if (claw.currentState == clawStates.IDLE) {
+                setFinished();
+            }
         }
     }
 
