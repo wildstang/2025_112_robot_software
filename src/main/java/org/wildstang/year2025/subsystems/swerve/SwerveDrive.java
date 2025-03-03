@@ -5,6 +5,8 @@ import com.ctre.phoenix6.hardware.Pigeon2;
 import com.revrobotics.spark.SparkAnalogSensor;
 import com.revrobotics.spark.SparkLimitSwitch;
 
+import org.photonvision.targeting.PhotonPipelineResult;
+import org.photonvision.targeting.PhotonTrackedTarget;
 import org.wildstang.framework.core.Core;
 import org.wildstang.framework.io.inputs.Input;
 import org.wildstang.framework.logger.Log;
@@ -21,6 +23,7 @@ import org.wildstang.year2025.robot.WsSubsystems;
 // import org.wildstang.year2025.subsystems.LED.LedSubsystem.LEDstates;
 import org.wildstang.year2025.subsystems.arm_lift.ArmLift;
 import org.wildstang.year2025.subsystems.arm_lift.ArmLift.gameStates;
+import org.wildstang.year2025.subsystems.localization.PoPV;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
@@ -30,6 +33,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructPublisher;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -77,6 +81,8 @@ public class SwerveDrive extends SwerveDriveTemplate {
     public driveType driveState;
     private Pose2d curPose;
 
+    private PoPV vision;
+
     private static final double DEG_TO_RAD = Math.PI / 180.0;
     private static final double RAD_TO_DEG = 180.0 / Math.PI;
     private Boolean rotHelperOverride = false;
@@ -92,6 +98,7 @@ public class SwerveDrive extends SwerveDriveTemplate {
         gyro.setYaw(0.0);
         SmartDashboard.putData("Field", m_field);
         publisher = NetworkTableInstance.getDefault().getStructTopic("Pose Estimator", Pose2d.struct).publish();
+        vision = new PoPV();
 
     }
 
@@ -222,6 +229,48 @@ public class SwerveDrive extends SwerveDriveTemplate {
                             }
                             break;
                         case L2_ALGAE_REEF:
+                            
+                            if(DriverStation.getAlliance().equals(DriverStation.Alliance.Blue)){
+                                if(!vision.cameraResults.isEmpty()){
+                                    for(PhotonPipelineResult result : vision.cameraResults){
+                                        if (result.hasTargets()){
+                                            PhotonTrackedTarget closestTarget = result.getBestTarget();
+                                            int closestTargetID = closestTarget.getFiducialId();
+                                            for(PhotonTrackedTarget target: result.getTargets()){
+                                                if(target.getFiducialId() == closestTargetID && (closestTargetID % 2 != 0)){
+                                                    xOutput = target.getBestCameraToTarget().getX();
+                                                    yOutput = target.getBestCameraToTarget().getY();
+                                                    rotOutput = swerveHelper.getRotControl(target.getYaw(), getGyroAngle());
+                                                    this.swerveSignal = swerveHelper.setDrive(xOutput, yOutput, rotOutput, getGyroAngle());
+                                                    drive();
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            if(DriverStation.getAlliance().equals(DriverStation.Alliance.Red)){
+                                if(!vision.cameraResults.isEmpty()){
+                                    for(PhotonPipelineResult result : vision.cameraResults){
+                                        if (result.hasTargets()){
+                                            PhotonTrackedTarget closestTarget = result.getBestTarget();
+                                            int closestTargetID = closestTarget.getFiducialId();
+                                            for(PhotonTrackedTarget target: result.getTargets()){
+                                                if(target.getFiducialId() == closestTargetID && (closestTargetID % 2 == 0)){
+                                                    xOutput = target.getBestCameraToTarget().getX();
+                                                    yOutput = target.getBestCameraToTarget().getY();
+                                                    rotOutput = swerveHelper.getRotControl(target.getYaw(), getGyroAngle());
+                                                    this.swerveSignal = swerveHelper.setDrive(xOutput, yOutput, rotOutput, getGyroAngle());
+                                                    drive();
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            break;
+                            
                         case L3_ALGAE_REEF:
                             // derateValue = 0.75;
                             double curAngle = getGyroAngle();

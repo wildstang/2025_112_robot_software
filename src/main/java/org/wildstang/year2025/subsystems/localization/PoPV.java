@@ -1,5 +1,6 @@
 package org.wildstang.year2025.subsystems.localization; 
 
+import java.util.ArrayList;
 import java.util.List;
 // import java.util.Optional;
 
@@ -17,6 +18,7 @@ import edu.wpi.first.math.Matrix;
 // import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.numbers.N1;
@@ -34,11 +36,13 @@ public class PoPV {
     boolean leftCameraHasTarget;
     PhotonTrackedTarget leftCameraBestTarget;
     Transform3d leftCameraToRobot; // Defines position and orientation of how the camera is mounted
+  
+
 
      /* ------------------ */
 
     PhotonCamera liftTopCamera;
-    List<PhotonPipelineResult> cameraResults;
+    public List<PhotonPipelineResult> cameraResults;
     boolean cameraHasResult;
     PhotonTrackedTarget cameraTarget;
     Transform3d currentAprilTag;
@@ -48,9 +52,9 @@ public class PoPV {
 
     /* Right Camera */
 
-    public PoPV(String leftCameraID, String rightCameraID){
-        leftCamera = new PhotonCamera(leftCameraID);
-        rightCamera = new PhotonCamera(rightCameraID);
+    public PoPV(){
+        leftCamera = new PhotonCamera(VisionConsts.leftCameraID);
+        rightCamera = new PhotonCamera(VisionConsts.rightCameraID);
         leftCameraToRobot = new Transform3d(new Translation3d(0,0,0), new Rotation3d(0,0,90));
         photonPoseEstimator= new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, leftCameraToRobot);
         photonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY); // if pose estimator cannot determine pose with multipe tags, this will choose the solution with the lowest ambiguity
@@ -58,7 +62,15 @@ public class PoPV {
 
 
     public void update(){
-        if (!cameraResults.isEmpty()) {
+        cameraResults = leftCamera.getAllUnreadResults();
+
+        if(aprilTagFieldLayout.getTagPose(cameraTarget.getFiducialId()).isPresent()){
+            estimatedRobotPose = PhotonUtils.estimateFieldToRobotAprilTag(cameraTarget.getBestCameraToTarget(), aprilTagFieldLayout.getTagPose(cameraTarget.getFiducialId()).get(), leftCameraToRobot);
+        }
+        
+
+        /*
+         *   if (!cameraResults.isEmpty()) {
             for (int i = 0; i < cameraResults.size(); i++) {
                 cameraHasResult = cameraResults.get(i).hasTargets();
             
@@ -72,9 +84,9 @@ public class PoPV {
             if(aprilTagFieldLayout.getTagPose(cameraTarget.getFiducialId()).isPresent()){
                 estimatedRobotPose = PhotonUtils.estimateFieldToRobotAprilTag(cameraTarget.getBestCameraToTarget(), aprilTagFieldLayout.getTagPose(cameraTarget.getFiducialId()).get(), leftCameraToRobot);
             }
-        
-        }
+         */
     }
+    
         
     // public Optional<EstimatedRobotPose> getEstimatedGlobalPose(){//Process new vision data and return and estimated pose if can be calculated
     //     Optional<EstimatedRobotPose> visionEst = Optional.empty(); //Creates empty optional to hold estimation result
@@ -83,4 +95,18 @@ public class PoPV {
     //         // updateEstimationStdDevs(visionEst, change.getTargets()); // Unimplemented method that will update the standard deviations values on the new estimated lsit of targets
     //     }
     // }
+
+    public int getCurrentAprilTagID(){
+        return cameraTarget.getFiducialId();
+    }
+
+    public Transform3d getCurrentAprilTagTransform3d(){
+        return currentAprilTag;
+    }
+    public PhotonTrackedTarget getCurrentTarget(){
+        return cameraTarget;
+    }
+   
+
+    
 }

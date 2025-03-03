@@ -27,4 +27,7 @@ public class VisionConsts {
 
     public static Pose3d cameraPose = new Pose3d(-11.8*inToM,8.5*inToM,22.3*inToM, new Rotation3d(0.0,-65*Math.PI/180.0,11*Math.PI/180.0));
 
+
+    public static final String leftCameraID = "";
+    public static final String rightCameraID = "";
 }

@@ -383,6 +383,7 @@ public class ArmLift implements Subsystem {
                 gameState = gameStates.L2_ALGAE_REEF;
                 armSetpoint = this.isFront ? ArmLiftConstants.L2_INTAKE_ANGLE : 2 * Math.PI - ArmLiftConstants.L2_INTAKE_ANGLE;
                 liftSetpoint = ArmLiftConstants.L2_INTAKE_LIFT_HEIGHT;
+                
                 break;
             case L3_ALGAE_REEF:
                 this.isFront = true;
