@@ -35,9 +35,9 @@ public class CenterAlgae extends AutoProgram {
         addStep(new SetClawStateStep(clawStates.OUTTAKE));
 
         AutoParallelStepGroup group3 = new AutoParallelStepGroup();
-        // group3.addStep(new SetArmLiftStateStep(gameStates.L3_ALGAE_REEF, true));
+        group3.addStep(new SetArmLiftStateStep(gameStates.L3_ALGAE_REEF, true));
         group3.addStep(new SwervePathFollowerStep("BargeToIJ", swerve));
-        // group3.addStep(new SetClawStateStep(clawStates.INTAKE));
+        group3.addStep(new SetClawStateStep(clawStates.INTAKE));
         addStep(group3);
 
     }

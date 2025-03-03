@@ -116,7 +116,7 @@ public class Claw implements Subsystem{
                     clawMotor2.setSpeed(-ClawConstants.CLAW_PROCESSOR_SPEED);
                 } else {
                     clawMotor.setSpeed(ClawConstants.CLAW_OUTTAKE_SPEED);
-                    clawMotor2.setSpeed(-ClawConstants.CLAW_OUTTAKE_SPEED * 0.8);
+                    clawMotor2.setSpeed(-ClawConstants.CLAW_OUTTAKE_SPEED);
                 }
                 break;
 
