@@ -7,6 +7,7 @@ import com.revrobotics.spark.SparkLimitSwitch;
 
 import org.wildstang.framework.core.Core;
 import org.wildstang.framework.io.inputs.Input;
+import org.wildstang.framework.logger.Log;
 // import org.wildstang.framework.logger.Log;
 import org.wildstang.framework.io.inputs.AnalogInput;
 import org.wildstang.framework.io.inputs.DigitalInput;
@@ -26,9 +27,12 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -82,16 +86,22 @@ public class SwerveDrive extends SwerveDriveTemplate {
     private Boolean rotHelperOverride = false;
 
     public final Field2d m_field = new Field2d();
-    StructPublisher<Pose2d> publisher;
+    StructPublisher<Pose2d> posePublisher;
+    private SwerveModuleState[] moduleStates;
+    StructArrayPublisher<SwerveModuleState> moduleStatePublisher;
+    StructPublisher<ChassisSpeeds> chassisSpeedPublisher;
 
     @Override
     public void init() {
         initInputs();
         initOutputs();
         resetState();
+        moduleStates = new SwerveModuleState[] {modules[0].getModuleState(),modules[1].getModuleState(),modules[2].getModuleState(),modules[3].getModuleState()};
         gyro.setYaw(0.0);
         SmartDashboard.putData("Field", m_field);
-        publisher = NetworkTableInstance.getDefault().getStructTopic("Pose Estimator", Pose2d.struct).publish();
+        posePublisher = NetworkTableInstance.getDefault().getStructTopic("Pose Estimator", Pose2d.struct).publish();
+        moduleStatePublisher = NetworkTableInstance.getDefault().getStructArrayTopic("Swerve Module States", SwerveModuleState.struct).publish();
+        chassisSpeedPublisher = NetworkTableInstance.getDefault().getStructTopic("Chassis Speeds", ChassisSpeeds.struct).publish();
 
     }
 
@@ -311,7 +321,10 @@ public class SwerveDrive extends SwerveDriveTemplate {
         SmartDashboard.putBoolean("Pixy Obj Det", pixyDigital.isPressed());
         SmartDashboard.putBoolean("Rot Control Override", rotHelperOverride);
         SmartDashboard.putBoolean("rot lock", rotLocked);
-        publisher.set(curPose);
+        posePublisher.set(curPose);
+        moduleStates = new SwerveModuleState[] {modules[0].getModuleState(),modules[1].getModuleState(),modules[2].getModuleState(),modules[3].getModuleState()};
+        moduleStatePublisher.set(moduleStates);
+        chassisSpeedPublisher.set(swerveKinematics.toChassisSpeeds(moduleStates));
         m_field.setRobotPose(curPose);
     }
 
@@ -374,11 +387,11 @@ public class SwerveDrive extends SwerveDriveTemplate {
     /**
      * Resets the gyro, and sets it the input number of radians
      * Used for starting the match at a non-0 angle
-     * @param degrees the current value the gyro should read
+     * @param radians the current value the gyro should read
      */
     public void setGyro(double radians) {
         StatusCode code = gyro.setYaw(radians * RAD_TO_DEG);
-        SmartDashboard.putString("gyro status code", code.getName());
+        Log.warn("Gyro Status Code: " + code.getName());
         rotTarget = radians;
     }
 

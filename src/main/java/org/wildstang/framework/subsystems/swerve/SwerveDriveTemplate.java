@@ -8,7 +8,7 @@ public abstract class SwerveDriveTemplate implements Subsystem{
 
     public abstract void setAutoHeading(double headingTarget);
 
-    public abstract void setGyro(double degrees);
+    public abstract void setGyro(double radians);
 
     public abstract void setToAuto();
 
