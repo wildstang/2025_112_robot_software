@@ -140,7 +140,7 @@ public class SwerveDrive extends SwerveDriveTemplate {
         swerveKinematics = new SwerveDriveKinematics(new Translation2d(DriveConstants.ROBOT_WIDTH/2, DriveConstants.ROBOT_LENGTH/2), new Translation2d(DriveConstants.ROBOT_WIDTH/2, -DriveConstants.ROBOT_LENGTH/2), new Translation2d(-DriveConstants.ROBOT_WIDTH/2, DriveConstants.ROBOT_LENGTH/2), new Translation2d(-DriveConstants.ROBOT_WIDTH/2, -DriveConstants.ROBOT_LENGTH/2));
         //create default swerveSignal
         swerveSignal = new SwerveSignal(new double[]{0.0, 0.0, 0.0, 0.0}, new double[]{0.0, 0.0, 0.0, 0.0});
-        poseEstimator = new SwerveDrivePoseEstimator(swerveKinematics, odoAngle(), odoPosition(), new Pose2d());
+        poseEstimator = new SwerveDrivePoseEstimator(swerveKinematics, odoAngle(), getSwerveModulePositions(), new Pose2d());
     }
 
     @Override
@@ -216,7 +216,7 @@ public class SwerveDrive extends SwerveDriveTemplate {
 
     @Override
     public void update() {
-        poseEstimator.update(odoAngle(), odoPosition());
+        poseEstimator.update(odoAngle(), getSwerveModulePositions());
         curPose = poseEstimator.getEstimatedPosition();
 
         switch (driveState) {
@@ -403,12 +403,12 @@ public class SwerveDrive extends SwerveDriveTemplate {
         return new Rotation2d(getGyroAngle());
     }
 
-    public SwerveModulePosition[] odoPosition(){
+    public SwerveModulePosition[] getSwerveModulePositions(){
         return new SwerveModulePosition[]{modules[0].odoPosition(), modules[1].odoPosition(), modules[2].odoPosition(), modules[3].odoPosition()};
     }
 
     public void setPose(Pose2d pos){
-        this.poseEstimator.resetPosition(odoAngle(), odoPosition(), pos);
+        this.poseEstimator.resetPosition(odoAngle(), getSwerveModulePositions(), pos);
     }
 
     public Pose2d returnPose(){
