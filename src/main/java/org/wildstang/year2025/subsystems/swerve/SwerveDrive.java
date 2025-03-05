@@ -5,6 +5,8 @@ import com.ctre.phoenix6.hardware.Pigeon2;
 import com.revrobotics.spark.SparkAnalogSensor;
 import com.revrobotics.spark.SparkLimitSwitch;
 
+import org.photonvision.PhotonPoseEstimator;
+import org.photonvision.PhotonUtils;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 import org.wildstang.framework.core.Core;
@@ -23,11 +25,15 @@ import org.wildstang.year2025.robot.WsSubsystems;
 // import org.wildstang.year2025.subsystems.LED.LedSubsystem.LEDstates;
 import org.wildstang.year2025.subsystems.arm_lift.ArmLift;
 import org.wildstang.year2025.subsystems.arm_lift.ArmLift.gameStates;
+import org.wildstang.year2025.subsystems.localization.PoPVConstants;
 import org.wildstang.year2025.subsystems.localization.PoPV;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.estimator.PoseEstimator;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -231,15 +237,15 @@ public class SwerveDrive extends SwerveDriveTemplate {
                         case L2_ALGAE_REEF:
                             
                             if(DriverStation.getAlliance().equals(DriverStation.Alliance.Blue)){
-                                if(!vision.cameraResults.isEmpty()){
-                                    for(PhotonPipelineResult result : vision.cameraResults){
+                                if(!vision.leftCameraResults.isEmpty()){
+                                    for(PhotonPipelineResult result : vision.leftCameraResults){
                                         if (result.hasTargets()){
                                             PhotonTrackedTarget closestTarget = result.getBestTarget();
                                             int closestTargetID = closestTarget.getFiducialId();
                                             for(PhotonTrackedTarget target: result.getTargets()){
                                                 if(target.getFiducialId() == closestTargetID && (closestTargetID % 2 != 0)){
-                                                    xOutput = target.getBestCameraToTarget().getX();
-                                                    yOutput = target.getBestCameraToTarget().getY();
+                                                    xOutput = PoPVConstants.get(target.getFiducialId()).getX();
+                                                    yOutput = PoPVConstants.get(target.getFiducialId()).getY();
                                                     rotOutput = swerveHelper.getRotControl(target.getYaw(), getGyroAngle());
                                                     this.swerveSignal = swerveHelper.setDrive(xOutput, yOutput, rotOutput, getGyroAngle());
                                                     drive();
@@ -250,15 +256,15 @@ public class SwerveDrive extends SwerveDriveTemplate {
                                 }
                             }
                             if(DriverStation.getAlliance().equals(DriverStation.Alliance.Red)){
-                                if(!vision.cameraResults.isEmpty()){
-                                    for(PhotonPipelineResult result : vision.cameraResults){
+                                if(!vision.leftCameraResults.isEmpty()){
+                                    for(PhotonPipelineResult result : vision.leftCameraResults){
                                         if (result.hasTargets()){
                                             PhotonTrackedTarget closestTarget = result.getBestTarget();
                                             int closestTargetID = closestTarget.getFiducialId();
                                             for(PhotonTrackedTarget target: result.getTargets()){
                                                 if(target.getFiducialId() == closestTargetID && (closestTargetID % 2 == 0)){
-                                                    xOutput = target.getBestCameraToTarget().getX();
-                                                    yOutput = target.getBestCameraToTarget().getY();
+                                                    xOutput = PoPVConstants.get(target.getFiducialId()).getX();
+                                                    yOutput = PoPVConstants.get(target.getFiducialId()).getY();
                                                     rotOutput = swerveHelper.getRotControl(target.getYaw(), getGyroAngle());
                                                     this.swerveSignal = swerveHelper.setDrive(xOutput, yOutput, rotOutput, getGyroAngle());
                                                     drive();
@@ -306,6 +312,7 @@ public class SwerveDrive extends SwerveDriveTemplate {
                         case SHOOT_NET:
                             rotTarget = (getGyroAngle() <= Math.PI / 2.0 || getGyroAngle() >= 3.0 * Math.PI / 2.0) ? 0 : Math.PI;
                             rotOutput = swerveHelper.getRotControl(rotTarget, getGyroAngle());
+                            alignBarge();
                             break;
                             // derateValue = 0.5;
                         default:
@@ -342,6 +349,35 @@ public class SwerveDrive extends SwerveDriveTemplate {
 
     }
 
+    private void alignBarge(){
+        if(DriverStation.getAlliance().equals(DriverStation.Alliance.Blue)){
+            if(!vision.leftCameraResults.isEmpty()){
+                for(PhotonPipelineResult result : vision.leftCameraResults){
+                    if (result.hasTargets()){
+                        for(PhotonTrackedTarget target : result.getTargets()){
+                            if(target.getFiducialId() == 14){
+                                
+                                
+                                if(robotPose.getReferencePose().getX() < 200 && robotPose.getReferencePose().getY() < 300){
+        
+                                    var cameraPose = curPose.transformBy(new Transform2d(new Translation2d(PoPVConstants.leftCameraToRobot.getX(), PoPVConstants.leftCameraToRobot.getY()), new Rotation2d(PoPVConstants.leftCameraToRobot.getRotation().getAngle())));
+                                    var targetPose = cameraPose.transformBy(new Transform2d(new Translation2d(camToTarget.getX(), camToTarget.getY()), new Rotation2d(camToTarget.getRotation().getAngle())));
+                                    
+                                    xOutput = PoPVConstants.get(target.getFiducialId()).getX();
+                                    yOutput = PoPVConstants.get(target.getFiducialId()).getY();
+                                    rotOutput = swerveHelper.getRotControl(target.getYaw(), getGyroAngle());
+                                }
+                                
+                                
+                                this.swerveSignal = swerveHelper.setDrive(xOutput, yOutput, rotOutput, getGyroAngle());
+                                drive();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
     private void putDashboard() {
         SmartDashboard.putNumber("Gyro Reading", getGyroAngle());
         SmartDashboard.putNumber("X output", xOutput);

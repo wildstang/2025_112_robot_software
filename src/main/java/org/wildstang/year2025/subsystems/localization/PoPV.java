@@ -3,7 +3,9 @@ package org.wildstang.year2025.subsystems.localization;
 import java.util.ArrayList;
 import java.util.List;
 // import java.util.Optional;
+import java.util.Optional;
 
+import org.photonvision.EstimatedRobotPose;
 // import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
@@ -15,6 +17,7 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.geometry.Pose2d;
 // import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -26,23 +29,23 @@ import edu.wpi.first.math.numbers.N3;
 
 public class PoPV {
 
-    AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
+    public AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
 
     /* Left Camera */
     PhotonCamera leftCamera; //Vision camera
     PhotonCamera rightCamera;
 
-    PhotonPipelineResult leftCameraResults;
+    public List<PhotonPipelineResult> leftCameraResults;
     boolean leftCameraHasTarget;
     PhotonTrackedTarget leftCameraBestTarget;
-    Transform3d leftCameraToRobot; // Defines position and orientation of how the camera is mounted
+     // Defines position and orientation of how the camera is mounted
   
 
 
      /* ------------------ */
 
     PhotonCamera liftTopCamera;
-    public List<PhotonPipelineResult> cameraResults;
+    
     boolean cameraHasResult;
     PhotonTrackedTarget cameraTarget;
     Transform3d currentAprilTag;
@@ -55,18 +58,25 @@ public class PoPV {
     public PoPV(){
         leftCamera = new PhotonCamera(VisionConsts.leftCameraID);
         rightCamera = new PhotonCamera(VisionConsts.rightCameraID);
-        leftCameraToRobot = new Transform3d(new Translation3d(0,0,0), new Rotation3d(0,0,90));
-        photonPoseEstimator= new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, leftCameraToRobot);
+        
+        photonPoseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, PoPVConstants.leftCameraToRobot);
         photonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY); // if pose estimator cannot determine pose with multipe tags, this will choose the solution with the lowest ambiguity
     }
 
 
-    public void update(){
-        cameraResults = leftCamera.getAllUnreadResults();
-
-        if(aprilTagFieldLayout.getTagPose(cameraTarget.getFiducialId()).isPresent()){
-            estimatedRobotPose = PhotonUtils.estimateFieldToRobotAprilTag(cameraTarget.getBestCameraToTarget(), aprilTagFieldLayout.getTagPose(cameraTarget.getFiducialId()).get(), leftCameraToRobot);
+    public PhotonPoseEstimator getEstimatedGlobalPose(Pose2d prevEstimatedRobotPose){
+        photonPoseEstimator.setReferencePose(prevEstimatedRobotPose);
+        for(var target : leftCameraResults){
+           photonPoseEstimator.update(target);
         }
+        return photonPoseEstimator;
+    }
+        
+
+    public void update(){
+        leftCameraResults = leftCamera.getAllUnreadResults();
+
+        
         
 
         /*
