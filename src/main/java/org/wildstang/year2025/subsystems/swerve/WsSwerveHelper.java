@@ -23,7 +23,7 @@ public class WsSwerveHelper {
      * @param i_tx the translation joystick x value
      * @param i_ty the translation joystick y value
      * @param i_rot the rotation joystick value
-     * @param i_gyro the gyro value, field centric, in bearing degrees
+     * @param i_gyro the gyro value, field centric, in RHR radians
      * @return driveSignal for normal driving, normalized
      */
     public SwerveSignal setDrive(double i_tx, double i_ty, double i_rot, double i_gyro) {

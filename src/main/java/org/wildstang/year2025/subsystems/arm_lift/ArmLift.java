@@ -35,8 +35,8 @@ public class ArmLift implements Subsystem {
     private DigitalInput dpadDown, dpadUp;
     private DigitalInput dpadLeft, dpadRight;
     private DigitalInput leftJoyStickButton;
-    private AnalogInput leftJoyStickY;
-    private AnalogInput rightJoyStickX;
+    // private AnalogInput leftJoyStickY;
+    // private AnalogInput rightJoyStickX;
     private AnalogInput leftTrigger;
     
     /* Lift Variables */
@@ -101,9 +101,9 @@ public class ArmLift implements Subsystem {
         faceDown.addInputListener(this);
         leftTrigger = (AnalogInput) Core.getInputManager().getInput(WsInputs.DRIVER_LEFT_TRIGGER);
         leftTrigger.addInputListener(this);
-        leftJoyStickY = (AnalogInput) Core.getInputManager().getInput(WsInputs.DRIVER_LEFT_JOYSTICK_Y);
+        // leftJoyStickY = (AnalogInput) Core.getInputManager().getInput(WsInputs.DRIVER_LEFT_JOYSTICK_Y);
         // leftJoyStickY.addInputListener(this);
-        rightJoyStickX = (AnalogInput) Core.getInputManager().getInput(WsInputs.DRIVER_RIGHT_JOYSTICK_X);
+        // rightJoyStickX = (AnalogInput) Core.getInputManager().getInput(WsInputs.DRIVER_RIGHT_JOYSTICK_X);
         // rightJoyStickX.addInputListener(this);
         dpadDown = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_DPAD_DOWN);
         dpadDown.addInputListener(this);
@@ -185,14 +185,14 @@ public class ArmLift implements Subsystem {
         }
     }
 
-    private void testAnalogSubsystem(){
-        liftMotor1.setSpeed(leftJoyStickY.getValue());
-        liftMotor2.setSpeed(-leftJoyStickY.getValue());
-        SmartDashboard.putNumber("Lift Speed", leftJoyStickY.getValue());
+    // private void testAnalogSubsystem(){
+    //     liftMotor1.setSpeed(leftJoyStickY.getValue());
+    //     liftMotor2.setSpeed(-leftJoyStickY.getValue());
+    //     SmartDashboard.putNumber("Lift Speed", leftJoyStickY.getValue());
 
-        armMotor.setSpeed(rightJoyStickX.getValue());
-        SmartDashboard.putNumber("Arm Speed", rightJoyStickX.getValue());
-    }
+    //     armMotor.setSpeed(rightJoyStickX.getValue());
+    //     SmartDashboard.putNumber("Arm Speed", rightJoyStickX.getValue());
+    // }
 
     private void competitionControlSystem(){
          //get current positions of arm and lift

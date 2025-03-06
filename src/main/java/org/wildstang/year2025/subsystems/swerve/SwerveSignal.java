@@ -6,7 +6,7 @@ public class SwerveSignal {
     private double[] angle;
     private double maxSpeed;
 
-    /**contains motor speeds, robot relative angles in bearing-degrees 
+    /**contains motor speeds, robot relative angles in RHR radians 
      * @param i_speed double[] for the speed of each module, in [0,1] signal
      * @param i_angle double[] for the angle of the module, in radians
     */

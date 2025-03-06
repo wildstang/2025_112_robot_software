@@ -147,7 +147,7 @@ public class SwerveModule {
      * @return boolean whether you should move towards that angle or the opposite
     */
     public boolean getDirection(double angle) {
-        double angleErr = ((angle - getAngle()) % (2.0 * Math.PI) + 2.0 * Math.PI) % (2.0 * Math.PI);
+        double angleErr = (Math.abs(angle - getAngle()) % (2.0 * Math.PI) + 2.0 * Math.PI) % (2.0 * Math.PI);
         return angleErr < (Math.PI / 2.0) || angleErr > (3.0 * Math.PI / 2.0);
     }
 
