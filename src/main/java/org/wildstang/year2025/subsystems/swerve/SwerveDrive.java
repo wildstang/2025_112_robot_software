@@ -27,6 +27,7 @@ import org.wildstang.year2025.subsystems.arm_lift.ArmLift;
 import org.wildstang.year2025.subsystems.arm_lift.ArmLift.gameStates;
 import org.wildstang.year2025.subsystems.localization.PoPVConstants;
 import org.wildstang.year2025.subsystems.localization.WsPV;
+import org.wildstang.year2025.subsystems.localization.Localization;
 import org.wildstang.year2025.subsystems.localization.PoPV;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -50,6 +51,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * description: controls a swerve drive for four swerveModules through autonomous and teleoperated control
  */
 public class SwerveDrive extends SwerveDriveTemplate {
+
+    private Localization loc;
 
     private AnalogInput leftStickX;  // translation joystick x
     private AnalogInput leftStickY;  // translation joystick y
@@ -77,15 +80,14 @@ public class SwerveDrive extends SwerveDriveTemplate {
     public SwerveModule[] modules;
     private SwerveSignal swerveSignal;
     private WsSwerveHelper swerveHelper = new WsSwerveHelper();
-    private SwerveDrivePoseEstimator poseEstimator;
 
-    SwerveDriveKinematics swerveKinematics;
+    public SwerveDriveKinematics swerveKinematics;
     // private Claw claw;
     private ArmLift armLift;
     // private LedSubsystem led;
 
-    public enum driveType {TELEOP, AUTO};
-    public driveType driveState;
+    public enum DriveState {TELEOP, AUTO, REEF, NET, PROCESSOR, GROUND_INTAKE};
+    public DriveState driveState;
     private Pose2d curPose;
 
     private PoPV vision;
@@ -153,7 +155,7 @@ public class SwerveDrive extends SwerveDriveTemplate {
         // led = (LedSubsystem) Core.getSubsystemManager().getSubsystem(WsSubsystems.LED);
         // claw = (Claw) Core.getSubsystemManager().getSubsystem(WsSubsystems.CLAW);
         armLift = (ArmLift) Core.getSubsystemManager().getSubsystem(WsSubsystems.ARMLIFT);
-        photonVision = (WsPV) Core.getSubsystemManager().getSubsystem(WsSubsystems.WS_PV);
+        loc = (Localization) Core.getSubsystemManager().getSubsystem(WsSubsystems.LOCALIZATION);
 
     }
 
@@ -351,6 +353,10 @@ public class SwerveDrive extends SwerveDriveTemplate {
 
     }
 
+    public void setDriveState(DriveState newState) {
+        driveState = newState;
+    }
+
     private void alignBarge(){
         if(DriverStation.getAlliance().equals(DriverStation.Alliance.Blue)){
             if(!vision.leftCameraResults.isEmpty()){
@@ -404,7 +410,7 @@ public class SwerveDrive extends SwerveDriveTemplate {
 
     /** sets the drive to teleop/cross, and sets drive motors to coast */
     public void setToTeleop() {
-        driveState = driveType.TELEOP;
+        driveState = DriveState.TELEOP;
         for (int i = 0; i < modules.length; i++) {
             modules[i].setDriveBrake(false);
         }
@@ -417,7 +423,7 @@ public class SwerveDrive extends SwerveDriveTemplate {
 
     /**sets the drive to autonomous */
     public void setToAuto() {
-        driveState = driveType.AUTO;
+        driveState = DriveState.AUTO;
         for (int i = 0; i < modules.length; i++) {
             modules[i].setDriveBrake(true);
         }
@@ -473,16 +479,12 @@ public class SwerveDrive extends SwerveDriveTemplate {
         return (((gyro.getYaw().getValueAsDouble() * DEG_TO_RAD) % (2.0 * Math.PI)) + 2.0 * Math.PI) % (2.0 * Math.PI);
     }
 
-    public Rotation2d odoAngle(){
+    public Rotation2d getOdoAngle(){
         return new Rotation2d(getGyroAngle());
     }
 
-    public SwerveModulePosition[] odoPosition(){
+    public SwerveModulePosition[] getOdoPosition(){
         return new SwerveModulePosition[]{modules[0].odoPosition(), modules[1].odoPosition(), modules[2].odoPosition(), modules[3].odoPosition()};
-    }
-
-    public void setPose(Pose2d pos){
-        this.poseEstimator.resetPosition(odoAngle(), odoPosition(), pos);
     }
 
     public Pose2d returnPose(){
