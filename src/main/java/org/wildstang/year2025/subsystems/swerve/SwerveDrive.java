@@ -57,7 +57,6 @@ public class SwerveDrive extends SwerveDriveTemplate {
     private double xSpeed;
     private double ySpeed;
     private double wSpeed;
-    // private double derateValue = 1.0;
     private boolean rotLocked;
     private double rotTarget;
     private double pathXTarget;
@@ -69,9 +68,7 @@ public class SwerveDrive extends SwerveDriveTemplate {
     private WsSwerveHelper swerveHelper = new WsSwerveHelper();
 
     public SwerveDriveKinematics swerveKinematics;
-    // private Claw claw;
     private ArmLift armLift;
-    // private LedSubsystem led;
 
     public enum DriveState {TELEOP, AUTO, REEF, NET, PROCESSOR, GROUND_INTAKE};
     public DriveState driveState;
@@ -133,14 +130,11 @@ public class SwerveDrive extends SwerveDriveTemplate {
         };
 
         swerveKinematics = new SwerveDriveKinematics(new Translation2d(DriveConstants.ROBOT_WIDTH/2, DriveConstants.ROBOT_LENGTH/2), new Translation2d(DriveConstants.ROBOT_WIDTH/2, -DriveConstants.ROBOT_LENGTH/2), new Translation2d(-DriveConstants.ROBOT_WIDTH/2, DriveConstants.ROBOT_LENGTH/2), new Translation2d(-DriveConstants.ROBOT_WIDTH/2, -DriveConstants.ROBOT_LENGTH/2));
-        //create default swerveSignal
         swerveSignal = new SwerveSignal(new double[]{0.0, 0.0, 0.0, 0.0}, new double[]{0.0, 0.0, 0.0, 0.0});
     }
 
     @Override
     public void initSubsystems(){
-        // led = (LedSubsystem) Core.getSubsystemManager().getSubsystem(WsSubsystems.LED);
-        // claw = (Claw) Core.getSubsystemManager().getSubsystem(WsSubsystems.CLAW);
         armLift = (ArmLift) Core.getSubsystemManager().getSubsystem(WsSubsystems.ARMLIFT);
         loc = (Localization) Core.getSubsystemManager().getSubsystem(WsSubsystems.LOCALIZATION);
 
@@ -174,40 +168,15 @@ public class SwerveDrive extends SwerveDriveTemplate {
         // joystick positive value corresponds to cw rotation
         // drivetrain positive value corresponds to ccw rotation
         rotOutput = swerveHelper.scaleDeadband(-rightStickX.getValue(), DriveConstants.DEADBAND);  // negate joystick value so positive on the joystick (right) commands a negative rot speed (turn cw) and vice versa
-        
-        // if(leftTrigger.getValue() != 0 && !rotHelperOverride){
-        //     driveState = driveType.GROUND_INTAKE;
-        //  }else if(rotOutput != 0){
-        //      driveState = driveType.TELEOP;
-        //  } 
 
         // if the rotational joystick is being used, the robot should not be auto tracking heading
         // otherwise engage rotation lock at current heading
         if (rotOutput != 0) {
-            // if (armLift.gameState == gameStates.L2_ALGAE_REEF || armLift.gameState == gameStates.L3_ALGAE_REEF) {
-
-            // } else {
-                rotOutput *= Math.abs(rotOutput);
-                rotOutput *= DriveConstants.ROTATION_SPEED;
-                rotLocked = false;
-            // }
-        // }  else if (rotLocked == false) {
-        //     rotTarget = getGyroAngle();
-        //     rotLocked = true;
+            rotOutput *= Math.abs(rotOutput);
+            rotLocked = false;
         } else {
             rotLocked = true;
         }
-        
-        //assign thrust
-        // derateValue = (DriveConstants.DRIVE_DERATE * Math.abs(leftTrigger.getValue()) + 1);
-        // xOutput /= derateValue;
-        // yOutput /= derateValue;
-        // rotOutput /= derateValue;
-    }
-    
-    @Override
-    public void resetState() {
-        setToTeleop();
     }
 
     @Override
@@ -220,55 +189,41 @@ public class SwerveDrive extends SwerveDriveTemplate {
                 xOutput = xSpeed * DriveConstants.DRIVE_F_K + (pathXTarget - curPose.getX()) * DriveConstants.POS_P;
                 yOutput = ySpeed * DriveConstants.DRIVE_F_K + (pathYTarget - curPose.getY()) * DriveConstants.POS_P;
                 break;
+
             case TELEOP:
                 break;
+
             case GROUND_INTAKE:
-                if (algaeInView() && armLift.isAtSetpoint()) {
-                    // rotLocked = true;
-                    // derateValue = 0.75;
-                    rotTarget =  ((1.0 - pixyAnalog.getVoltage()) * 0.70 + getGyroAngle() + 2.0 * Math.PI) % (2.0 * Math.PI);
+                if (algaeInView() && armLift.isAtSetpoint() && rotLocked) {
+                    rotOutput = (1.0 - pixyAnalog.getVoltage()) * 0.40;
+                }
+                break;
+
+            case REEF:
+                if (rotLocked) {
+                    double curAngle = getGyroAngle();
+                    if (curAngle > 11.0 * Math.PI / 6.0 || curAngle < Math.PI / 6.0) rotTarget = 0.0;
+                    else if (curAngle < 3.0 * Math.PI / 6.0) rotTarget = 2.0 * Math.PI / 6.0;
+                    else if (curAngle < 5.0 * Math.PI / 6.0) rotTarget = 4.0 * Math.PI / 6.0;
+                    else if (curAngle < 7.0 * Math.PI / 6.0) rotTarget = 6.0 * Math.PI / 6.0;
+                    else if (curAngle < 9.0 * Math.PI / 6.0) rotTarget = 8.0 * Math.PI / 6.0;
+                    else rotTarget = 10.0 * Math.PI / 6.0;
                     rotOutput = swerveHelper.getRotControl(rotTarget, getGyroAngle());
                 }
                 break;
-            case REEF:
-                // derateValue = 0.75;
-                double curAngle = getGyroAngle();
-                if (curAngle > 11.0 * Math.PI / 6.0 || curAngle < Math.PI / 6.0) rotTarget = 0.0;
-                else if (curAngle < 3.0 * Math.PI / 6.0) rotTarget = 2.0 * Math.PI / 6.0;
-                else if (curAngle < 5.0 * Math.PI / 6.0) rotTarget = 4.0 * Math.PI / 6.0;
-                else if (curAngle < 7.0 * Math.PI / 6.0) rotTarget = 6.0 * Math.PI / 6.0;
-                else if (curAngle < 9.0 * Math.PI / 6.0) rotTarget = 8.0 * Math.PI / 6.0;
-                else rotTarget = 10.0 * Math.PI / 6.0;
-                // rotTarget = ((double) Math.round(getGyroAngle() / (Math.PI / 3.0)) % 6.0) * (Math.PI / 3.0);
-                rotOutput = swerveHelper.getRotControl(rotTarget, getGyroAngle());
-                break;
-            //     if (algaeInView() && armLift.isAtSetpoint()){
-            //         yOutput = (1.0 - pixyAnalog.getVoltage()) * 0.30;// * derateValue;
-            //         rotOutput = Math.min(Math.max(rotOutput, -1.0), 1.0);
-            //         //TODO: this is very janky and should be refactored to be more logical
-            //         //undo red alliance inversion so while in robot relative mode forward always moves forward
-            //         if (!Core.isBlueAlliance()) {
-            //             xOutput *= -1;
-            //         }
-            //         xOutput = Math.min(Math.max(xOutput, -1.0), 1.0);// * derateValue;
-            //         yOutput = Math.min(Math.max(yOutput, -1.0), 1.0);// * derateValue;
-            //         this.swerveSignal = swerveHelper.setDrive(xOutput , yOutput, rotOutput, 0);
-            //         drive();
-            //         putDashboard();
-            //         return;
-            //     }
+
             case PROCESSOR:
-                // derateValue = 0.75;
-                rotTarget = (getGyroAngle() <= Math.PI) ? Math.PI / 2.0 : 3.0 * Math.PI / 2.0;
-                rotOutput = swerveHelper.getRotControl(rotTarget, getGyroAngle());
+                if (rotLocked) {
+                    rotTarget = (getGyroAngle() <= Math.PI) ? Math.PI / 2.0 : 3.0 * Math.PI / 2.0;
+                    rotOutput = swerveHelper.getRotControl(rotTarget, getGyroAngle());
+                }
                 break;
+
             case NET:
-                rotTarget = (getGyroAngle() <= Math.PI / 2.0 || getGyroAngle() >= 3.0 * Math.PI / 2.0) ? 0 : Math.PI;
-                rotOutput = swerveHelper.getRotControl(rotTarget, getGyroAngle());
-                break;
-                // derateValue = 0.5;
-            default:
-                // derateValue = 1.0;
+                if (rotLocked) {
+                    rotTarget = (getGyroAngle() <= Math.PI / 2.0 || getGyroAngle() >= 3.0 * Math.PI / 2.0) ? 0 : Math.PI;
+                    rotOutput = swerveHelper.getRotControl(rotTarget, getGyroAngle());
+                }
                 break;
         }
         
@@ -278,7 +233,6 @@ public class SwerveDrive extends SwerveDriveTemplate {
         this.swerveSignal = swerveHelper.setDrive(xOutput , yOutput, rotOutput, getGyroAngle());
         drive();
         putDashboard();
-
     }
 
     public void setDriveState(DriveState newState) {
@@ -298,7 +252,6 @@ public class SwerveDrive extends SwerveDriveTemplate {
         SmartDashboard.putNumber("Auto y pos", pathYTarget);
         SmartDashboard.putNumber("rot target", rotTarget);
         SmartDashboard.putBoolean("Blue Alliance", Core.isBlueAlliance());
-        // SmartDashboard.putString("cur pose", curPose.toString());
         SmartDashboard.putNumber("Pixy Voltage", pixyAnalog.getVoltage());
         SmartDashboard.putBoolean("Pixy Obj Det", pixyDigital.isPressed());
         SmartDashboard.putBoolean("Rot Control Override", rotHelperOverride);
@@ -362,7 +315,6 @@ public class SwerveDrive extends SwerveDriveTemplate {
 
     public boolean algaeInView(){
         return pixyDigital.isPressed();
-        
     }
 
     /**
@@ -386,6 +338,11 @@ public class SwerveDrive extends SwerveDriveTemplate {
 
     public SwerveModulePosition[] getOdoPosition(){
         return new SwerveModulePosition[]{modules[0].odoPosition(), modules[1].odoPosition(), modules[2].odoPosition(), modules[3].odoPosition()};
+    }
+    
+    @Override
+    public void resetState() {
+        setToTeleop();
     }
     
     @Override
