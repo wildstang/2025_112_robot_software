@@ -26,6 +26,7 @@ import org.wildstang.year2025.robot.WsSubsystems;
 import org.wildstang.year2025.subsystems.arm_lift.ArmLift;
 import org.wildstang.year2025.subsystems.arm_lift.ArmLift.gameStates;
 import org.wildstang.year2025.subsystems.localization.PoPVConstants;
+import org.wildstang.year2025.subsystems.localization.WsPV;
 import org.wildstang.year2025.subsystems.localization.PoPV;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -88,6 +89,7 @@ public class SwerveDrive extends SwerveDriveTemplate {
     private Pose2d curPose;
 
     private PoPV vision;
+    private WsPV photonVision;
 
     private static final double DEG_TO_RAD = Math.PI / 180.0;
     private static final double RAD_TO_DEG = 180.0 / Math.PI;
@@ -105,6 +107,7 @@ public class SwerveDrive extends SwerveDriveTemplate {
         SmartDashboard.putData("Field", m_field);
         publisher = NetworkTableInstance.getDefault().getStructTopic("Pose Estimator", Pose2d.struct).publish();
         vision = new PoPV();
+        curPose = new Pose2d(0.0,0.0,new Rotation2d(0.0));
 
     }
 
@@ -143,7 +146,6 @@ public class SwerveDrive extends SwerveDriveTemplate {
         swerveKinematics = new SwerveDriveKinematics(new Translation2d(DriveConstants.ROBOT_WIDTH/2, DriveConstants.ROBOT_LENGTH/2), new Translation2d(DriveConstants.ROBOT_WIDTH/2, -DriveConstants.ROBOT_LENGTH/2), new Translation2d(-DriveConstants.ROBOT_WIDTH/2, DriveConstants.ROBOT_LENGTH/2), new Translation2d(-DriveConstants.ROBOT_WIDTH/2, -DriveConstants.ROBOT_LENGTH/2));
         //create default swerveSignal
         swerveSignal = new SwerveSignal(new double[]{0.0, 0.0, 0.0, 0.0}, new double[]{0.0, 0.0, 0.0, 0.0});
-        poseEstimator = new SwerveDrivePoseEstimator(swerveKinematics, odoAngle(), odoPosition(), new Pose2d());
     }
 
     @Override
@@ -151,6 +153,8 @@ public class SwerveDrive extends SwerveDriveTemplate {
         // led = (LedSubsystem) Core.getSubsystemManager().getSubsystem(WsSubsystems.LED);
         // claw = (Claw) Core.getSubsystemManager().getSubsystem(WsSubsystems.CLAW);
         armLift = (ArmLift) Core.getSubsystemManager().getSubsystem(WsSubsystems.ARMLIFT);
+        photonVision = (WsPV) Core.getSubsystemManager().getSubsystem(WsSubsystems.WS_PV);
+
     }
 
     @Override
@@ -219,9 +223,7 @@ public class SwerveDrive extends SwerveDriveTemplate {
 
     @Override
     public void update() {
-        poseEstimator.update(odoAngle(), odoPosition());
-        curPose = poseEstimator.getEstimatedPosition();
-
+        curPose = photonVision.curPose;
         switch (driveState) {
             case TELEOP:
                 if (!rotHelperOverride && rotLocked) {
