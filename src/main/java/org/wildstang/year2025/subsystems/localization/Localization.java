@@ -138,12 +138,12 @@ public class Localization implements Subsystem {
     }
 
     // TODO: fill in
-    public Pose2d getReefTarget() {
+    public Pose2d getReefTargetPose() {
         return new Pose2d();
     }
 
     // TODO: fill in
-    public Pose2d getProcesserTarget() {
+    public Pose2d getProcesserTargetPose() {
         return new Pose2d();
     }
 
