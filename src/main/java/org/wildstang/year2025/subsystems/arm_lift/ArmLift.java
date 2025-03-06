@@ -14,6 +14,7 @@ import org.wildstang.year2025.robot.WsInputs;
 import org.wildstang.year2025.robot.WsOutputs;
 import org.wildstang.year2025.robot.WsSubsystems;
 import org.wildstang.year2025.subsystems.Claw.Claw;
+import org.wildstang.year2025.subsystems.localization.Localization;
 
 // import com.revrobotics.spark.SparkAnalogSensor;
 
@@ -42,7 +43,6 @@ public class ArmLift implements Subsystem {
     /* Lift Variables */
     private WsSpark liftMotor1;
     private WsSpark liftMotor2;
-    // private SparkAnalogSensor liftPot;
     private double currentLiftHeight, currentLiftVel;
     public enum gameStates {GROUND_INTAKE, L2_ALGAE_REEF, L3_ALGAE_REEF, STORAGE, SCORE_PRELOAD, SHOOT_NET, START, CORAL_INTAKE, CORAL_L2, CORAL_L3, PROCESSOR, DEFENSE}; // Our Arm/Lift States
     public gameStates gameState = gameStates.START;
@@ -58,6 +58,7 @@ public class ArmLift implements Subsystem {
     private double validArmAngle;
     private double validLiftHeight;
     private Claw claw;
+    private Localization loc;
     private boolean isFront;
     private double manualArmAdjust;
 
@@ -65,7 +66,6 @@ public class ArmLift implements Subsystem {
     public void init(){
         initOutput();
         initInputs();
-        // liftPot = liftMotor1.getController().getAnalog();
         currentArmAngle = getArmAngle();
         currentLiftHeight = getLiftHeight();
         liftRecalculateFlag = false;
@@ -120,6 +120,7 @@ public class ArmLift implements Subsystem {
     @Override
     public void initSubsystems() {
         claw = (Claw) Core.getSubsystemManager().getSubsystem(WsSubsystems.CLAW);
+        loc = (Localization) Core.getSubsystemManager().getSubsystem(WsSubsystems.LOCALIZATION);
     }
 
     public void inputUpdate(Input source){

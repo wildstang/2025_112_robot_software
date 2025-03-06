@@ -138,12 +138,14 @@ public class Localization implements Subsystem {
     }
 
     // TODO: fill in
+    // returns the nearest reef pose to align for intaking
     public Pose2d getReefTargetPose() {
         return new Pose2d();
     }
 
     // TODO: fill in
-    public Pose2d getProcesserTargetPose() {
+    // returns the processor target pose corresponding to the current side of the field the robot is on
+    public Pose2d getProcessorTargetPose() {
         return new Pose2d();
     }
 
