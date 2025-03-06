@@ -98,7 +98,6 @@ public class SwerveDrive extends SwerveDriveTemplate {
     private Boolean rotHelperOverride = false;
 
     public final Field2d m_field = new Field2d();
-    StructPublisher<Pose2d> publisher;
 
     @Override
     public void init() {
@@ -107,7 +106,6 @@ public class SwerveDrive extends SwerveDriveTemplate {
         resetState();
         gyro.setYaw(0.0);
         SmartDashboard.putData("Field", m_field);
-        publisher = NetworkTableInstance.getDefault().getStructTopic("Pose Estimator", Pose2d.struct).publish();
         vision = new PoPV();
         curPose = new Pose2d(0.0,0.0,new Rotation2d(0.0));
 
@@ -404,7 +402,6 @@ public class SwerveDrive extends SwerveDriveTemplate {
         SmartDashboard.putBoolean("Pixy Obj Det", pixyDigital.isPressed());
         SmartDashboard.putBoolean("Rot Control Override", rotHelperOverride);
         SmartDashboard.putBoolean("rot lock", rotLocked);
-        publisher.set(curPose);
         m_field.setRobotPose(curPose);
     }
 

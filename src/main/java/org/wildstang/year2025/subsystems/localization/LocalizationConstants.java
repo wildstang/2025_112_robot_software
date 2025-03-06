@@ -12,13 +12,11 @@ import edu.wpi.first.math.numbers.N3;
 
 public class LocalizationConstants {
     public static final String kFrontCam = "FrontCam";
-    // Cam mounted facing forward, half a meter forward of center, half a meter up from center.
-    public static final Transform3d kBotToFrontCam =
-            new Transform3d(new Translation3d(0.5, 0.0, 0.5), new Rotation3d(0, 0, 0));
+    public static final Transform3d kBotToFrontCam = new Transform3d(new Translation3d(0.18, 0.07, 0.17), new Rotation3d(0, 0.459, 0));
+    public static final Transform3d kBotToRearCam = new Transform3d(new Translation3d(-0.18, 0.07, 0.17), new Rotation3d(0, 0.459, Math.PI));
 
     // The layout of the AprilTags on the field
-    public static final AprilTagFieldLayout kTagLayout =
-            AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
+    public static final AprilTagFieldLayout kTagLayout = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
 
     // The standard deviations of our vision estimated poses, which affect correction rate
     // (Fake values. Experiment and determine estimation noise on an actual robot.)

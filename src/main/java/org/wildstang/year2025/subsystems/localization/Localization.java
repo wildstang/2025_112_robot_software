@@ -11,6 +11,7 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 
 import org.wildstang.framework.core.Core;
 import org.wildstang.framework.io.inputs.Input;
+import org.wildstang.framework.logger.Log;
 import org.wildstang.framework.subsystems.Subsystem;
 import org.wildstang.year2025.robot.WsSubsystems;
 import org.wildstang.year2025.subsystems.swerve.SwerveDrive;
@@ -20,6 +21,9 @@ import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructPublisher;
+import edu.wpi.first.networktables.StructArrayPublisher;
 
 public class Localization implements Subsystem {
     
@@ -29,6 +33,10 @@ public class Localization implements Subsystem {
     private PhotonCamera frontCam;
     private Matrix<N3, N1> curStdDevs;
     private Pose2d currentPose;
+    StructPublisher<Pose2d> posePublisher, frontCamPublisher;
+    StructArrayPublisher<Pose2d> visionTargetPublisher;
+    Optional<EstimatedRobotPose> frontVisionEst;
+    Pose2d[] frontVisTargets;
 
     @Override
     public void init() {
@@ -36,6 +44,10 @@ public class Localization implements Subsystem {
         frontEstimator = new PhotonPoseEstimator(LocalizationConstants.kTagLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, LocalizationConstants.kBotToFrontCam);
         frontEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
         currentPose = new Pose2d();
+        posePublisher = NetworkTableInstance.getDefault().getStructTopic("Pose Estimator", Pose2d.struct).publish();
+        frontCamPublisher = NetworkTableInstance.getDefault().getStructTopic("Front Cam Pose Estimator", Pose2d.struct).publish();
+        visionTargetPublisher = NetworkTableInstance.getDefault().getStructArrayTopic("Vision Targets", Pose2d.struct).publish();
+        frontVisionEst = Optional.empty();
     }
 
     @Override
@@ -50,21 +62,36 @@ public class Localization implements Subsystem {
 
     @Override
     public void update() {
+        // Update pose estimator with drivetrain odometry values
         estimator.update(drive.getOdoAngle(), drive.getOdoPosition());
-        Optional<EstimatedRobotPose> visionEst = getEstimatedGlobalPose();
-        if (visionEst.isPresent()) {  // this runs whenever we have had new camera data in the last ~20ms; if no new data since the last loop, don't bother updating
-            estimator.addVisionMeasurement(visionEst.get().estimatedPose.toPose2d(), visionEst.get().timestampSeconds, curStdDevs);
+
+        // Update pose estimator with front camera
+        frontVisionEst = Optional.empty();
+        for (var change : frontCam.getAllUnreadResults()) {
+            frontVisionEst = frontEstimator.update(change);
+            List<PhotonTrackedTarget> targets = change.getTargets();
+            frontVisTargets = new Pose2d[targets.size()];
+            for (int i = 0; i < targets.size(); i++){
+                frontVisTargets[i] = frontEstimator.getFieldTags().getTagPose(targets.get(i).getFiducialId()).get().toPose2d();
+            }
+            visionTargetPublisher.set(frontVisTargets, (long) (1_000_000 * frontVisionEst.get().timestampSeconds));
+            frontCamPublisher.set(frontVisionEst.get().estimatedPose.toPose2d(), (long) (1_000_000 * frontVisionEst.get().timestampSeconds));
+            Log.info("Processing FrontCam from timestamp " + frontVisionEst.get().timestampSeconds);
+            updateEstimationStdDevs(frontVisionEst, targets);
         }
+        if (frontVisionEst.isPresent()) {  // this runs whenever we have had new camera data in the last ~20ms; if no new data since the last loop, don't bother updating
+            estimator.addVisionMeasurement(frontVisionEst.get().estimatedPose.toPose2d(), frontVisionEst.get().timestampSeconds, curStdDevs);
+        }
+
+        // TODO: copy above code for back cam
+
+        // Get current pose estimate after all updates
         currentPose = estimator.getEstimatedPosition();
+        putDashboard();
     }
 
-    private Optional<EstimatedRobotPose> getEstimatedGlobalPose() {
-        Optional<EstimatedRobotPose> visionEst = Optional.empty();
-        for (var change : frontCam.getAllUnreadResults()) {
-            visionEst = frontEstimator.update(change);
-            updateEstimationStdDevs(visionEst, change.getTargets());
-        }
-        return visionEst;
+    private void putDashboard () {
+        posePublisher.set(currentPose);
     }
 
     private void updateEstimationStdDevs(Optional<EstimatedRobotPose> estimatedPose, List<PhotonTrackedTarget> targets) {
