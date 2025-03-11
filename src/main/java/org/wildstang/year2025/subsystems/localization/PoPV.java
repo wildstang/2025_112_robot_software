@@ -56,8 +56,8 @@ public class PoPV {
     /* Right Camera */
 
     public PoPV(){
-        leftCamera = new PhotonCamera(VisionConsts.leftCameraID);
-        rightCamera = new PhotonCamera(VisionConsts.rightCameraID);
+        // leftCamera = new PhotonCamera(VisionConsts.leftCameraID);
+        // rightCamera = new PhotonCamera(VisionConsts.rightCameraID);
         
         photonPoseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, PoPVConstants.leftCameraToRobot);
         photonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY); // if pose estimator cannot determine pose with multipe tags, this will choose the solution with the lowest ambiguity

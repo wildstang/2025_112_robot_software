@@ -16,6 +16,8 @@ import org.wildstang.year2025.robot.WsSubsystems;
 import org.wildstang.year2025.subsystems.Claw.Claw;
 import org.wildstang.year2025.subsystems.localization.Localization;
 
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+
 // import com.revrobotics.spark.SparkAnalogSensor;
 
 /**
@@ -44,8 +46,9 @@ public class ArmLift implements Subsystem {
     private WsSpark liftMotor1;
     private WsSpark liftMotor2;
     private double currentLiftHeight, currentLiftVel;
-    public enum gameStates {GROUND_INTAKE, L2_ALGAE_REEF, L3_ALGAE_REEF, STORAGE, SCORE_PRELOAD, SHOOT_NET, START, CORAL_INTAKE, CORAL_L2, CORAL_L3, PROCESSOR, DEFENSE}; // Our Arm/Lift States
-    public gameStates gameState = gameStates.START;
+    public enum GameStates {GROUND_INTAKE, L2_ALGAE_REEF, L3_ALGAE_REEF, STORAGE, SCORE_PRELOAD, SHOOT_NET, START, CORAL_INTAKE, CORAL_L2, CORAL_L3, PROCESSOR, DEFENSE}; // Our Arm/Lift States
+    public GameStates gameState = GameStates.START;
+    public GameStates newState = GameStates.START;
     
     /* Arm Variables */
     private double currentArmAngle, currentArmVel;
@@ -124,30 +127,26 @@ public class ArmLift implements Subsystem {
     }
 
     public void inputUpdate(Input source){
-        // Log.warn(source.getName());
         if (faceDown.getValue()) {
-            setGameState(gameStates.STORAGE, isFront);
+            newState = GameStates.STORAGE;
         } else if (faceLeft.getValue()) {
-            setGameState(gameStates.L2_ALGAE_REEF);
+            newState = GameStates.L2_ALGAE_REEF;
         } else if (faceRight.getValue()) {
-            setGameState(gameStates.L3_ALGAE_REEF);
+            newState = GameStates.L3_ALGAE_REEF;
         } else if (faceUp.getValue()) {
-            setGameState(gameStates.SHOOT_NET);
+            newState = GameStates.SHOOT_NET;
         } else if (leftTrigger.getValue() != 0) {
-            setGameState(gameStates.GROUND_INTAKE);
+            newState = GameStates.GROUND_INTAKE;
         } else if (dpadDown.getValue()) {
             manualArmAdjust -= 0.05;
-            // setGameState(gameStates.CORAL_INTAKE);
         } else if(dpadUp.getValue()){
             manualArmAdjust += 0.05;
-            // setGameState(gameStates.PROCESSOR);
         } else if (dpadLeft.getValue()) {
-            setGameState(gameStates.PROCESSOR);
+            newState = GameStates.PROCESSOR;
         } else if (dpadRight.getValue()) {
-            setGameState(gameStates.PROCESSOR);
-        }
-        else if(leftJoyStickButton.getValue()){
-            setGameState(gameStates.DEFENSE);
+            newState = GameStates.PROCESSOR;
+        } else if(leftJoyStickButton.getValue()){
+            newState = GameStates.DEFENSE;
         }
     }
 
@@ -196,11 +195,15 @@ public class ArmLift implements Subsystem {
     // }
 
     private void competitionControlSystem(){
-         //get current positions of arm and lift
-         currentArmAngle = getArmAngle(); // multiplies encode value of 0-1 by 2pi for radians
+         //get current state of arm and lift
+         currentArmAngle = getArmAngle();
          currentArmVel = getArmVel();
          currentLiftHeight = getLiftHeight();
          currentLiftVel = getLiftVel();
+
+        //  if (newState != gameState || isFront != newFront) {
+
+        //  }
 
          if(liftRecalculateFlag && liftProfile.profileDone){
             double[] validSetpoints = getValidSeptpoints(liftSetpoint, currentLiftHeight, armSetpoint, currentArmAngle);
@@ -356,74 +359,74 @@ public class ArmLift implements Subsystem {
         + (ArmLiftConstants.ARM_MOI * goalAccel);
     }
 
-    public void setGameState(gameStates newState) {
+    public void setGameState(GameStates newState) {
         // if we are going to storage, don't invert
-        if (newState == gameStates.STORAGE || newState == gameStates.DEFENSE) {
+        if (newState == GameStates.STORAGE || newState == GameStates.DEFENSE) {
             setGameState(newState, isFront);
         } else {
             setGameState(newState, !isFront);
         }
     }
 
-    public void setGameState(gameStates newState, boolean isFront){
+    public void setGameState(GameStates newState, boolean isFront){
         this.isFront = isFront;
         switch (newState) {
             case GROUND_INTAKE:
                 this.isFront = true;  // ground intake can only happen from the front
-                gameState = gameStates.GROUND_INTAKE;
+                gameState = GameStates.GROUND_INTAKE;
                 armSetpoint = ArmLiftConstants.GROUND_INTAKE_RIGHT_ANGLE;
                 liftSetpoint = ArmLiftConstants.GROUND_INTAKE_LIFT_HEIGHT;
                 break;
             case STORAGE:
-                gameState = gameStates.STORAGE;
+                gameState = GameStates.STORAGE;
                 armSetpoint = ArmLiftConstants.STORAGE_ANGLE;
                 liftSetpoint = ArmLiftConstants.STORAGE_LIFT_HEIGHT;
                 break;
             case L2_ALGAE_REEF:
                 this.isFront = true;
-                gameState = gameStates.L2_ALGAE_REEF;
+                gameState = GameStates.L2_ALGAE_REEF;
                 armSetpoint = this.isFront ? ArmLiftConstants.L2_INTAKE_ANGLE : 2 * Math.PI - ArmLiftConstants.L2_INTAKE_ANGLE;
                 liftSetpoint = ArmLiftConstants.L2_INTAKE_LIFT_HEIGHT;
                 
                 break;
             case L3_ALGAE_REEF:
                 this.isFront = true;
-                gameState = gameStates.L3_ALGAE_REEF;
+                gameState = GameStates.L3_ALGAE_REEF;
                 armSetpoint = this.isFront ? ArmLiftConstants.L3_INTAKE_ANGLE : 2 * Math.PI - ArmLiftConstants.L3_INTAKE_ANGLE;
                 liftSetpoint = ArmLiftConstants.L3_INTAKE_LIFT_HEIGHT;
                 break;
             case SHOOT_NET:
                 this.isFront = false;
-                gameState = gameStates.SHOOT_NET;
+                gameState = GameStates.SHOOT_NET;
                 armSetpoint = this.isFront ? ArmLiftConstants.SHOOT_NET_ANGLE : 2 * Math.PI - ArmLiftConstants.SHOOT_NET_ANGLE;
                 liftSetpoint = ArmLiftConstants.SHOOT_NET_LIFT_HEIGHT;
                 break;
             case CORAL_INTAKE:
                 this.isFront = false;  // coral intake can only happen from the back
-                gameState = gameStates.CORAL_INTAKE;
+                gameState = GameStates.CORAL_INTAKE;
                 armSetpoint = ArmLiftConstants.CORAL_STATION_ANGLE;
                 liftSetpoint = ArmLiftConstants.CORAL_STATION_HEIGHT;
                 break;
             case CORAL_L2:
                 this.isFront = true;
-                gameState = gameStates.CORAL_L2;
+                gameState = GameStates.CORAL_L2;
                 armSetpoint = ArmLiftConstants.L2_SCORE_ANGLE;
                 liftSetpoint = ArmLiftConstants.L2_SCORE_LIFT_HEIGHT;
                 break;
             case CORAL_L3:
                 this.isFront = true;
-                gameState = gameStates.CORAL_L3;
+                gameState = GameStates.CORAL_L3;
                 armSetpoint = ArmLiftConstants.L3_SCORE_ANGLE;
                 liftSetpoint = ArmLiftConstants.L3_SCORE_LIFT_HEIGHT;
                 break;
             case PROCESSOR:
-                this.isFront = true;
-                gameState = gameStates.PROCESSOR;
+                this.isFront = false;
+                gameState = GameStates.PROCESSOR;
                 armSetpoint = this.isFront ? ArmLiftConstants.PROCESSOR_ANGLE : 2 * Math.PI - ArmLiftConstants.PROCESSOR_ANGLE;;
                 liftSetpoint = ArmLiftConstants.PROCESSOR_HEIGHT;
                 break;
             case DEFENSE:
-                gameState = gameStates.DEFENSE;
+                gameState = GameStates.DEFENSE;
                 armSetpoint = ArmLiftConstants.DEFENSE_ANGLE;
                 liftSetpoint = ArmLiftConstants.DEFENSE_LIFT_HEIGHT;
                 break;

@@ -45,7 +45,7 @@ public class WsPV implements Subsystem {
     private SwerveDriveKinematics swerveKinematics;
     
 
-    private VisionConsts VC = new VisionConsts();
+    // private VisionConsts VC = new VisionConsts();
 
     public int tid = 0;
     public double tx = 0;
@@ -97,11 +97,11 @@ public class WsPV implements Subsystem {
     @Override
     public void initSubsystems() {
         swerve = (SwerveDrive) Core.getSubsystemManager().getSubsystem(WsSubsystems.SWERVE_DRIVE);
-        poseEstimator = new SwerveDrivePoseEstimator(swerveKinematics, swerve.odoAngle(), swerve.odoPosition(), new Pose2d());
+        poseEstimator = new SwerveDrivePoseEstimator(swerveKinematics, swerve.getOdoAngle(), swerve.getOdoPosition(), new Pose2d());
     }
 
     public void update(){
-        poseEstimator.update(swerve.odoAngle(), swerve.odoPosition());
+        poseEstimator.update(swerve.getOdoAngle(), swerve.getOdoPosition());
         curPose = poseEstimator.getEstimatedPosition();
         result = camera.getAllUnreadResults();
         if (!result.isEmpty()) {
@@ -133,8 +133,8 @@ public class WsPV implements Subsystem {
         SmartDashboard.putNumber(cameraID + " Y", ty);
         SmartDashboard.putNumber(cameraID + " X", tx);
         SmartDashboard.putBoolean(cameraID + " isAT", isAT);
-        SmartDashboard.putNumber(cameraID + "poseX", estimatedPose.getX()*VC.mToIn);
-        SmartDashboard.putNumber(cameraID + "posey", estimatedPose.getY()*VC.mToIn);
+        // SmartDashboard.putNumber(cameraID + "poseX", estimatedPose.getX()*VC.mToIn);
+        // SmartDashboard.putNumber(cameraID + "posey", estimatedPose.getY()*VC.mToIn);
     }
 
     public boolean TargetInView(){

@@ -19,6 +19,7 @@ import org.wildstang.year2025.subsystems.swerve.SwerveDrive;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -143,10 +144,15 @@ public class Localization implements Subsystem {
         return new Pose2d();
     }
 
-    // TODO: fill in
     // returns the processor target pose corresponding to the current side of the field the robot is on
     public Pose2d getProcessorTargetPose() {
-        return new Pose2d();
+        return (currentPose.getX() < LocalizationConstants.MID_FIELD_X) ? LocalizationConstants.BLUE_PROCESSOR : LocalizationConstants.RED_PROCESSOR;
+    }
+
+    public Pose2d getNetTargetPose() {
+        double xTarget = (currentPose.getX() < LocalizationConstants.MID_FIELD_X) ? LocalizationConstants.BLUE_NET_X : LocalizationConstants.RED_NET_X;
+        double rTarget = ((currentPose.getRotation().getRadians() + 2.0 * Math.PI) % (2.0 * Math.PI) > 3.0 * Math.PI / 2.0 || (currentPose.getRotation().getRadians() + 2.0 * Math.PI) % (2.0 * Math.PI) < Math.PI / 2.0) ? 0.0 : Math.PI;
+        return new Pose2d(xTarget, currentPose.getY(), new Rotation2d(rTarget));
     }
 
     @Override

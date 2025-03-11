@@ -13,7 +13,7 @@ import org.wildstang.year2025.robot.WsSubsystems;
 import org.wildstang.year2025.subsystems.LED.LedSubsystem;
 import org.wildstang.year2025.subsystems.LED.LedSubsystem.LEDstates;
 import org.wildstang.year2025.subsystems.arm_lift.ArmLift;
-import org.wildstang.year2025.subsystems.arm_lift.ArmLift.gameStates;
+import org.wildstang.year2025.subsystems.arm_lift.ArmLift.GameStates;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
@@ -86,7 +86,7 @@ public class Claw implements Subsystem{
                 }
                 if (algaeInClaw) {
                     led.ledState = LEDstates.INTAKE;
-                    armLift.setGameState(gameStates.STORAGE);
+                    armLift.setGameState(GameStates.STORAGE);
                     setGameState(clawStates.HOLD);
                 } else {
                     clawMotor.setSpeed(ClawConstants.CLAW_INTAKE_SPEED);
@@ -104,14 +104,14 @@ public class Claw implements Subsystem{
                 // clawMotor.setCurrentLimit(10, 15, 3);
                 if(timer.get() > ClawConstants.OUTTAKE_TIME){
                     // if we are in scoring position and finished outtaking, go to storage
-                    if (armLift.gameState == gameStates.SHOOT_NET) {
-                        armLift.setGameState(gameStates.STORAGE);
+                    if (armLift.gameState == GameStates.SHOOT_NET) {
+                        armLift.setGameState(GameStates.STORAGE);
                     }
                     setGameState(clawStates.IDLE);
                     timer.reset();
                     algaeInClaw = false;
                 }
-                if (armLift.gameState == gameStates.PROCESSOR){
+                if (armLift.gameState == GameStates.PROCESSOR){
                     clawMotor.setSpeed(ClawConstants.CLAW_PROCESSOR_SPEED);
                     clawMotor2.setSpeed(-ClawConstants.CLAW_PROCESSOR_SPEED);
                 } else {

@@ -4,6 +4,8 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
@@ -22,4 +24,14 @@ public class LocalizationConstants {
     // (Fake values. Experiment and determine estimation noise on an actual robot.)
     public static final Matrix<N3, N1> kSingleTagStdDevs = VecBuilder.fill(4, 4, 8);
     public static final Matrix<N3, N1> kMaxStdDevs = VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
+
+    /* Goal Poses */
+    public static final double MID_FIELD_X = 8.77;
+    
+    public static final Pose2d BLUE_PROCESSOR = new Pose2d(6.25, 0.55, new Rotation2d(Math.PI / 2.0));
+    public static final Pose2d RED_PROCESSOR = new Pose2d(11.30, 7.50, new Rotation2d(3.0 * Math.PI / 2.0));
+    
+    public static final double BLUE_NET_X = 7.60;
+    public static final double RED_NET_X = 9.95;
+    /* ---------- */
 }
