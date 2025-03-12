@@ -142,7 +142,7 @@ public class Localization implements Subsystem {
 
     // TODO: fill in
     // returns the nearest reef pose to align for intaking
-    public Pose2d getReefTargetPose() {
+    public Pose2d getNearestReefPose() {
         return new Pose2d();
     }
 

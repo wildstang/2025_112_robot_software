@@ -1,5 +1,7 @@
 package org.wildstang.year2025.subsystems.localization;
 
+import java.util.List;
+
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.Matrix;
@@ -33,5 +35,22 @@ public class LocalizationConstants {
     
     public static final double BLUE_NET_X = 7.60;
     public static final double RED_NET_X = 9.95;
+
+    public static final Pose2d BLUE_REEF_AB = new Pose2d();
+    public static final Pose2d BLUE_REEF_CD = new Pose2d();
+    public static final Pose2d BLUE_REEF_EF = new Pose2d();
+    public static final Pose2d BLUE_REEF_GH = new Pose2d();
+    public static final Pose2d BLUE_REEF_IJ = new Pose2d();
+    public static final Pose2d BLUE_REEF_KL = new Pose2d();
+    public static final List<Pose2d> BLUE_REEF = List.of(BLUE_REEF_AB, BLUE_REEF_CD, BLUE_REEF_EF, BLUE_REEF_GH, BLUE_REEF_IJ, BLUE_REEF_KL);
+
+    public static final Pose2d RED_REEF_AB = new Pose2d();
+    public static final Pose2d RED_REEF_CD = new Pose2d();
+    public static final Pose2d RED_REEF_EF = new Pose2d();
+    public static final Pose2d RED_REEF_GH = new Pose2d();
+    public static final Pose2d RED_REEF_IJ = new Pose2d();
+    public static final Pose2d RED_REEF_KL = new Pose2d();
+    public static final List<Pose2d> RED_REEF = List.of(RED_REEF_AB, RED_REEF_CD, RED_REEF_EF, RED_REEF_GH, RED_REEF_IJ, RED_REEF_KL);
+
     /* ---------- */
 }
