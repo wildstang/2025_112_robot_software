@@ -7,11 +7,12 @@ import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
+import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
 import org.wildstang.framework.core.Core;
 import org.wildstang.framework.io.inputs.Input;
-import org.wildstang.framework.logger.Log;
+// import org.wildstang.framework.logger.Log;
 import org.wildstang.framework.subsystems.Subsystem;
 import org.wildstang.year2025.robot.WsSubsystems;
 import org.wildstang.year2025.subsystems.swerve.SwerveDrive;
@@ -68,20 +69,21 @@ public class Localization implements Subsystem {
 
         // Update pose estimator with front camera
         frontVisionEst = Optional.empty();
-        for (var change : frontCam.getAllUnreadResults()) {
+        List<PhotonPipelineResult> temp = frontCam.getAllUnreadResults();
+        for (var change : temp) {
             frontVisionEst = frontEstimator.update(change);
             List<PhotonTrackedTarget> targets = change.getTargets();
             frontVisTargets = new Pose2d[targets.size()];
             for (int i = 0; i < targets.size(); i++){
                 frontVisTargets[i] = frontEstimator.getFieldTags().getTagPose(targets.get(i).getFiducialId()).get().toPose2d();
             }
-            visionTargetPublisher.set(frontVisTargets, (long) (1_000_000 * frontVisionEst.get().timestampSeconds));
-            frontCamPublisher.set(frontVisionEst.get().estimatedPose.toPose2d(), (long) (1_000_000 * frontVisionEst.get().timestampSeconds));
-            Log.info("Processing FrontCam from timestamp " + frontVisionEst.get().timestampSeconds);
-            updateEstimationStdDevs(frontVisionEst, targets);
-        }
-        if (frontVisionEst.isPresent()) {  // this runs whenever we have had new camera data in the last ~20ms; if no new data since the last loop, don't bother updating
-            estimator.addVisionMeasurement(frontVisionEst.get().estimatedPose.toPose2d(), frontVisionEst.get().timestampSeconds, curStdDevs);
+            if (frontVisionEst.isPresent()) {  // this runs whenever we have had new camera data in the last ~20ms; if no new data since the last loop, don't bother updating
+                visionTargetPublisher.set(frontVisTargets, (long) (1_000_000 * frontVisionEst.get().timestampSeconds));
+                frontCamPublisher.set(frontVisionEst.get().estimatedPose.toPose2d(), (long) (1_000_000 * frontVisionEst.get().timestampSeconds));
+                // Log.info("Processing FrontCam from timestamp " + frontVisionEst.get().timestampSeconds);
+                updateEstimationStdDevs(frontVisionEst, targets);
+                estimator.addVisionMeasurement(frontVisionEst.get().estimatedPose.toPose2d(), frontVisionEst.get().timestampSeconds, curStdDevs);
+            }
         }
 
         // TODO: copy above code for back cam
