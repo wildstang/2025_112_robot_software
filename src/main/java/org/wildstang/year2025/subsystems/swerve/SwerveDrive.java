@@ -70,7 +70,7 @@ public class SwerveDrive extends SwerveDriveTemplate {
     public SwerveDriveKinematics swerveKinematics;
     private ArmLift armLift;
 
-    public enum DriveState {TELEOP, AUTO};
+    public enum DriveState {TELEOP, AUTO, REEF};
     public DriveState driveState;
     private Pose2d curPose;
 
@@ -197,16 +197,15 @@ public class SwerveDrive extends SwerveDriveTemplate {
                             rotOutput = (1.0 - pixyAnalog.getVoltage()) * 0.40;
                         }
                         break;
-
                     case L2_ALGAE_REEF:
                     case L3_ALGAE_REEF:
-                        // Pose2d reefTarget = loc.getReefTargetPose();
-                        // pathXTarget = reefTarget.getX();
-                        // pathYTarget = reefTarget.getY();
-                        // rotTarget = reefTarget.getRotation().getRadians();
-                        // xOutput = (pathXTarget - curPose.getX()) * DriveConstants.POS_P;
-                        // yOutput = (pathYTarget - curPose.getY()) * DriveConstants.POS_P;
-                        // rotOutput = swerveHelper.getRotControl(rotTarget, getGyroAngle());
+                        Pose2d reefTarget = loc.getNearestReefPose();
+                        pathXTarget = reefTarget.getX();
+                        pathYTarget = reefTarget.getY();
+                        rotTarget = reefTarget.getRotation().getRadians();
+                        xOutput = (pathXTarget - curPose.getX()) * DriveConstants.POS_P;
+                        yOutput = (pathYTarget - curPose.getY()) * DriveConstants.POS_P;
+                        rotOutput = swerveHelper.getRotControl(rotTarget, getGyroAngle());
                         if (rotLocked) {
                             double curAngle = getGyroAngle();
                             if (curAngle > 11.0 * Math.PI / 6.0 || curAngle < Math.PI / 6.0) rotTarget = 0.0;
@@ -220,13 +219,13 @@ public class SwerveDrive extends SwerveDriveTemplate {
                         break;
 
                     case PROCESSOR:
-                        // Pose2d procTarget = loc.getProcessorTargetPose();
-                        // pathXTarget = procTarget.getX();
-                        // pathYTarget = procTarget.getY();
-                        // rotTarget = procTarget.getRotation().getRadians();
-                        // xOutput = (pathXTarget - curPose.getX()) * DriveConstants.POS_P;
-                        // yOutput = (pathYTarget - curPose.getY()) * DriveConstants.POS_P;
-                        // rotOutput = swerveHelper.getRotControl(rotTarget, getGyroAngle());
+                        Pose2d procTarget = loc.getProcessorTargetPose();
+                        pathXTarget = procTarget.getX();
+                        pathYTarget = procTarget.getY();
+                        rotTarget = procTarget.getRotation().getRadians();
+                        xOutput = (pathXTarget - curPose.getX()) * DriveConstants.POS_P;
+                        yOutput = (pathYTarget - curPose.getY()) * DriveConstants.POS_P;
+                        rotOutput = swerveHelper.getRotControl(rotTarget, getGyroAngle());
                         if (rotLocked) {
                             rotTarget = (getGyroAngle() <= Math.PI) ? Math.PI / 2.0 : 3.0 * Math.PI / 2.0;
                             rotOutput = swerveHelper.getRotControl(rotTarget, getGyroAngle());
