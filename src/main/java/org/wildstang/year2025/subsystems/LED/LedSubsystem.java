@@ -17,44 +17,41 @@ public class LedSubsystem implements Subsystem {
 
     private AddressableLED led;
     private AddressableLEDBuffer ledBuffer;
-    private Timer timer =  new Timer();
-    private Timer clock1 = new Timer();
-    private Timer clock2 = new Timer();
+    private Timer rumbleTimer =  new Timer();
+    private Timer patternClock = new Timer();
 
-    public static enum LEDstates {NORMAL, INTAKE, SHOOT, HOLD, ALGAE_DETECT};
+    public static enum LEDstates {NORMAL, INTAKE, SHOOT, ALGAE_DETECT};
     public LEDstates ledState = LEDstates.NORMAL;
 
-    // private int[] white = {255,255,255};
-    // private int[] blue = {0,0,255};
-    // private int[] red = {255,0,0};
-    // private int[] green = {0,255,0};
-    // private int[] orange = {255,100,0};
-    // private int[] cyan = {0,155,155};
-    // private int[] purple = {128,0,128};
+    private int port = 0;  //port
+    private int length = 39;  //length
 
-    private int port = 0;//port
-    private int length = 39;//length
-    // private int initialHue = 0;
-    // private int initialRed = 0;
-    // private int initialBlue = 0;
-    
-    // private int colorFn;
-    // private int startRand = 1;
-    // private int startRandG = 1;
-    // private int changeSpeed = 12;
-    // private int plusOr;
     private int flashColor = 2;
     private int flashHalf = 1;
     private int flashSpeedOne = 10;
-    private int flashSpeedTwo = 12;
+    private int flashSpeedTwo = 20;
     private int currentColor = 0;
     private int k = 0;
     private int initialHue = 0;
-    // private int s = 0;
-    // private int shiftSpeed = 20;
 
     XboxController controller = new XboxController(0);
     SwerveDrive drive;
+
+    @Override
+    public void init() {
+        led = new AddressableLED(port);
+        ledBuffer = new AddressableLEDBuffer(length);
+        led.setLength(ledBuffer.getLength());
+        resetState();
+        setRGB(0, 0, 255);
+        led.start();
+        patternClock.start();
+    }
+
+    @Override
+    public void initSubsystems() {
+        drive = (SwerveDrive) Core.getSubsystemManager().getSubsystem(WsSubsystems.SWERVE_DRIVE);
+    }
 
     @Override
     public void inputUpdate(Input source) {
@@ -64,45 +61,41 @@ public class LedSubsystem implements Subsystem {
     public void update() {
         // override all other signals during last 15 to last 13 seconds of the match
         // to provide end of match signal
-        if (DriverStation.isFMSAttached() && (DriverStation.getMatchTime() < 15 && DriverStation.getMatchTime() > 13)){
-            controller.setRumble(RumbleType.kBothRumble, 0.5);
-            timer.start();
+        if (DriverStation.isFMSAttached() && DriverStation.getMatchTime() < 15 && DriverStation.getMatchTime() > 13) {
             rainbow();
             return;
         }
-        if(timer.hasElapsed(0.65)){
+        if(rumbleTimer.isRunning() && rumbleTimer.hasElapsed(0.65)){
             controller.setRumble(RumbleType.kBothRumble, 0);
-            timer.stop();
-            timer.reset();
+            rumbleTimer.stop();
+            rumbleTimer.reset();
             ledState = LEDstates.NORMAL;
         }
 
         switch(ledState){  
             case INTAKE:
-                timer.start();
+                rumbleTimer.reset();
                 controller.setRumble(RumbleType.kBothRumble, 0.5);
-                Flash();
+                normalGreen();
                 break;
             case ALGAE_DETECT:
                 if (drive.algaeInView()){
                     setGreen();
                 } else {
-                    NormalGreen();
+                    flash();
                 }
                 break;
             default:
-                NormalBlue();
+                normalBlue();
                 break;
         }
     }
 
-    public void NormalBlue(){
-        // colorFn = 0;
-        clock1.start();
-        if(clock1.hasElapsed(0.05)){
-            for(int i = 0; i < length; i++){
+    public void normalBlue(){
+        if (patternClock.hasElapsed(0.05)) {
+            for (int i = 0; i < length; i++) {
                 int randomNum = (int)(Math.random() * 3);
-                switch(randomNum){
+                switch (randomNum) {
                     case 0:
                         ledBuffer.setRGB(i, 0, 0, 255);
                         break;
@@ -114,13 +107,12 @@ public class LedSubsystem implements Subsystem {
                         break;
                 }
             }
-            // clock1.stop();
-            clock1.reset();
+            patternClock.reset();
         }
         led.setData(ledBuffer);
     }
 
-    private void rainbow(){
+    private void rainbow() {
         for (int i = 0; i < ledBuffer.getLength(); i++){
             ledBuffer.setHSV(i, 180 - (initialHue + (i * 180 / ledBuffer.getLength())) % 180, 255, 128);
         }
@@ -128,27 +120,18 @@ public class LedSubsystem implements Subsystem {
         led.setData(ledBuffer);
     }
 
-    public void setGreen(){
-        // colorFn = 2;
+    public void setGreen() {
         for(int i = 0; i < length; i++){
             ledBuffer.setRGB(i, 61,255,179);
         }
         led.setData(ledBuffer);
     }
 
-    public void setBlack(){
-        for(int i = 0; i < length; i++){
-            ledBuffer.setRGB(i, 0, 0, 0);
-        }
-        led.setData(ledBuffer);
-    }
-
-    public void NormalGreen(){
-        clock2.start();
-        if(clock2.hasElapsed(0.05)){
+    public void normalGreen() {
+        if (patternClock.hasElapsed(0.05)) {
             for(int i = 0; i < length; i++){
-                int randomNum = (int)(Math.random() * 3);
-                switch(randomNum){
+                int randomNum = (int) (Math.random() * 3);
+                switch (randomNum) {
                     case 0:
                         ledBuffer.setRGB(i, 0, 153, 0);
                         break;
@@ -160,37 +143,34 @@ public class LedSubsystem implements Subsystem {
                         break;
                 }
             }
-            // clock2.stop();
-            clock2.reset();
+            patternClock.reset();
         }
         led.setData(ledBuffer);
     }
 
-    public void Flash(){
+    public void flash(){
+        k++;
         if (flashHalf == 1){
-            if (k <= (255 / flashSpeedOne) + 1){
-                k++;
+            if (k <= (255 / flashSpeedOne)){
                 for (int i = 0; i < length; i++){
                     if (flashColor == 1){
-                        currentColor = (int)((Math.random() + 1) * flashSpeedOne) + ledBuffer.getRed(i);
+                        currentColor = (int) ((Math.random() + 1) * flashSpeedOne) + ledBuffer.getRed(i);
                         if (currentColor > 255) currentColor = 255;
                         ledBuffer.setRGB(i, currentColor, 0, (int) ((ledBuffer.getBlue(i)) / 1.5));
                     }
                     if (flashColor == 2){
-                        currentColor = (int)((Math.random() + 1) * flashSpeedOne) + ledBuffer.getGreen(i);
+                        currentColor = (int) ((Math.random() + 1) * flashSpeedOne) + ledBuffer.getGreen(i);
                         if (currentColor > 255) currentColor = 255;
-                        ledBuffer.setRGB(i, (int)(0.5 * currentColor), currentColor, (int)(0.875 * currentColor));
+                        ledBuffer.setRGB(i, (int) (0.5 * currentColor), currentColor, (int)(0.875 * currentColor));
                     }
                 }
-            }
-            else {
+            } else {
+                setRGB(127, 255, 223);
                 flashHalf = 2;
                 k = 0;
             }
-        }
-        else if (flashHalf == 2){
-            if (k <= (255 / flashSpeedTwo) + 1){
-                k++;
+        } else if (flashHalf == 2){
+            if (k <= (255 / flashSpeedTwo)){
                 for (int i = 0; i < length; i++){
                     if (flashColor == 1){
                         currentColor = (int) (-(Math.random() + 1) * flashSpeedTwo) + ledBuffer.getRed(i);
@@ -204,51 +184,35 @@ public class LedSubsystem implements Subsystem {
                     }
                 }
             } else {
+                setRGB(0, 0, 0);
                 flashHalf = 1;
                 k = 0;
-                NormalBlue();
             }
         }
         led.setData(ledBuffer);
     }
 
-    @Override
-    public void init() {
-        led = new AddressableLED(port);
-        ledBuffer = new AddressableLEDBuffer(length);
-        led.setLength(ledBuffer.getLength());
-        resetState();
-        setRGB(0, 0, 255);
+    public void setRGB(int red, int green, int blue){
+        for (int i = 0; i < length; i++){
+            ledBuffer.setRGB(i, red, green, blue);
+        }
         led.setData(ledBuffer);
-        led.start();
+    }
+
+    public void setRGB(int[] color){
+        setRGB(color[0], color[1], color[2]);
     }
 
     @Override
     public void selfTest() {
     }
 
-   
     @Override
     public void resetState() {
     }
 
     @Override
-    public void initSubsystems() {
-        drive = (SwerveDrive) Core.getSubsystemManager().getSubsystem(WsSubsystems.SWERVE_DRIVE);
-    }
-
-    @Override
     public String getName() {
         return ("LED");
-    }
-
-    public void setRGB(int red, int green, int blue){
-        for (int i = 0; i < length; i++){
-            ledBuffer.setRGB(i, (int)(0.75*red), (int)(0.75*green), (int)(0.75*blue));
-        }
-    }
-
-    public void setRGB(int[] color){
-        setRGB(color[0],color[1],color[2]);
     }
 }
