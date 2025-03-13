@@ -5,6 +5,8 @@ import com.ctre.phoenix6.hardware.Pigeon2;
 import com.revrobotics.spark.SparkAnalogSensor;
 import com.revrobotics.spark.SparkLimitSwitch;
 
+import java.security.cert.X509CRL;
+
 import org.wildstang.framework.core.Core;
 import org.wildstang.framework.io.inputs.Input;
 import org.wildstang.framework.logger.Log;
@@ -53,6 +55,11 @@ public class SwerveDrive extends SwerveDriveTemplate {
 
     private double xOutput;
     private double yOutput;
+
+    private double xInput;
+    private double yInput;
+
+
     private double rotOutput;
     private double xSpeed;
     private double ySpeed;
@@ -155,13 +162,13 @@ public class SwerveDrive extends SwerveDriveTemplate {
         // get x and y speeds
         // joystick axes: +X is to the driver's right, +Y is away from the driver
         // field axes: +X is away from the blue alliance driver station, +Y is to the left from the blue alliance driver station perspective
-        xOutput = swerveHelper.scaleDeadband(leftStickY.getValue(), DriveConstants.DEADBAND);  // joystick y value corresponds to driving forward, i.e. pushing the stick away from the driver (stick +Y) should make the robot drive away from the driver station (field +X)
-        yOutput = swerveHelper.scaleDeadband(-leftStickX.getValue(), DriveConstants.DEADBAND);  // joystick x value corresonds to driving sideways in the opposite direction, i.e. pushing the stick to the drivers left (stick -X) should make the robot drive towards the 
+        xInput = swerveHelper.scaleDeadband(leftStickY.getValue(), DriveConstants.DEADBAND);  // joystick y value corresponds to driving forward, i.e. pushing the stick away from the driver (stick +Y) should make the robot drive away from the driver station (field +X)
+        yInput = swerveHelper.scaleDeadband(-leftStickX.getValue(), DriveConstants.DEADBAND);  // joystick x value corresonds to driving sideways in the opposite direction, i.e. pushing the stick to the drivers left (stick -X) should make the robot drive towards the 
 
         // reverse x/y directions if on red alliance to match field coordinate system
         if (!Core.isBlueAlliance()) {
-            xOutput *= -1;
-            yOutput *= -1;
+            xInput *= -1;
+            yInput *= -1;
         }
 
         //get rotational joystick
@@ -182,9 +189,6 @@ public class SwerveDrive extends SwerveDriveTemplate {
     @Override
     public void update() {
         curPose = loc.getCurrentPose();
-
-
-        
         switch (driveState) {
             case AUTO:
                 xOutput = xSpeed * DriveConstants.DRIVE_F_K + (pathXTarget - curPose.getX()) * DriveConstants.POS_P;
@@ -203,8 +207,8 @@ public class SwerveDrive extends SwerveDriveTemplate {
                     case L2_ALGAE_REEF:
                     case L3_ALGAE_REEF:
                         Pose2d reefTarget = loc.getNearestReefPose();
-                        pathXTarget = reefTarget.getX();
-                        pathYTarget = reefTarget.getY();
+                        pathXTarget = reefTarget.getX() + xInput;
+                        pathYTarget = reefTarget.getY() + yInput;
                         rotTarget = reefTarget.getRotation().getRadians();
                         xOutput = (pathXTarget - curPose.getX()) * DriveConstants.POS_P;
                         yOutput = (pathYTarget - curPose.getY()) * DriveConstants.POS_P;
@@ -213,8 +217,8 @@ public class SwerveDrive extends SwerveDriveTemplate {
 
                     case PROCESSOR:
                         Pose2d procTarget = loc.getProcessorTargetPose();
-                        pathXTarget = procTarget.getX();
-                        pathYTarget = procTarget.getY();
+                        pathXTarget = procTarget.getX() + xInput;
+                        pathYTarget = procTarget.getY() + yInput;
                         rotTarget = procTarget.getRotation().getRadians();
                         xOutput = (pathXTarget - curPose.getX()) * DriveConstants.POS_P;
                         yOutput = (pathYTarget - curPose.getY()) * DriveConstants.POS_P;
@@ -223,13 +227,18 @@ public class SwerveDrive extends SwerveDriveTemplate {
 
                     case SHOOT_NET:
                         Pose2d netPose = loc.getNetTargetPose();
-                        xOutput = (netPose.getX() - curPose.getX()) * DriveConstants.POS_P;
-                        yOutput = (netPose.getY() - curPose.getY()) * DriveConstants.POS_P;
-                        rotOutput = swerveHelper.getRotControl(netPose.getRotation().getRadians(), DEG_TO_RAD);
-    
+                        pathXTarget = netPose.getX() + xInput;
+                        pathYTarget = curPose.getY();
+                        rotTarget = netPose.getRotation().getRadians();
+                        xOutput = (pathXTarget - curPose.getX()) * DriveConstants.POS_P;
+                        yOutput = yInput; 
+                        rotOutput = swerveHelper.getRotControl(rotTarget, DEG_TO_RAD);
                         break;
                     
                     default:
+                        xOutput = xInput;
+                        yOutput = yInput;
+
                         break;
                 }
             }
@@ -250,6 +259,8 @@ public class SwerveDrive extends SwerveDriveTemplate {
 
     private void putDashboard() {
         SmartDashboard.putNumber("Gyro Reading", getGyroAngle());
+        SmartDashboard.putNumber("X input", xInput);
+        SmartDashboard.putNumber("Y input", yInput);
         SmartDashboard.putNumber("X output", xOutput);
         SmartDashboard.putNumber("Y output", yOutput);
         SmartDashboard.putNumber("rotOutput", rotOutput);
