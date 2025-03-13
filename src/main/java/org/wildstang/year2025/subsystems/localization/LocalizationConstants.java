@@ -42,7 +42,6 @@ public class LocalizationConstants {
     public static final Pose2d BLUE_REEF_GH = new Pose2d();
     public static final Pose2d BLUE_REEF_IJ = new Pose2d();
     public static final Pose2d BLUE_REEF_KL = new Pose2d();
-    public static final List<Pose2d> BLUE_REEF = List.of(BLUE_REEF_AB, BLUE_REEF_CD, BLUE_REEF_EF, BLUE_REEF_GH, BLUE_REEF_IJ, BLUE_REEF_KL);
 
     public static final Pose2d RED_REEF_AB = new Pose2d();
     public static final Pose2d RED_REEF_CD = new Pose2d();
@@ -50,7 +49,8 @@ public class LocalizationConstants {
     public static final Pose2d RED_REEF_GH = new Pose2d();
     public static final Pose2d RED_REEF_IJ = new Pose2d();
     public static final Pose2d RED_REEF_KL = new Pose2d();
-    public static final List<Pose2d> RED_REEF = List.of(RED_REEF_AB, RED_REEF_CD, RED_REEF_EF, RED_REEF_GH, RED_REEF_IJ, RED_REEF_KL);
+    public static final List<Pose2d> REEF_POSES = List.of(BLUE_REEF_AB, BLUE_REEF_CD, BLUE_REEF_EF, BLUE_REEF_GH, BLUE_REEF_IJ, BLUE_REEF_KL, RED_REEF_AB, RED_REEF_CD, RED_REEF_EF, RED_REEF_GH, RED_REEF_IJ, RED_REEF_KL);
+    public static final List<Pose2d> L2_POSES = List.of();
 
     /* ---------- */
 }

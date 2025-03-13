@@ -15,6 +15,7 @@ import org.wildstang.framework.io.inputs.Input;
 // import org.wildstang.framework.logger.Log;
 import org.wildstang.framework.subsystems.Subsystem;
 import org.wildstang.year2025.robot.WsSubsystems;
+import org.wildstang.year2025.subsystems.arm_lift.ArmLift.GameStates;
 import org.wildstang.year2025.subsystems.swerve.SwerveDrive;
 
 import edu.wpi.first.math.Matrix;
@@ -140,15 +141,35 @@ public class Localization implements Subsystem {
         estimator.resetPosition(drive.getOdoAngle(), drive.getOdoPosition(), newPose);
     }
 
-    // TODO: fill in
     // returns the nearest reef pose to align for intaking
     public Pose2d getNearestReefPose() {
-        return new Pose2d();
+        Pose2d bestPose = currentPose.nearest(LocalizationConstants.REEF_POSES);
+        if (Math.abs(currentPose.getRotation().getRadians() - bestPose.getRotation().getRadians()) > Math.PI / 2.0) {
+            bestPose = new Pose2d(bestPose.getTranslation(), bestPose.getRotation().plus(Rotation2d.kPi));
+        }
+        return bestPose;
+    }
+
+    // returns the nearest reef pose to align for intaking
+    public Object[] getNearestReefHeight() {
+        GameStates newState;
+        Pose2d bestPose = currentPose.nearest(LocalizationConstants.REEF_POSES);
+        if (LocalizationConstants.L2_POSES.contains(bestPose)) {
+            newState = GameStates.L2_ALGAE_REEF;
+        } else {
+            newState = GameStates.L3_ALGAE_REEF;
+        }
+        Boolean isFront = Math.abs(currentPose.getRotation().getRadians() - bestPose.getRotation().getRadians()) < Math.PI / 2.0;
+        return new Object[] {newState, isFront};
     }
 
     // returns the processor target pose corresponding to the current side of the field the robot is on
     public Pose2d getProcessorTargetPose() {
-        return (currentPose.getX() < LocalizationConstants.MID_FIELD_X) ? LocalizationConstants.BLUE_PROCESSOR : LocalizationConstants.RED_PROCESSOR;
+        Pose2d bestPose = (currentPose.getX() < LocalizationConstants.MID_FIELD_X) ? LocalizationConstants.BLUE_PROCESSOR : LocalizationConstants.RED_PROCESSOR;
+        if (Math.abs(currentPose.getRotation().getRadians() - bestPose.getRotation().getRadians()) > Math.PI / 2.0) {
+            bestPose = new Pose2d(bestPose.getTranslation(), bestPose.getRotation().plus(Rotation2d.kPi));
+        }
+        return bestPose;
     }
 
     public Pose2d getNetTargetPose() {
