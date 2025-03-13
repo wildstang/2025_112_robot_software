@@ -15,7 +15,7 @@
  "params":{
   "waypoints":[
     {"x":{"exp":"BargeScore.x", "val":7.6}, "y":{"exp":"BargeScore.y", "val":5.62}, "heading":{"exp":"BargeScore.heading", "val":3.14}, "intervals":75, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
-    {"x":{"exp":"AlgaeIJ.x", "val":5.2}, "y":{"exp":"AlgaeIJ.y", "val":5.3}, "heading":{"exp":"AlgaeIJ.heading", "val":4.19}, "intervals":40, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false}],
+    {"x":{"exp":"AlgaeIJ.x", "val":5.18}, "y":{"exp":"AlgaeIJ.y", "val":5.28}, "heading":{"exp":"AlgaeIJ.heading", "val":4.19}, "intervals":40, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false}],
   "constraints":[
     {"from":"first", "to":null, "data":{"type":"StopPoint", "props":{}}, "enabled":true},
     {"from":"last", "to":null, "data":{"type":"StopPoint", "props":{}}, "enabled":true},
