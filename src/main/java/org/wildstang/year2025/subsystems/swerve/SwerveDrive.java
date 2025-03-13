@@ -222,10 +222,10 @@ public class SwerveDrive extends SwerveDriveTemplate {
                         break;
 
                     case SHOOT_NET:
-                        Pose2d netPose = loc.getNetTargetPose();
-                        xOutput = (netPose.getX() - curPose.getX()) * DriveConstants.POS_P;
-                        yOutput = (netPose.getY() - curPose.getY()) * DriveConstants.POS_P;
-                        rotOutput = swerveHelper.getRotControl(netPose.getRotation().getRadians(), DEG_TO_RAD);
+                        Pose2d netTargetPose = loc.getNetTargetPose();
+                        xOutput = (netTargetPose.getX() - curPose.getX()) * DriveConstants.POS_P;
+                        yOutput = (netTargetPose.getY() - curPose.getY()) * DriveConstants.POS_P;
+                        rotOutput = swerveHelper.getRotControl(netTargetPose.getRotation().getRadians(), DEG_TO_RAD);
     
                         break;
                     
