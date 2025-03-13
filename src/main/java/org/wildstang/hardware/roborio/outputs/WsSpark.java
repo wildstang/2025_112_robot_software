@@ -303,8 +303,8 @@ public class WsSpark extends WsMotorController {
         config.apply(absEncoderConfig);
         config.closedLoop.feedbackSensor(FeedbackSensor.kAbsoluteEncoder);
         config.closedLoop.positionWrappingEnabled(true);
-        config.closedLoop.positionWrappingMaxInput(2.0 * Math.PI);
-        config.closedLoop.positionWrappingMinInput(0.0);
+        config.closedLoop.positionWrappingMaxInput(Math.PI);
+        config.closedLoop.positionWrappingMinInput(-Math.PI);
         isUsingController = true;
     }
     /**
@@ -324,8 +324,8 @@ public class WsSpark extends WsMotorController {
         config.apply(absEncoderConfig);
         config.closedLoop.feedbackSensor(FeedbackSensor.kAbsoluteEncoder);
         config.closedLoop.positionWrappingEnabled(isWrapped);
-        config.closedLoop.positionWrappingMaxInput(2.0 * Math.PI);
-        config.closedLoop.positionWrappingMinInput(0.0);
+        config.closedLoop.positionWrappingMaxInput(Math.PI);
+        config.closedLoop.positionWrappingMinInput(-Math.PI);
         isUsingController = true;
         isUsingController = true;
     }

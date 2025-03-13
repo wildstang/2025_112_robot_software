@@ -2,9 +2,10 @@ package org.wildstang.framework.subsystems.swerve;
 
 import org.wildstang.framework.subsystems.Subsystem;
 
-public abstract class SwerveDriveTemplate implements Subsystem{
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
-    public abstract void setAutoHeading(double headingTarget);
+public abstract class SwerveDriveTemplate implements Subsystem{
 
     public abstract void setGyro(double radians);
 
@@ -12,6 +13,6 @@ public abstract class SwerveDriveTemplate implements Subsystem{
 
     public abstract void setToTeleop();
 
-    public abstract void setAutoValues(double velocityX, double velocityY, double angVel, double xPos, double yPos, double heading);
+    public abstract void setAutoValues(ChassisSpeeds speed, Pose2d pose);
 
 }

@@ -1,5 +1,7 @@
 package org.wildstang.year2025.subsystems.swerve;
 
+import edu.wpi.first.math.MathUtil;
+
 public class WsSwerveHelper {
 
     private SwerveSignal swerveSignal;
@@ -65,12 +67,7 @@ public class WsSwerveHelper {
      * @return double that indicates what the rotational joystick value should be
      */
     public double getRotControl(double i_target, double i_gyro) {
-        rotErr = i_target - i_gyro;
-        if (rotErr > Math.PI) {
-            rotErr = (rotErr - 2.0 * Math.PI);  // if error is greater than pi, it is faster to spin cw
-        } else if (rotErr < -Math.PI) {
-            rotErr = (rotErr + 2.0 * Math.PI);
-        }
+        rotErr = MathUtil.angleModulus(i_target - i_gyro);
         rotPID = rotErr * DriveConstants.ROT_P + (rotErr - prevRotErr) * DriveConstants.ROT_D;  // otherwise spin ccw
         prevRotErr = rotErr;
         return rotPID;  // saturate rotation control to range [-1.0, 1.0]
@@ -78,7 +75,7 @@ public class WsSwerveHelper {
 
     /**x,y inputs are cartesian, angle values are in radians, returns 0 - 2pi */
     public double getDirection(double x, double y) {
-        return (2.0 * Math.PI + Math.atan2(y,x)) % (2.0 * Math.PI);  // this math ensures we always return a positive value between 0 and 2pi
+        return Math.atan2(y,x);  // this math ensures we always return a value between -pi and pi
     }
     
     public double scaleDeadband(double input, double deadband){

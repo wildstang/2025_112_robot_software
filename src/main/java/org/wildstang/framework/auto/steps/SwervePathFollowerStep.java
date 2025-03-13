@@ -12,6 +12,7 @@ import org.wildstang.framework.subsystems.swerve.SwerveDriveTemplate;
 import org.wildstang.year2025.robot.WsSubsystems;
 import org.wildstang.year2025.subsystems.localization.Localization;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -68,7 +69,7 @@ public class SwervePathFollowerStep extends AutoStep {
     public SwervePathFollowerStep(String pathData, SwerveDriveTemplate drive, Boolean isFirstPath) {
         this(pathData, drive);
         if (isFirstPath) {
-            m_drive.setGyro(pathtraj.get().getInitialPose(!isBlue).get().getRotation().getRadians());
+            m_drive.setGyro(MathUtil.angleModulus(pathtraj.get().getInitialPose(!isBlue).get().getRotation().getRadians()));
             loc.setCurrentPose(pathtraj.get().getInitialPose(!isBlue).get());
             trajPublisher.set(pathtraj.get().getPoses());
         }
@@ -87,14 +88,14 @@ public class SwervePathFollowerStep extends AutoStep {
         if (timer.get() >= endTime) {
             sample = pathtraj.get().getFinalSample(!isBlue).get();
             drivePose = loc.getCurrentPose();
-            Log.warn(Double.toString(sample.x - drivePose.getX()) + Double.toString(sample.y - drivePose.getY()));
-            m_drive.setAutoValues(0.0, 0.0, 0.0, sample.x, sample.y, (((2.0 * Math.PI)+sample.heading)%(2.0 * Math.PI)));
+            Log.warn("Final pose err x: " + Double.toString(sample.x - drivePose.getX()) + "y: " + Double.toString(sample.y - drivePose.getY()));
+            m_drive.setAutoValues(new ChassisSpeeds(), sample.getPose());
             setFinished();
         } else {
             sample = pathtraj.get().sampleAt(timer.get(), !isBlue).get();
             sampleVel = ChassisSpeeds.discretize(sample.getChassisSpeeds(), 0.02);
 
-            m_drive.setAutoValues(sampleVel.vxMetersPerSecond, sampleVel.vyMetersPerSecond, sampleVel.omegaRadiansPerSecond, sample.x, sample.y, (((2.0 * Math.PI)+sample.heading)%(2.0 * Math.PI)));
+            m_drive.setAutoValues(sampleVel, sample.getPose());
         }
     }
 

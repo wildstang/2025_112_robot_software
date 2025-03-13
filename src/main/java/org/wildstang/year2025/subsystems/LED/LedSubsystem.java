@@ -1,12 +1,9 @@
 package org.wildstang.year2025.subsystems.LED;
 
 import org.wildstang.framework.core.Core;
-import org.wildstang.framework.io.inputs.DigitalInput;
 import org.wildstang.framework.io.inputs.Input;
 import org.wildstang.framework.subsystems.Subsystem;
-import org.wildstang.year2025.robot.WsInputs;
 import org.wildstang.year2025.robot.WsSubsystems;
-// import org.wildstang.year2025.subsystems.localization.WsVision;
 import org.wildstang.year2025.subsystems.swerve.SwerveDrive;
 
 import edu.wpi.first.wpilibj.AddressableLED;
@@ -15,13 +12,11 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
-// import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class LedSubsystem implements Subsystem {
 
     private AddressableLED led;
     private AddressableLEDBuffer ledBuffer;
-    // private WsVision vision;
     private Timer timer =  new Timer();
     private Timer clock1 = new Timer();
     private Timer clock2 = new Timer();
@@ -53,11 +48,7 @@ public class LedSubsystem implements Subsystem {
     private int flashSpeedOne = 10;
     private int flashSpeedTwo = 12;
     private int currentColor = 0;
-    private DigitalInput leftStick;
-    private DigitalInput rightStick;
-    private DigitalInput dpadUp;
     private int k = 0;
-    private int c = 0;
     private int initialHue = 0;
     // private int s = 0;
     // private int shiftSpeed = 20;
@@ -75,12 +66,13 @@ public class LedSubsystem implements Subsystem {
         // to provide end of match signal
         if (DriverStation.isFMSAttached() && (DriverStation.getMatchTime() < 15 && DriverStation.getMatchTime() > 13)){
             controller.setRumble(RumbleType.kBothRumble, 0.5);
+            timer.start();
             rainbow();
             return;
         }
         if(timer.hasElapsed(0.65)){
             controller.setRumble(RumbleType.kBothRumble, 0);
-            // timer.stop();
+            timer.stop();
             timer.reset();
             ledState = LEDstates.NORMAL;
         }
@@ -109,20 +101,20 @@ public class LedSubsystem implements Subsystem {
         clock1.start();
         if(clock1.hasElapsed(0.05)){
             for(int i = 0; i < length; i++){
-                int randomNum = (int)(Math.random() * 2);
+                int randomNum = (int)(Math.random() * 3);
                 switch(randomNum){
                     case 0:
-                        ledBuffer.setRGB(i, 0, 0, 153);
+                        ledBuffer.setRGB(i, 0, 0, 255);
                         break;
                     case 1:
-                        ledBuffer.setRGB(i, 102, 178, 150);
+                        ledBuffer.setRGB(i, 72, 241, 247);
                         break;
                     case 2:
-                        ledBuffer.setRGB(i, 200, 153, 200);
+                        ledBuffer.setRGB(i, 19, 53, 107);
                         break;
                 }
             }
-            clock1.stop();
+            // clock1.stop();
             clock1.reset();
         }
         led.setData(ledBuffer);
@@ -130,7 +122,7 @@ public class LedSubsystem implements Subsystem {
 
     private void rainbow(){
         for (int i = 0; i < ledBuffer.getLength(); i++){
-            ledBuffer.setHSV(i, 180-(initialHue + (i*180/ledBuffer.getLength()))%180, 255, 128);
+            ledBuffer.setHSV(i, 180 - (initialHue + (i * 180 / ledBuffer.getLength())) % 180, 255, 128);
         }
         initialHue = (initialHue + 3) % 180;
         led.setData(ledBuffer);
@@ -153,10 +145,10 @@ public class LedSubsystem implements Subsystem {
 
     public void NormalGreen(){
         clock2.start();
-            if(clock2.hasElapsed(0.05)){
-                for(int i = 0; i < length; i++){
-                    int randomNum = (int)(Math.random()*2);
-                    switch(randomNum){
+        if(clock2.hasElapsed(0.05)){
+            for(int i = 0; i < length; i++){
+                int randomNum = (int)(Math.random() * 3);
+                switch(randomNum){
                     case 0:
                         ledBuffer.setRGB(i, 0, 153, 0);
                         break;
@@ -166,60 +158,54 @@ public class LedSubsystem implements Subsystem {
                     case 2:
                         ledBuffer.setRGB(i, 200, 255, 200);
                         break;
-                    }
                 }
-                clock2.stop();
-                clock2.reset();
             }
+            // clock2.stop();
+            clock2.reset();
+        }
         led.setData(ledBuffer);
     }
 
     public void Flash(){
         if (flashHalf == 1){
-            if (k <= 255 / (1 + flashSpeedOne)){
+            if (k <= (255 / flashSpeedOne) + 1){
                 k++;
                 for (int i = 0; i < length; i++){
                     if (flashColor == 1){
                         currentColor = (int)((Math.random() + 1) * flashSpeedOne) + ledBuffer.getRed(i);
-                        if (currentColor > 255){
-                            currentColor = 255;
-                        }
-                        ledBuffer.setRGB(i, currentColor, 0, ((int)((ledBuffer.getBlue(i))/1.5)));
+                        if (currentColor > 255) currentColor = 255;
+                        ledBuffer.setRGB(i, currentColor, 0, (int) ((ledBuffer.getBlue(i)) / 1.5));
                     }
                     if (flashColor == 2){
                         currentColor = (int)((Math.random() + 1) * flashSpeedOne) + ledBuffer.getGreen(i);
-                        if (currentColor > 255){
-                            currentColor = 255;
-                        }
+                        if (currentColor > 255) currentColor = 255;
                         ledBuffer.setRGB(i, (int)(0.5 * currentColor), currentColor, (int)(0.875 * currentColor));
                     }
                 }
             }
             else {
                 flashHalf = 2;
+                k = 0;
             }
         }
         else if (flashHalf == 2){
-            if (c <= 255 / (0.5 * flashSpeedTwo)){
-                c++;
+            if (k <= (255 / flashSpeedTwo) + 1){
+                k++;
                 for (int i = 0; i < length; i++){
                     if (flashColor == 1){
-                        currentColor = (int)((Math.random() -1.5) * flashSpeedTwo) + ledBuffer.getRed(i);
-                        if (currentColor < 0){
-                            currentColor = 0;
-                        }
+                        currentColor = (int) (-(Math.random() + 1) * flashSpeedTwo) + ledBuffer.getRed(i);
+                        if (currentColor < 0) currentColor = 0;
                         ledBuffer.setRGB(i, currentColor, 0, ledBuffer.getBlue(i));
                     }
                     if (flashColor == 2){
-                        currentColor = (int)((Math.random() -1.5) * flashSpeedTwo) + ledBuffer.getGreen(i);
-                        if (currentColor < 0){
-                            currentColor = 0;
-                        }
+                        currentColor = (int) (-(Math.random() + 1) * flashSpeedTwo) + ledBuffer.getGreen(i);
+                        if (currentColor < 0) currentColor = 0;
                         ledBuffer.setRGB(i, (int)(0.5 * currentColor), currentColor, (int)(0.675 * currentColor));
                     }
                 }
             } else {
                 flashHalf = 1;
+                k = 0;
                 NormalBlue();
             }
         }
@@ -231,23 +217,10 @@ public class LedSubsystem implements Subsystem {
         led = new AddressableLED(port);
         ledBuffer = new AddressableLEDBuffer(length);
         led.setLength(ledBuffer.getLength());
-        setRGB(255, 255, 255);
-        led.setData(ledBuffer);
-        led.start();
         resetState();
-        // timer.start();
-        for (int i = 0; i < length; i++){
-            ledBuffer.setRGB(i, 0, 0, 0);
-        }
+        setRGB(0, 0, 255);
         led.setData(ledBuffer);
         led.start();
-
-        leftStick = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_LEFT_JOYSTICK_BUTTON);
-        leftStick.addInputListener(this);
-        rightStick = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_RIGHT_JOYSTICK_BUTTON);
-        rightStick.addInputListener(this);
-        dpadUp = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_DPAD_UP);
-        dpadUp.addInputListener(this); 
     }
 
     @Override

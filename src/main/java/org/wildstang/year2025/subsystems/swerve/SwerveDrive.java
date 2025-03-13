@@ -5,8 +5,6 @@ import com.ctre.phoenix6.hardware.Pigeon2;
 import com.revrobotics.spark.SparkAnalogSensor;
 import com.revrobotics.spark.SparkLimitSwitch;
 
-import java.security.cert.X509CRL;
-
 import org.wildstang.framework.core.Core;
 import org.wildstang.framework.io.inputs.Input;
 import org.wildstang.framework.logger.Log;
@@ -21,8 +19,10 @@ import org.wildstang.year2025.robot.WsSubsystems;
 import org.wildstang.year2025.subsystems.arm_lift.ArmLift;
 import org.wildstang.year2025.subsystems.localization.Localization;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -55,19 +55,21 @@ public class SwerveDrive extends SwerveDriveTemplate {
 
     private double xOutput;
     private double yOutput;
+    private double rOutput;
 
     private double xInput;
     private double yInput;
+    private double rInput;
 
-
-    private double rotOutput;
-    private double xSpeed;
-    private double ySpeed;
-    private double wSpeed;
-    private boolean rotLocked;
-    private double rotTarget;
-    private double pathXTarget;
-    private double pathYTarget;
+    // private double xSpeed;
+    // private double ySpeed;
+    // private double wSpeed;
+    // private boolean rotLocked;
+    // private double rotTarget;
+    // private double pathXTarget;
+    // private double pathYTarget;
+    private Pose2d targetPose;
+    private ChassisSpeeds targetSpeed;
 
     public final Pigeon2 gyro = new Pigeon2(CANConstants.GYRO);
     public SwerveModule[] modules;
@@ -77,7 +79,7 @@ public class SwerveDrive extends SwerveDriveTemplate {
     public SwerveDriveKinematics swerveKinematics;
     private ArmLift armLift;
 
-    public enum DriveState {TELEOP, AUTO, REEF};
+    public enum DriveState {TELEOP, AUTO};
     public DriveState driveState;
     private Pose2d curPose;
 
@@ -88,7 +90,10 @@ public class SwerveDrive extends SwerveDriveTemplate {
     public final Field2d m_field = new Field2d();
     private SwerveModuleState[] moduleStates;
     StructArrayPublisher<SwerveModuleState> moduleStatePublisher;
-    StructPublisher<ChassisSpeeds> chassisSpeedPublisher;
+    StructPublisher<ChassisSpeeds> chassisSpeedPublisher, targetSpeedPublisher;
+    StructPublisher<Pose2d> targetPosePublisher;
+
+    private final ChassisSpeeds kZeroSpeed = new ChassisSpeeds();
 
     @Override
     public void init() {
@@ -100,8 +105,8 @@ public class SwerveDrive extends SwerveDriveTemplate {
         SmartDashboard.putData("Field", m_field);
         moduleStatePublisher = NetworkTableInstance.getDefault().getStructArrayTopic("Swerve Module States", SwerveModuleState.struct).publish();
         chassisSpeedPublisher = NetworkTableInstance.getDefault().getStructTopic("Chassis Speeds", ChassisSpeeds.struct).publish();
-        curPose = new Pose2d(0.0,0.0,new Rotation2d(0.0));
-
+        targetSpeedPublisher = NetworkTableInstance.getDefault().getStructTopic("Target Speeds", ChassisSpeeds.struct).publish();
+        targetPosePublisher = NetworkTableInstance.getDefault().getStructTopic("Target Pose", Pose2d.struct).publish();
     }
 
     public void initInputs() {
@@ -144,7 +149,7 @@ public class SwerveDrive extends SwerveDriveTemplate {
     public void initSubsystems(){
         armLift = (ArmLift) Core.getSubsystemManager().getSubsystem(WsSubsystems.ARMLIFT);
         loc = (Localization) Core.getSubsystemManager().getSubsystem(WsSubsystems.LOCALIZATION);
-
+        curPose = loc.getCurrentPose();
     }
 
     @Override
@@ -171,86 +176,74 @@ public class SwerveDrive extends SwerveDriveTemplate {
             yInput *= -1;
         }
 
+        xInput *= Math.abs(xInput);
+        yInput *= Math.abs(yInput);
+
         //get rotational joystick
         // joystick positive value corresponds to cw rotation
         // drivetrain positive value corresponds to ccw rotation
-        rotOutput = swerveHelper.scaleDeadband(-rightStickX.getValue(), DriveConstants.DEADBAND);  // negate joystick value so positive on the joystick (right) commands a negative rot speed (turn cw) and vice versa
+        rInput = swerveHelper.scaleDeadband(-rightStickX.getValue(), DriveConstants.DEADBAND);  // negate joystick value so positive on the joystick (right) commands a negative rot speed (turn cw) and vice versa
 
-        // if the rotational joystick is being used, the robot should not be auto tracking heading
-        // otherwise engage rotation lock at current heading
-        if (rotOutput != 0) {
-            rotOutput *= Math.abs(rotOutput);
-            rotLocked = false;
-        } else {
-            rotLocked = true;
-        }
+        rInput *= Math.abs(rOutput);
     }
 
     @Override
     public void update() {
         curPose = loc.getCurrentPose();
+
         switch (driveState) {
             case AUTO:
-                xOutput = xSpeed * DriveConstants.DRIVE_F_K + (pathXTarget - curPose.getX()) * DriveConstants.POS_P;
-                yOutput = ySpeed * DriveConstants.DRIVE_F_K + (pathYTarget - curPose.getY()) * DriveConstants.POS_P;
-                rotOutput = wSpeed * DriveConstants.DRIVE_F_ROT + swerveHelper.getRotControl(rotTarget, getGyroAngle());
+                setAutoDriveValues(targetSpeed, targetPose);
                 break;
 
             case TELEOP:
-            if(!rotHelperOverride){
-                switch (armLift.gameState) {
-                    case GROUND_INTAKE:
-                        if (algaeInView() && armLift.isAtSetpoint() && rotLocked) {
-                            rotOutput = (1.0 - pixyAnalog.getVoltage()) * 0.40;
-                        }
-                        break;
-                    case L2_ALGAE_REEF:
-                    case L3_ALGAE_REEF:
-                        Pose2d reefTarget = loc.getNearestReefPose();
-                        pathXTarget = reefTarget.getX() + xInput;
-                        pathYTarget = reefTarget.getY() + yInput;
-                        rotTarget = reefTarget.getRotation().getRadians();
-                        xOutput = (pathXTarget - curPose.getX()) * DriveConstants.POS_P;
-                        yOutput = (pathYTarget - curPose.getY()) * DriveConstants.POS_P;
-                        rotOutput = swerveHelper.getRotControl(rotTarget, getGyroAngle());
-                        break;
+                if (!rotHelperOverride) {
+                    switch (armLift.gameState) {
+                        case GROUND_INTAKE:
+                            xOutput = xInput;
+                            yOutput = yInput;
+                            if (algaeInView() && armLift.isAtSetpoint() && rInput == 0) {
+                                rOutput = (1.0 - pixyAnalog.getVoltage()) * 0.40;  // TODO: tune these values
+                            } else {
+                                rOutput = rInput;
+                            }
+                            break;
 
-                    case PROCESSOR:
-                        Pose2d procTarget = loc.getProcessorTargetPose();
-                        pathXTarget = procTarget.getX() + xInput;
-                        pathYTarget = procTarget.getY() + yInput;
-                        rotTarget = procTarget.getRotation().getRadians();
-                        xOutput = (pathXTarget - curPose.getX()) * DriveConstants.POS_P;
-                        yOutput = (pathYTarget - curPose.getY()) * DriveConstants.POS_P;
-                        rotOutput = swerveHelper.getRotControl(rotTarget, getGyroAngle());
-                        break;
+                        case L2_ALGAE_REEF:
+                        case L3_ALGAE_REEF:
+                            targetPose = loc.getNearestReefPose().plus(new Transform2d(xInput, yInput, Rotation2d.kZero));
+                            setAutoDriveValues(kZeroSpeed, targetPose);
+                            break;
 
-                    case SHOOT_NET:
+                        case PROCESSOR:
+                            targetPose = loc.getNearestProcessorPose().plus(new Transform2d(xInput, yInput, Rotation2d.kZero));
+                            setAutoDriveValues(kZeroSpeed, targetPose);
+                            break;
 
-                        Pose2d netPose = loc.getNetTargetPose();
-                        pathXTarget = netPose.getX() + xInput;
-                        pathYTarget = curPose.getY();
-                        rotTarget = netPose.getRotation().getRadians();
-                        xOutput = (pathXTarget - curPose.getX()) * DriveConstants.POS_P;
-                        yOutput = yInput; 
-                        rotOutput = swerveHelper.getRotControl(rotTarget, DEG_TO_RAD);
-
-                        break;
-                    
-                    default:
-                        xOutput = xInput;
-                        yOutput = yInput;
-
-                        break;
+                        case SHOOT_NET:
+                            targetPose = loc.getNearestBargePose().plus(new Transform2d(xInput, yInput, Rotation2d.kZero));
+                            setAutoDriveValues(kZeroSpeed, targetPose);
+                            yOutput = yInput;  // override yOutput to allow driver to align to clear spot on the barge
+                            break;
+                        
+                        default:
+                            xOutput = xInput;
+                            yOutput = yInput;
+                            rOutput = rInput;
+                            break;
+                    }
+                } else {
+                    xOutput = xInput;
+                    yOutput = yInput;
+                    rOutput = rInput;
                 }
-            }
                 break;
         }
         
-        rotOutput = Math.min(Math.max(rotOutput, -1.0), 1.0);
-        xOutput = Math.min(Math.max(xOutput, -1.0), 1.0);// * derateValue;
-        yOutput = Math.min(Math.max(yOutput, -1.0), 1.0);// * derateValue;
-        this.swerveSignal = swerveHelper.setDrive(xOutput , yOutput, rotOutput, getGyroAngle());
+        rOutput = Math.min(Math.max(rOutput, -1.0), 1.0);
+        xOutput = Math.min(Math.max(xOutput, -1.0), 1.0);
+        yOutput = Math.min(Math.max(yOutput, -1.0), 1.0);
+        this.swerveSignal = swerveHelper.setDrive(xOutput , yOutput, rOutput, getGyroAngle());
         drive();
         putDashboard();
     }
@@ -265,23 +258,18 @@ public class SwerveDrive extends SwerveDriveTemplate {
         SmartDashboard.putNumber("Y input", yInput);
         SmartDashboard.putNumber("X output", xOutput);
         SmartDashboard.putNumber("Y output", yOutput);
-        SmartDashboard.putNumber("rotOutput", rotOutput);
+        SmartDashboard.putNumber("rOutput", rOutput);
         SmartDashboard.putString("Drive mode", driveState.toString());
-        SmartDashboard.putNumber("Auto x velocity", xSpeed);
-        SmartDashboard.putNumber("Auto y velocity", ySpeed);
-        SmartDashboard.putNumber("Auto ang velocity", wSpeed);
-        SmartDashboard.putNumber("Auto x pos", pathXTarget);
-        SmartDashboard.putNumber("Auto y pos", pathYTarget);
-        SmartDashboard.putNumber("rot target", rotTarget);
         SmartDashboard.putBoolean("Blue Alliance", Core.isBlueAlliance());
         SmartDashboard.putNumber("Pixy Voltage", pixyAnalog.getVoltage());
         SmartDashboard.putBoolean("Pixy Obj Det", pixyDigital.isPressed());
         SmartDashboard.putBoolean("Rot Control Override", rotHelperOverride);
-        SmartDashboard.putBoolean("rot lock", rotLocked);
         moduleStates = new SwerveModuleState[] {modules[0].getModuleState(),modules[1].getModuleState(),modules[2].getModuleState(),modules[3].getModuleState()};
         moduleStatePublisher.set(moduleStates);
         chassisSpeedPublisher.set(swerveKinematics.toChassisSpeeds(moduleStates));
-        m_field.setRobotPose(curPose);
+        targetSpeedPublisher.set(targetSpeed);
+        targetPosePublisher.set(targetPose);
+        m_field.setRobotPose(curPose);  // TODO: check if this is needed to post to elastic or if we can use the Localization publisher
     }
 
     /** sets the drive to teleop/cross, and sets drive motors to coast */
@@ -290,11 +278,9 @@ public class SwerveDrive extends SwerveDriveTemplate {
         for (int i = 0; i < modules.length; i++) {
             modules[i].setDriveBrake(false);
         }
-        rotOutput = 0;
+        rOutput = 0;
         xOutput = 0;
         yOutput = 0;
-        rotTarget = getGyroAngle();
-        rotLocked = false;
     }
 
     /**sets the drive to autonomous */
@@ -303,12 +289,8 @@ public class SwerveDrive extends SwerveDriveTemplate {
         for (int i = 0; i < modules.length; i++) {
             modules[i].setDriveBrake(true);
         }
-        xSpeed = 0;
-        ySpeed = 0;
-        wSpeed = 0;
-        pathXTarget = curPose.getX();
-        pathYTarget = curPose.getY();
-        rotTarget = getGyroAngle();
+        targetSpeed = new ChassisSpeeds();
+        targetPose = curPose;
     }
 
     /**drives the robot at the current swerveSignal, and displays information for each swerve module */
@@ -321,18 +303,20 @@ public class SwerveDrive extends SwerveDriveTemplate {
 
     @Override
     /**sets autonomous values from the path data file */
-    public void setAutoValues(double velocityX, double velocityY, double angVel, double xTarget, double yTarget, double heading) {
-        xSpeed = velocityX;
-        ySpeed = velocityY;
-        wSpeed = angVel;
-        pathXTarget = xTarget;
-        pathYTarget = yTarget;
-        rotTarget = heading;
+    public void setAutoValues(ChassisSpeeds speed, Pose2d pose) {
+        targetSpeed = speed;
+        targetPose = pose;
     }
 
-    /**sets the autonomous heading controller to a new target */
-    public void setAutoHeading(double headingTarget) {
-        rotTarget = headingTarget;
+    /** Sets output values based on given ChassisSpeeds and target pose, but *does not* 
+     * call drive(). This gives the user to option to override certain values if needed.
+     * Used for both autonomous mode pathfinding and teleop autoalign.
+     */
+    private void setAutoDriveValues(ChassisSpeeds speed, Pose2d pose) {
+        xOutput = speed.vxMetersPerSecond * DriveConstants.DRIVE_F_K + (pose.getX() - curPose.getX()) * DriveConstants.POS_P;
+        yOutput = speed.vyMetersPerSecond * DriveConstants.DRIVE_F_K + (pose.getY() - curPose.getY()) * DriveConstants.POS_P;
+        rOutput = speed.omegaRadiansPerSecond * DriveConstants.DRIVE_F_ROT + swerveHelper.getRotControl(MathUtil.angleModulus(pose.getRotation().getRadians()), MathUtil.angleModulus(curPose.getRotation().getRadians()));  // TODO: tune rot controller
+
     }
 
     public boolean algaeInView(){
@@ -347,11 +331,10 @@ public class SwerveDrive extends SwerveDriveTemplate {
     public void setGyro(double radians) {
         StatusCode code = gyro.setYaw(radians * RAD_TO_DEG);
         Log.warn("Gyro Status Code: " + code.getName());
-        rotTarget = radians;
     }
 
     public double getGyroAngle() {
-        return (((gyro.getYaw().getValueAsDouble() * DEG_TO_RAD) % (2.0 * Math.PI)) + 2.0 * Math.PI) % (2.0 * Math.PI);
+        return MathUtil.angleModulus(gyro.getYaw().getValueAsDouble() * DEG_TO_RAD);
     }
 
     public Rotation2d getOdoAngle(){

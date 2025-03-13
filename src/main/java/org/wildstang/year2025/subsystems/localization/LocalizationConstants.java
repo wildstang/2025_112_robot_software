@@ -16,6 +16,7 @@ import edu.wpi.first.math.numbers.N3;
 
 public class LocalizationConstants {
     public static final String kFrontCam = "FrontCam";
+    public static final String kRearCam = "RearCam";
     public static final Transform3d kBotToFrontCam = new Transform3d(new Translation3d(0.18, 0.07, 0.17), new Rotation3d(0, 0.459, 0));
     public static final Transform3d kBotToRearCam = new Transform3d(new Translation3d(-0.18, 0.07, 0.17), new Rotation3d(0, 0.459, Math.PI));
 
@@ -24,14 +25,14 @@ public class LocalizationConstants {
 
     // The standard deviations of our vision estimated poses, which affect correction rate
     // (Fake values. Experiment and determine estimation noise on an actual robot.)
-    public static final Matrix<N3, N1> kSingleTagStdDevs = VecBuilder.fill(4, 4, 8);
+    public static final Matrix<N3, N1> kSingleTagStdDevs = VecBuilder.fill(4, 4, 8);  // TODO: tune these values
     public static final Matrix<N3, N1> kMaxStdDevs = VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
 
     /* Goal Poses */
     public static final double MID_FIELD_X = 8.77;
     
     public static final Pose2d BLUE_PROCESSOR = new Pose2d(6.25, 0.55, new Rotation2d(Math.PI / 2.0));
-    public static final Pose2d RED_PROCESSOR = new Pose2d(11.30, 7.50, new Rotation2d(3.0 * Math.PI / 2.0));
+    public static final Pose2d RED_PROCESSOR = new Pose2d(11.30, 7.50, new Rotation2d(-Math.PI / 2.0));
     
     public static final double BLUE_NET_X = 7.60;
     public static final double RED_NET_X = 9.95;

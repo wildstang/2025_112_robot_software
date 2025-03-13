@@ -262,7 +262,6 @@ public class Core {
                 Log.info("Alliance updated to " + Core.alliance.toString());
                 SmartDashboard.putBoolean("FMS Alliance Received", true);
             } else {
-                // Log.warn("No Alliance could be retrieved from DriverStation");
                 SmartDashboard.putBoolean("FMS Alliance Received", false);
             }
         }

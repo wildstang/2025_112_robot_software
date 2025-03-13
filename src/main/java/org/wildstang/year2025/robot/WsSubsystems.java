@@ -16,9 +16,11 @@ import org.wildstang.year2025.subsystems.swerve.SwerveDrive;
 public enum WsSubsystems implements Subsystems {
 
     // enumerate subsystems
+    // IMPORTANT: DO NOT REORDER WITHOUT VERIFYING WITH ZACH
+    // To ensure proper behavior, Localization needs to update first, followed by ArmLift, and LED needs to update last
     LOCALIZATION("Localization", Localization.class),
-    SWERVE_DRIVE("Swerve Drive", SwerveDrive.class),
     ARMLIFT("Arm Lift", ArmLift.class),
+    SWERVE_DRIVE("Swerve Drive", SwerveDrive.class),
     CLAW("Claw", Claw.class),
     CLIMB("Climb", Climb.class),
     LED("LED", LedSubsystem.class),
