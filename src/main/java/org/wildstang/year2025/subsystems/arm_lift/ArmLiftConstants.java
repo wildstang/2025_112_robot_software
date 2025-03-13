@@ -56,7 +56,7 @@ public final class ArmLiftConstants {
     public static final double STORAGE_LIFT_HEIGHT = 0.10;
 
     public static final double START_ANGLE = Math.PI;
-    public static final double START_LIFT_HEIGHT = 0.229;
+    public static final double START_LIFT_HEIGHT = 0.216;
 
     public static final double DEFENSE_ANGLE = Math.PI;
     public static final double DEFENSE_LIFT_HEIGHT = 0;
