@@ -204,17 +204,7 @@ public class ArmLift implements Subsystem {
         }
     }
 
-    // private void testAnalogSubsystem(){
-    //     liftMotor1.setSpeed(leftJoyStickY.getValue());
-    //     liftMotor2.setSpeed(-leftJoyStickY.getValue());
-    //     SmartDashboard.putNumber("Lift Speed", leftJoyStickY.getValue());
-
-    //     armMotor.setSpeed(rightJoyStickX.getValue());
-    //     SmartDashboard.putNumber("Arm Speed", rightJoyStickX.getValue());
-    // }
-
     private void putDashboard(){
-        // SmartDashboard.putNumber("Lift Pot Voltage", liftPot.getPosition());
         SmartDashboard.putNumber("Arm Angle", currentArmAngle);
         SmartDashboard.putNumber("Lift Height", currentLiftHeight);
         SmartDashboard.putNumber("Arm control output", armControlOutput(currentArmAngle, currentArmVel));
