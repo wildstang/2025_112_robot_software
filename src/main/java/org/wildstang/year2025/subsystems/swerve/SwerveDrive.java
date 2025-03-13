@@ -183,6 +183,8 @@ public class SwerveDrive extends SwerveDriveTemplate {
     public void update() {
         curPose = loc.getCurrentPose();
 
+
+        
         switch (driveState) {
             case AUTO:
                 xOutput = xSpeed * DriveConstants.DRIVE_F_K + (pathXTarget - curPose.getX()) * DriveConstants.POS_P;
@@ -191,6 +193,7 @@ public class SwerveDrive extends SwerveDriveTemplate {
                 break;
 
             case TELEOP:
+            if(!rotHelperOverride){
                 switch (armLift.gameState) {
                     case GROUND_INTAKE:
                         if (algaeInView() && armLift.isAtSetpoint() && rotLocked) {
@@ -206,16 +209,6 @@ public class SwerveDrive extends SwerveDriveTemplate {
                         xOutput = (pathXTarget - curPose.getX()) * DriveConstants.POS_P;
                         yOutput = (pathYTarget - curPose.getY()) * DriveConstants.POS_P;
                         rotOutput = swerveHelper.getRotControl(rotTarget, getGyroAngle());
-                        if (rotLocked) {
-                            double curAngle = getGyroAngle();
-                            if (curAngle > 11.0 * Math.PI / 6.0 || curAngle < Math.PI / 6.0) rotTarget = 0.0;
-                            else if (curAngle < 3.0 * Math.PI / 6.0) rotTarget = 2.0 * Math.PI / 6.0;
-                            else if (curAngle < 5.0 * Math.PI / 6.0) rotTarget = 4.0 * Math.PI / 6.0;
-                            else if (curAngle < 7.0 * Math.PI / 6.0) rotTarget = 6.0 * Math.PI / 6.0;
-                            else if (curAngle < 9.0 * Math.PI / 6.0) rotTarget = 8.0 * Math.PI / 6.0;
-                            else rotTarget = 10.0 * Math.PI / 6.0;
-                            rotOutput = swerveHelper.getRotControl(rotTarget, getGyroAngle());
-                        }
                         break;
 
                     case PROCESSOR:
@@ -226,25 +219,15 @@ public class SwerveDrive extends SwerveDriveTemplate {
                         xOutput = (pathXTarget - curPose.getX()) * DriveConstants.POS_P;
                         yOutput = (pathYTarget - curPose.getY()) * DriveConstants.POS_P;
                         rotOutput = swerveHelper.getRotControl(rotTarget, getGyroAngle());
-                        if (rotLocked) {
-                            rotTarget = (getGyroAngle() <= Math.PI) ? Math.PI / 2.0 : 3.0 * Math.PI / 2.0;
-                            rotOutput = swerveHelper.getRotControl(rotTarget, getGyroAngle());
-                        }
                         break;
 
                     case SHOOT_NET:
-                        // pathXTarget = (curPose.getX() < PoseConstants.MID_FIELD_X) ? PoseConstants.BLUE_NET_X : PoseConstants.RED_NET_X;
-                        // pathYTarget = curPose.getY();
-                        // xOutput = (pathXTarget - curPose.getX()) * DriveConstants.POS_P;
-                        if (rotLocked) {
-                            rotTarget = (getGyroAngle() <= Math.PI / 2.0 || getGyroAngle() >= 3.0 * Math.PI / 2.0) ? 0 : Math.PI;
-                            rotOutput = swerveHelper.getRotControl(rotTarget, getGyroAngle());
-                        }
                         break;
                     
                     default:
                         break;
                 }
+            }
                 break;
         }
         
