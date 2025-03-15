@@ -245,7 +245,7 @@ public class ArmLift implements Subsystem {
         return(armMotor.getVelocity() / ArmLiftConstants.ARM_GEAR_RATO * 2.0 * Math.PI / 60.0 );
     }
 
-    private void getArmReefHeight(){
+    public void getArmReefHeight(){
         Object[] objArray = loc.getNearestReefHeight();
         setGameState((GameStates) objArray[0], (Boolean) objArray[1]);
     }
