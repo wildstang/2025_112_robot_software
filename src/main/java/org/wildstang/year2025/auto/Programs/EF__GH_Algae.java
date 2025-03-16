@@ -11,7 +11,7 @@ import org.wildstang.year2025.subsystems.Claw.Claw.clawStates;
 import org.wildstang.year2025.subsystems.arm_lift.ArmLift.GameStates;
 import org.wildstang.year2025.subsystems.swerve.SwerveDrive;
 
-public class EF_Algae extends AutoProgram {
+public class EF__GH_Algae extends AutoProgram {
 
     @Override
     protected void defineSteps() {

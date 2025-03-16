@@ -184,7 +184,7 @@ public class SwerveDrive extends SwerveDriveTemplate {
         // drivetrain positive value corresponds to ccw rotation
         rInput = swerveHelper.scaleDeadband(-rightStickX.getValue(), DriveConstants.DEADBAND);  // negate joystick value so positive on the joystick (right) commands a negative rot speed (turn cw) and vice versa
 
-        rInput *= Math.abs(rOutput);
+        rInput *= Math.abs(rInput);
     }
 
     @Override
