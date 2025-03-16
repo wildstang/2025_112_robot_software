@@ -20,7 +20,7 @@ public class Climb implements Subsystem {
 
     @Override
     public void inputUpdate(Input source) {
-        climbMotorSpeed = rightTrigger.getValue();
+        climbMotorSpeed = -rightTrigger.getValue();
     }
 
     @Override
