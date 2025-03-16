@@ -61,6 +61,9 @@ public final class ArmLiftConstants {
     public static final double DEFENSE_ANGLE = Math.PI;
     public static final double DEFENSE_LIFT_HEIGHT = 0;
 
+    public static final double LOLIPOP_ANGLE = 1.55;
+    public static final double LOLIPOP_HEIGHT = 0.3;
+
     //Intaking
     public static final double GROUND_INTAKE_RIGHT_ANGLE = 1.1;  // radians
     public static final double GROUND_INTAKE_LIFT_HEIGHT = 0.05;  // meters

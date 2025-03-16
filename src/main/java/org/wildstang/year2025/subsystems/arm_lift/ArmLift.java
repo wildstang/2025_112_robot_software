@@ -42,7 +42,7 @@ public class ArmLift implements Subsystem {
     private WsSpark liftMotor1;
     private WsSpark liftMotor2;
     private double currentLiftHeight, currentLiftVel;
-    public enum GameStates {GROUND_INTAKE, L2_ALGAE_REEF, L3_ALGAE_REEF, STORAGE, SCORE_PRELOAD, SHOOT_NET, START, CORAL_INTAKE, CORAL_L2, CORAL_L3, PROCESSOR, DEFENSE}; // Our Arm/Lift States
+    public enum GameStates {GROUND_INTAKE, L2_ALGAE_REEF, L3_ALGAE_REEF, STORAGE, SCORE_PRELOAD, SHOOT_NET, START, CORAL_INTAKE, CORAL_L2, CORAL_L3, LOLIPOP, PROCESSOR, DEFENSE}; // Our Arm/Lift States
     public GameStates gameState = GameStates.START;
     public GameStates newState = GameStates.START;
     
@@ -131,6 +131,8 @@ public class ArmLift implements Subsystem {
         } else if (faceUp.getValue()) {
           isFront = loc.getNearestBargeDirection();
           setGameState(GameStates.SHOOT_NET);
+        } else if(faceRight.getValue()){
+          setGameState(GameStates.LOLIPOP);
         } else if (leftTrigger.getValue() != 0) {
            setGameState(GameStates.GROUND_INTAKE);
         } else if (dpadDown.getValue()) {
@@ -406,6 +408,11 @@ public class ArmLift implements Subsystem {
                 armSetpoint = ArmLiftConstants.DEFENSE_ANGLE;
                 liftSetpoint = ArmLiftConstants.DEFENSE_LIFT_HEIGHT;
                 break;
+            case LOLIPOP:
+                gameState = GameStates.LOLIPOP;
+                armSetpoint = ArmLiftConstants.LOLIPOP_ANGLE;
+                liftSetpoint = ArmLiftConstants.LOLIPOP_HEIGHT; 
+                break; 
             default:
                 break;
         }
