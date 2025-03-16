@@ -22,6 +22,7 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -38,6 +39,8 @@ public class Localization implements Subsystem {
     private Pose2d currentPose, bestPose;
     StructPublisher<Pose2d> posePublisher, bestPosePublisher, frontCamPublisher, rearCamPublisher;
     StructArrayPublisher<Pose2d> frontVisTargetPublisher, rearVisTargetPublisher;
+    StructArrayPublisher<SwerveModulePosition> modulePosPublisher;
+    StructPublisher<Rotation2d> odoAngPublisher;
     Optional<EstimatedRobotPose> visionEst;
     List<PhotonTrackedTarget> targets;
     Pose2d[] visTargets;
@@ -47,6 +50,8 @@ public class Localization implements Subsystem {
 
     @Override
     public void init() {
+        modulePosPublisher = NetworkTableInstance.getDefault().getStructArrayTopic("odo position", SwerveModulePosition.struct).publish();
+        odoAngPublisher = NetworkTableInstance.getDefault().getStructTopic("odo angle", Rotation2d.struct).publish();
         currentPose = new Pose2d();
         posePublisher = NetworkTableInstance.getDefault().getStructTopic("Pose Estimator", Pose2d.struct).publish();
         bestPose = new Pose2d();
@@ -56,13 +61,13 @@ public class Localization implements Subsystem {
         frontEstimator = new PhotonPoseEstimator(LocalizationConstants.kTagLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, LocalizationConstants.kBotToFrontCam);
         frontEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
         frontCamPublisher = NetworkTableInstance.getDefault().getStructTopic("Front Cam Pose Estimator", Pose2d.struct).publish();
-        frontVisTargetPublisher = NetworkTableInstance.getDefault().getStructArrayTopic("Vision Targets", Pose2d.struct).publish();
+        frontVisTargetPublisher = NetworkTableInstance.getDefault().getStructArrayTopic("Front Vision Targets", Pose2d.struct).publish();
 
         rearCam = new PhotonCamera(LocalizationConstants.kRearCam);
         rearEstimator = new PhotonPoseEstimator(LocalizationConstants.kTagLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, LocalizationConstants.kBotToRearCam);
         rearEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
         rearCamPublisher = NetworkTableInstance.getDefault().getStructTopic("Rear Cam Pose Estimator", Pose2d.struct).publish();
-        rearVisTargetPublisher = NetworkTableInstance.getDefault().getStructArrayTopic("Vision Targets", Pose2d.struct).publish();
+        rearVisTargetPublisher = NetworkTableInstance.getDefault().getStructArrayTopic("Rear Vision Targets", Pose2d.struct).publish();
     }
 
     @Override
@@ -79,6 +84,8 @@ public class Localization implements Subsystem {
     public void update() {
         // Update pose estimator with drivetrain odometry values
         estimator.update(drive.getOdoAngle(), drive.getOdoPosition());
+        modulePosPublisher.set(drive.getOdoPosition());
+        odoAngPublisher.set(drive.getOdoAngle());
 
         // Update pose estimator with vision estimates
         processPVResults(frontCam, frontEstimator, frontVisTargetPublisher, frontCamPublisher);
@@ -90,7 +97,7 @@ public class Localization implements Subsystem {
     }
 
     private void processPVResults(PhotonCamera cam, PhotonPoseEstimator camEstimator, StructArrayPublisher<Pose2d> visTargetPublisher, StructPublisher<Pose2d> camPosePublisher){
-        // Update pose estimator with front camera
+        // Update pose estimator with camera
         for (var change : cam.getAllUnreadResults()) {
             // create List of targets to publish
             targets = change.getTargets();
@@ -101,7 +108,7 @@ public class Localization implements Subsystem {
             visTargetPublisher.set(visTargets, (long) (1_000_000 * change.getTimestampSeconds()));
 
             // update pose estimator
-            visionEst = frontEstimator.update(change);
+            visionEst = camEstimator.update(change);
             if (visionEst.isPresent()) {
                 camPosePublisher.set(visionEst.get().estimatedPose.toPose2d(), (long) (1_000_000 * visionEst.get().timestampSeconds));
                 updateEstimationStdDevs(visionEst, targets);
@@ -114,6 +121,7 @@ public class Localization implements Subsystem {
 
     private void putDashboard () {
         posePublisher.set(currentPose);
+        // bestPosePublisher.set(getNearestReefPose());
     }
 
     private void updateEstimationStdDevs(Optional<EstimatedRobotPose> estimatedPose, List<PhotonTrackedTarget> targets) {

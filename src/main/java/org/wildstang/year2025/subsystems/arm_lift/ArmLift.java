@@ -130,7 +130,7 @@ public class ArmLift implements Subsystem {
            getArmReefHeight();
         } else if (faceUp.getValue()) {
           isFront = loc.getNearestBargeDirection();
-          setGameState(GameStates.SHOOT_NET);
+          setGameState(GameStates.SHOOT_NET, isFront);
         } else if(faceRight.getValue()){
           setGameState(GameStates.LOLIPOP);
         } else if (leftTrigger.getValue() != 0) {
@@ -141,7 +141,7 @@ public class ArmLift implements Subsystem {
             manualArmAdjust += 0.05;
         } else if (dpadRight.getValue()) {
            isFront = loc.getNearestProcessorDirection();
-           setGameState(GameStates.PROCESSOR);
+           setGameState(GameStates.PROCESSOR, isFront);
         } else if(leftJoyStickButton.getValue()){
            setGameState(GameStates.DEFENSE);
         }

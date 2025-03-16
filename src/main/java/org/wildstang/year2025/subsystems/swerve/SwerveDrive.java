@@ -22,7 +22,6 @@ import org.wildstang.year2025.subsystems.localization.Localization;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -211,17 +210,20 @@ public class SwerveDrive extends SwerveDriveTemplate {
 
                         case L2_ALGAE_REEF:
                         case L3_ALGAE_REEF:
-                            targetPose = loc.getNearestReefPose().plus(new Transform2d(xInput, yInput, Rotation2d.kZero));
+                            targetPose = loc.getNearestReefPose();
+                            targetPose = new Pose2d(targetPose.getX() + xInput, targetPose.getY() + yInput, targetPose.getRotation());
                             setAutoDriveValues(kZeroSpeed, targetPose);
                             break;
 
                         case PROCESSOR:
-                            targetPose = loc.getNearestProcessorPose().plus(new Transform2d(xInput, yInput, Rotation2d.kZero));
+                            targetPose = loc.getNearestProcessorPose();
+                            targetPose = new Pose2d(targetPose.getX() + xInput, targetPose.getY() + yInput, targetPose.getRotation());
                             setAutoDriveValues(kZeroSpeed, targetPose);
                             break;
 
                         case SHOOT_NET:
-                            targetPose = loc.getNearestBargePose().plus(new Transform2d(xInput, yInput, Rotation2d.kZero));
+                            targetPose = loc.getNearestBargePose();
+                            targetPose = new Pose2d(targetPose.getX() + xInput, targetPose.getY() + yInput, targetPose.getRotation());
                             setAutoDriveValues(kZeroSpeed, targetPose);
                             yOutput = yInput;  // override yOutput to allow driver to align to clear spot on the barge
                             break;

@@ -74,7 +74,7 @@ public class LedSubsystem implements Subsystem {
 
         switch(ledState){  
             case INTAKE:
-                rumbleTimer.reset();
+                rumbleTimer.start();
                 controller.setRumble(RumbleType.kBothRumble, 0.5);
                 normalGreen();
                 break;
