@@ -1,6 +1,7 @@
 package org.wildstang.year2025.subsystems.trollgate;
 
 import org.wildstang.framework.core.Core;
+import org.wildstang.framework.io.inputs.AnalogInput;
 import org.wildstang.framework.io.inputs.DigitalInput;
 import org.wildstang.framework.io.inputs.Input;
 import org.wildstang.framework.subsystems.Subsystem;
@@ -18,14 +19,17 @@ public class TrollGate implements Subsystem {
     // Output
     private PWM trollGate1;
     private PWM trollGate2;
+    private double trollGateSpeed;
 
     // Types of States
     public enum TollgateStates {CONTRACT, DETRACT}
     public TollgateStates currentState;
+    private AnalogInput rightTrigger;
 
     
     @Override
     public void inputUpdate(Input source) {
+        trollGateSpeed = rightTrigger.getValue();
     }
 
     @Override
@@ -33,6 +37,10 @@ public class TrollGate implements Subsystem {
         trollGate1 = new PWM(TrollGateConstants.TROLLGATE1CHANNEL);
         trollGate2 = new PWM(TrollGateConstants.TROLLGATE2CHANNEL);
         currentState = TollgateStates.DETRACT;
+        rightTrigger = (AnalogInput) Core.getInputManager().getInput(WsInputs.DRIVER_RIGHT_TRIGGER);
+        rightTrigger.addInputListener(this);
+        trollGateSpeed = 0;
+
     }
 
     @Override
@@ -42,21 +50,8 @@ public class TrollGate implements Subsystem {
 
     @Override
     public void update() { // every 20 ms
-
-        switch (currentState) {
-            case DETRACT:
-                trollGate1.setPosition(TrollGateConstants.DETRACT_POS);
-                trollGate2.setPosition(TrollGateConstants.DETRACT_POS);
-                break;
-            case CONTRACT:
-                trollGate1.setPosition(TrollGateConstants.CONTRACT_POS);
-                trollGate2.setPosition(TrollGateConstants.CONTRACT_POS);
-                break;
-           default:
-           trollGate1.setPosition(TrollGateConstants.DETRACT_POS);
-           trollGate2.setPosition(TrollGateConstants.DETRACT_POS);
-            break;
-        }
+                trollGate1.setPosition(trollGateSpeed);
+                trollGate2.setPosition(trollGateSpeed);
     }
 
     public void setTrollGateState(TollgateStates newState){

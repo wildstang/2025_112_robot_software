@@ -110,7 +110,7 @@ public class Claw implements Subsystem{
                     // if we are in scoring position and finished outtaking, go to storage
                     if (armLift.gameState == GameStates.SHOOT_NET) {
                         armLift.setGameState(GameStates.STORAGE);
-                        trollgate.setTrollGateState(TollgateStates.DETRACT);
+                      //  trollgate.setTrollGateState(TollgateStates.DETRACT);
                     }
                     setGameState(clawStates.IDLE);
                     timer.reset();
