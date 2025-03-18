@@ -7,6 +7,7 @@ import org.wildstang.framework.io.inputs.DigitalInput;
 import org.wildstang.framework.io.inputs.Input;
 import org.wildstang.framework.subsystems.Subsystem;
 import org.wildstang.hardware.roborio.outputs.WsSpark;
+import org.wildstang.sample.subsystems.Tollgate.tollgate;
 import org.wildstang.year2025.robot.WsInputs;
 import org.wildstang.year2025.robot.WsOutputs;
 import org.wildstang.year2025.robot.WsSubsystems;
@@ -14,6 +15,8 @@ import org.wildstang.year2025.subsystems.LED.LedSubsystem;
 import org.wildstang.year2025.subsystems.LED.LedSubsystem.LEDstates;
 import org.wildstang.year2025.subsystems.arm_lift.ArmLift;
 import org.wildstang.year2025.subsystems.arm_lift.ArmLift.GameStates;
+import org.wildstang.year2025.subsystems.trollgate.TrollGate;
+import org.wildstang.year2025.subsystems.trollgate.TrollGate.TollgateStates;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
@@ -38,6 +41,7 @@ public class Claw implements Subsystem{
 
     LedSubsystem led;
     ArmLift armLift;
+    TrollGate trollgate;
 
     @Override
     //Called everytime an input/buttons is pressed
@@ -106,6 +110,7 @@ public class Claw implements Subsystem{
                     // if we are in scoring position and finished outtaking, go to storage
                     if (armLift.gameState == GameStates.SHOOT_NET) {
                         armLift.setGameState(GameStates.STORAGE);
+                        trollgate.setTrollGateState(TollgateStates.DETRACT);
                     }
                     setGameState(clawStates.IDLE);
                     timer.reset();
@@ -176,6 +181,7 @@ public class Claw implements Subsystem{
     public void initSubsystems() {
         led = (LedSubsystem) Core.getSubsystemManager().getSubsystem(WsSubsystems.LED);
         armLift = (ArmLift) Core.getSubsystemManager().getSubsystem(WsSubsystems.ARMLIFT);
+        trollgate = (TrollGate) Core.getSubsystemManager().getSubsystem(WsSubsystems.TROLLGATE);
     }
 
 

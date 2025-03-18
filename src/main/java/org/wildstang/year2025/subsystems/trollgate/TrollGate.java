@@ -9,22 +9,19 @@ import org.wildstang.hardware.roborio.outputs.WsSpark;
 import org.wildstang.year2025.robot.WsOutputs;
 import org.wildstang.year2025.robot.WsInputs;
 
-import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.PWM;
 
 
 public class TrollGate implements Subsystem {
 
     
     // Output
-    private WsServo trollGate1;
-    private WsServo trollGate2;
+    private PWM trollGate1;
+    private PWM trollGate2;
 
     // Types of States
-    private enum TollgateStates {CONTRACT, DETRACT}
-    private TollgateStates currentState;
-
-    private Timer timer;
-    
+    public enum TollgateStates {CONTRACT, DETRACT}
+    public TollgateStates currentState;
 
     
     @Override
@@ -33,15 +30,9 @@ public class TrollGate implements Subsystem {
 
     @Override
     public void init() {
-        // // Initializing inputs
-        // rightBumper = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_RIGHT_SHOULDER);
-        // rightBumper.addInputListener(this);
-
-        // leftBumper = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_LEFT_TRIGGER);
-        // leftBumper.addInputListener(this);
-    
-        // // Initializing the motor
-        // motorSpark = (WsSpark) Core.getInputManager().getOutput(WsOutputs.motorSpark); // Ensure the correct constant is used
+        trollGate1 = new PWM(TrollGateConstants.TROLLGATE1CHANNEL);
+        trollGate2 = new PWM(TrollGateConstants.TROLLGATE2CHANNEL);
+        currentState = TollgateStates.DETRACT;
     }
 
     @Override
@@ -54,21 +45,29 @@ public class TrollGate implements Subsystem {
 
         switch (currentState) {
             case DETRACT:
-                motorSpark.setSpeed(1); // Move motor to make the tollgate go down?
+                trollGate1.setPosition(TrollGateConstants.DETRACT_POS);
+                trollGate2.setPosition(TrollGateConstants.DETRACT_POS);
                 break;
             case CONTRACT:
-                motorSpark.setSpeed(-1); // Move motor to make tollgate go back up?
+                trollGate1.setPosition(TrollGateConstants.CONTRACT_POS);
+                trollGate2.setPosition(TrollGateConstants.CONTRACT_POS);
                 break;
-            case IDLE:
-                motorSpark.setSpeed(0); // nothing is happening
-                break;
+           default:
+           trollGate1.setPosition(TrollGateConstants.DETRACT_POS);
+           trollGate2.setPosition(TrollGateConstants.DETRACT_POS);
+            break;
+        }
+    }
+
+    public void setTrollGateState(TollgateStates newState){
+       if (!newState.equals(currentState)){
+            currentState = newState;
         }
     }
 
     @Override
     public void resetState() {
-        currentState = TollgateStates.IDLE;
-        motorSpark.setSpeed(0); // Reset motor
+        currentState = TollgateStates.DETRACT;
     }
 
     @Override
