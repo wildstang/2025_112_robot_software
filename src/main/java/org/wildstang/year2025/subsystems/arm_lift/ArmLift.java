@@ -359,6 +359,7 @@ public class ArmLift implements Subsystem {
         this.isFront = isFront;
         switch (newState) {
             case GROUND_INTAKE:
+                this.isFront = true;
                 gameState = GameStates.GROUND_INTAKE;
                 armSetpoint = ArmLiftConstants.GROUND_INTAKE_RIGHT_ANGLE;
                 liftSetpoint = ArmLiftConstants.GROUND_INTAKE_LIFT_HEIGHT;
