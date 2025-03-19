@@ -20,8 +20,8 @@ public class LedSubsystem implements Subsystem {
     private Timer rumbleTimer =  new Timer();
     private Timer patternClock = new Timer();
 
-    public static enum LEDstates {NORMAL, INTAKE, SHOOT, ALGAE_DETECT, L2, L3};
-    public LEDstates ledState = LEDstates.NORMAL;
+    public static enum LEDstates {NORMAL, INTAKE, SHOOT, ALGAE_DETECT, L2, L3, GROUND_INTAKE};
+    public static LEDstates ledState = LEDstates.NORMAL;
 
     private int port = 0;  //port
     private int length = 39;  //length
@@ -76,7 +76,7 @@ public class LedSubsystem implements Subsystem {
             case INTAKE:
                 rumbleTimer.start();
                 controller.setRumble(RumbleType.kBothRumble, 0.5);
-                normalGreenLevel(0, 12);
+                normalGreen();
                 break;
             case ALGAE_DETECT:
                 if (drive.algaeInView()){
@@ -85,6 +85,8 @@ public class LedSubsystem implements Subsystem {
                     flash();
                 }
                 break;
+            case GROUND_INTAKE:
+                normalGreenSection(0, 12);
             case L2:
                 setSectionColor(12, 25, new int[]{0,0,250});
             case L3:
@@ -156,7 +158,7 @@ public class LedSubsystem implements Subsystem {
         led.setData(ledBuffer);
     }
 
-    public void normalGreenLevel(int start, int end) {
+    public void normalGreenSection(int start, int end) {
         if (patternClock.hasElapsed(0.05)) {
             for(int i = start; i < end; i++){
                 int randomNum = (int) (Math.random() * 3);
