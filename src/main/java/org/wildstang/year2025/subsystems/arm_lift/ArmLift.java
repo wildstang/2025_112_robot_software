@@ -14,6 +14,7 @@ import org.wildstang.year2025.robot.WsInputs;
 import org.wildstang.year2025.robot.WsOutputs;
 import org.wildstang.year2025.robot.WsSubsystems;
 import org.wildstang.year2025.subsystems.Claw.Claw;
+import org.wildstang.year2025.subsystems.LED.LedSubsystem;
 import org.wildstang.year2025.subsystems.localization.Localization;
 
 /**
@@ -363,6 +364,7 @@ public class ArmLift implements Subsystem {
                 gameState = GameStates.GROUND_INTAKE;
                 armSetpoint = ArmLiftConstants.GROUND_INTAKE_RIGHT_ANGLE;
                 liftSetpoint = ArmLiftConstants.GROUND_INTAKE_LIFT_HEIGHT;
+                LedSubsystem.ledState = LedSubsystem.LEDstates.GROUND_INTAKE;
                 break;
             case STORAGE:
                 gameState = GameStates.STORAGE;
