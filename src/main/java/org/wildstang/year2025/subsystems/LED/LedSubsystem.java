@@ -20,7 +20,7 @@ public class LedSubsystem implements Subsystem {
     private Timer rumbleTimer =  new Timer();
     private Timer patternClock = new Timer();
 
-    public static enum LEDstates {NORMAL, INTAKE, SHOOT, ALGAE_DETECT};
+    public static enum LEDstates {NORMAL, INTAKE, SHOOT, ALGAE_DETECT, L2, L3};
     public LEDstates ledState = LEDstates.NORMAL;
 
     private int port = 0;  //port
@@ -76,7 +76,7 @@ public class LedSubsystem implements Subsystem {
             case INTAKE:
                 rumbleTimer.start();
                 controller.setRumble(RumbleType.kBothRumble, 0.5);
-                normalGreen();
+                normalGreenLevel(0, 12);
                 break;
             case ALGAE_DETECT:
                 if (drive.algaeInView()){
@@ -85,12 +85,20 @@ public class LedSubsystem implements Subsystem {
                     flash();
                 }
                 break;
+            case L2:
+                setSectionColor(12, 25, new int[]{0,0,250});
+            case L3:
+                setSectionColor(25, 38, new int[]{250,0,0});
             default:
                 normalBlue();
                 break;
         }
     }
-
+    public void setSectionColor(int start, int end, int[] color){
+        for(int i = start; i <= end; i++){
+            ledBuffer.setRGB(i, color[0], color[1], color[2]);
+        }
+    }
     public void normalBlue(){
         if (patternClock.hasElapsed(0.05)) {
             for (int i = 0; i < length; i++) {
@@ -130,6 +138,27 @@ public class LedSubsystem implements Subsystem {
     public void normalGreen() {
         if (patternClock.hasElapsed(0.05)) {
             for(int i = 0; i < length; i++){
+                int randomNum = (int) (Math.random() * 3);
+                switch (randomNum) {
+                    case 0:
+                        ledBuffer.setRGB(i, 0, 153, 0);
+                        break;
+                    case 1:
+                        ledBuffer.setRGB(i, 102, 200, 150);
+                        break;
+                    case 2:
+                        ledBuffer.setRGB(i, 200, 255, 200);
+                        break;
+                }
+            }
+            patternClock.reset();
+        }
+        led.setData(ledBuffer);
+    }
+
+    public void normalGreenLevel(int start, int end) {
+        if (patternClock.hasElapsed(0.05)) {
+            for(int i = start; i < end; i++){
                 int randomNum = (int) (Math.random() * 3);
                 switch (randomNum) {
                     case 0:
