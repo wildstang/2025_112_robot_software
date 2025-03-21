@@ -15,7 +15,11 @@ import org.wildstang.year2025.robot.WsOutputs;
 import org.wildstang.year2025.robot.WsSubsystems;
 import org.wildstang.year2025.subsystems.Claw.Claw;
 import org.wildstang.year2025.subsystems.LED.LedSubsystem;
+import org.wildstang.year2025.subsystems.LED.LedSubsystem.LEDstates;
 import org.wildstang.year2025.subsystems.localization.Localization;
+
+import com.revrobotics.RelativeEncoder;
+import com.revrobotics.spark.SparkMax;
 
 /**
  * Interface describing a subsystem class.
@@ -38,6 +42,7 @@ public class ArmLift implements Subsystem {
     // private AnalogInput leftJoyStickY;
     // private AnalogInput rightJoyStickX;
     private AnalogInput leftTrigger;
+    private RelativeEncoder armEnc;
     
     /* Lift Variables */
     private WsSpark liftMotor1;
@@ -61,6 +66,9 @@ public class ArmLift implements Subsystem {
     private Localization loc;
     private boolean isFront;
     private double manualArmAdjust;
+    private double armOut, liftOut;
+
+    private LedSubsystem led;
 
      @Override
     public void init(){
@@ -89,6 +97,8 @@ public class ArmLift implements Subsystem {
         liftMotor2.setBrake();
        
         armMotor = (WsSpark) Core.getOutputManager().getOutput(WsOutputs.ARMMOTOR);
+        
+        armEnc = ((SparkMax) armMotor.getController()).getAlternateEncoder();
     }
 
     public void initInputs(){
@@ -120,6 +130,7 @@ public class ArmLift implements Subsystem {
 
     @Override
     public void initSubsystems() {
+        led = (LedSubsystem) Core.getSubsystemManager().getSubsystem(WsSubsystems.LED);
         claw = (Claw) Core.getSubsystemManager().getSubsystem(WsSubsystems.CLAW);
         loc = (Localization) Core.getSubsystemManager().getSubsystem(WsSubsystems.LOCALIZATION);
     }
@@ -174,9 +185,12 @@ public class ArmLift implements Subsystem {
             liftProfile.calculate(currentLiftHeight, validLiftHeight);
         }
 
-        armMotor.setSpeed(armControlOutput(currentArmAngle, currentArmVel));
-        liftMotor1.setSpeed(liftControlOutput(currentLiftHeight, currentLiftVel));
-        liftMotor2.setSpeed(-liftControlOutput(currentLiftHeight, currentLiftVel));
+        armOut = armControlOutput(currentArmAngle, currentArmVel);
+        liftOut = liftControlOutput(currentLiftHeight, currentLiftVel);
+
+        armMotor.setSpeed(armOut);
+        liftMotor1.setSpeed(liftOut);
+        liftMotor2.setSpeed(-liftOut);
 
         putDashboard();
     }
@@ -213,8 +227,8 @@ public class ArmLift implements Subsystem {
     private void putDashboard(){
         SmartDashboard.putNumber("Arm Angle", currentArmAngle);
         SmartDashboard.putNumber("Lift Height", currentLiftHeight);
-        SmartDashboard.putNumber("Arm control output", armControlOutput(currentArmAngle, currentArmVel));
-        SmartDashboard.putNumber("Lift Control Output", liftControlOutput(currentLiftHeight, currentArmVel));
+        SmartDashboard.putNumber("Arm control output", armOut);
+        SmartDashboard.putNumber("Lift Control Output", liftOut);
         SmartDashboard.putString("ArmLift State", gameState.name());
         SmartDashboard.putNumber("Arm setpoint", armSetpoint);
         SmartDashboard.putNumber("Lift setpoint", liftSetpoint);
@@ -241,10 +255,12 @@ public class ArmLift implements Subsystem {
     }
 
     private double getArmAngle() {
+        // return (armEnc.getPosition() * 2.0 * Math.PI / ArmLiftConstants.ARM_ENC_RATIO) - manualArmAdjust;
         return (armMotor.getPosition() / ArmLiftConstants.ARM_GEAR_RATO * 2.0 * Math.PI) - manualArmAdjust;
     }
 
     private double getArmVel() {
+        // return(armEnc.getVelocity() / ArmLiftConstants.ARM_ENC_RATIO * 2.0 * Math.PI / 60.0 );
         return(armMotor.getVelocity() / ArmLiftConstants.ARM_GEAR_RATO * 2.0 * Math.PI / 60.0 );
     }
 
@@ -344,7 +360,7 @@ public class ArmLift implements Subsystem {
 
     private double getCurrentArmTorque(double goalAccel, double currentAngle){
         //gravitational torque +  (moment of intertia * accleration)
-        return (ArmLiftConstants.ARM_MASS * ArmLiftConstants.GRAVITY * ArmLiftConstants.ARM_COM_RADIUS * Math.sin(currentAngle)) 
+        return (ArmLiftConstants.GRAVITY * ArmLiftConstants.ARM_STATIC_TORQUE * Math.sin(currentAngle)) 
         + (ArmLiftConstants.ARM_MOI * goalAccel);
     }
 
@@ -364,7 +380,7 @@ public class ArmLift implements Subsystem {
                 gameState = GameStates.GROUND_INTAKE;
                 armSetpoint = ArmLiftConstants.GROUND_INTAKE_RIGHT_ANGLE;
                 liftSetpoint = ArmLiftConstants.GROUND_INTAKE_LIFT_HEIGHT;
-                LedSubsystem.ledState = LedSubsystem.LEDstates.GROUND_INTAKE;
+                led.ledState = LEDstates.GROUND_INTAKE;
                 break;
             case STORAGE:
                 gameState = GameStates.STORAGE;

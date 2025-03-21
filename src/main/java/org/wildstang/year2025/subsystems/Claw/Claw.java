@@ -76,7 +76,7 @@ public class Claw implements Subsystem{
         SmartDashboard.putNumber("claw current", clawMotor.getOutputCurrent());
         switch(currentState){
             case INTAKE:
-                if (Math.abs(clawMotor.getVelocity()) < ClawConstants.CLAW_CURRENT_VEL && clawMotor.getOutputCurrent() > ClawConstants.CLAW_CURRENT_HOLD) {
+                if ( clawMotor.getOutputCurrent() > ClawConstants.CLAW_CURRENT_HOLD) { //Math.abs(clawMotor.getVelocity()) < ClawConstants.CLAW_CURRENT_VEL &&
                     algaeHoldCount++;
                     if (algaeHoldCount >= ClawConstants.CLAW_HOLD_COUNT){
                         algaeInClaw = true;

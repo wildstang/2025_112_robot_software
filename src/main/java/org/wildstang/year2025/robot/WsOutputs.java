@@ -33,8 +33,8 @@ public enum WsOutputs implements Outputs {
     LIFTONE("First Lift Motor", new WsSparkConfig(CANConstants.LIFTONE, WsMotorControllers.SPARK_MAX_BRUSHLESS)),
     LIFTTWO("Second Lift Motor", new WsSparkConfig(CANConstants.LIFTTWO, WsMotorControllers.SPARK_MAX_BRUSHLESS)),
     ARMMOTOR("Arm Motor", new WsSparkConfig(CANConstants.ARMMOTOR, WsMotorControllers.SPARK_MAX_BRUSHLESS)),
-    CLAWMOTOR("Claw Motor", new WsSparkConfig(CANConstants.CLAW, WsMotorControllers.SPARK_MAX_BRUSHLESS)),
-    CLAWMOTOR2("Claw Motor 2", new WsSparkConfig(CANConstants.CLAW2, WsMotorControllers.SPARK_MAX_BRUSHLESS)),
+    CLAWMOTOR("Claw Motor", new WsSparkConfig(CANConstants.CLAW, WsMotorControllers.SPARK_FLEX_BRUSHLESS)),
+    CLAWMOTOR2("Claw Motor 2", new WsSparkConfig(CANConstants.CLAW2, WsMotorControllers.SPARK_FLEX_BRUSHLESS)),
     CLIMBMOTOR("Climb", new WsSparkConfig(CANConstants.CLIMBMOTOR, WsMotorControllers.SPARK_MAX_BRUSHLESS));
 
     // ---------------------------------

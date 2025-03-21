@@ -21,7 +21,7 @@ public class LedSubsystem implements Subsystem {
     private Timer patternClock = new Timer();
 
     public static enum LEDstates {NORMAL, INTAKE, SHOOT, ALGAE_DETECT, L2, L3, GROUND_INTAKE};
-    public static LEDstates ledState = LEDstates.NORMAL;
+    public LEDstates ledState = LEDstates.NORMAL;
 
     private int port = 0;  //port
     private int length = 39;  //length
@@ -102,7 +102,7 @@ public class LedSubsystem implements Subsystem {
         }
     }
     public void normalBlue(){
-        if (patternClock.hasElapsed(0.05)) {
+        if (patternClock.hasElapsed(0.1)) {
             for (int i = 0; i < length; i++) {
                 int randomNum = (int)(Math.random() * 3);
                 switch (randomNum) {

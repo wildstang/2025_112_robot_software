@@ -62,6 +62,7 @@ public class MotionProfile {
       double velocity = 0;
       double position = curPos;
       int dir = (int) Math.signum(desPos - curPos);
+      
       for(int i = 0; i < profileArray.length - 1; i++){
          if (i <= (int) (maxAccelerationTime / sampleTime)) {
             accel = maxAccel * dir;  // before reaching max velocity (acceleration)
@@ -81,6 +82,7 @@ public class MotionProfile {
          profileArray[i][1] = velocity;
          profileArray[i][2] = accel;
       }
+
       profileArray[profileArray.length - 1] = new double[] {desPos, 0, 0};  // ensure last sample has properly set values
    }
 
@@ -89,13 +91,14 @@ public class MotionProfile {
       double velocity = 0;
       double position = curPos;
       int dir = (int) Math.signum(desPos - curPos);
+
       for(int i = 0; i < profileArray.length - 1; i++){
-         if (i < (int) (profileArray.length - 1) / 2.0) {
+         if (i <= (int) profileArray.length / 2.0) {
             accel = maxAccel * dir;
             velocity = accel * sampleTime * i;
          } else {
             accel = -maxAccel * dir;
-            velocity = -accel * sampleTime * (profileArray.length - 1 - i);
+            velocity = -accel * sampleTime * (profileArray.length - i);
          }
 
          // Integrate velocity to get position
@@ -105,6 +108,7 @@ public class MotionProfile {
          profileArray[i][1] = velocity;
          profileArray[i][2] = accel;
       }
+
       profileArray[profileArray.length - 1] = new double[] {desPos, 0, 0};  // ensure last sample has properly set values
    }
 
