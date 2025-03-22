@@ -60,26 +60,29 @@ public class AutomateClimb implements Subsystem {
             case INIT:
                 if(motorPos < startPos){
                     climbMotor.setSpeed(climbMotorSpeed);
+                } else {
+                    climbMotor.setSpeed(0.0);
                 }
                 break;
             case EXTEND:
                 if(motorPos < extendedPosition){
                     climbMotor.setSpeed(climbMotorSpeed);
+                } else {
+                    climbMotor.setSpeed(0.0);
                 }
                 break;
            case RETRACT:
                 if(motorPos < retractedPosition){
                     climbMotor.setSpeed(climbMotorSpeed);
+                } else {
+                    climbMotor.setSpeed(0.0);
                 }
-                break;
-            default:
-                climbMotor.setSpeed(0);
                 break;
 
         }
        
        SmartDashboard.putNumber("climb speed", climbMotorSpeed);
-       SmartDashboard.putNumber("Motor Position (Radians): ", motorPos);
+       SmartDashboard.putNumber("Climb Position (Radians): ", motorPos);
     }
 
     public void setClimbState(){
@@ -87,8 +90,6 @@ public class AutomateClimb implements Subsystem {
             climbState = ClimbState.EXTEND;
         }else if(climbState == ClimbState.EXTEND){
             climbState = ClimbState.RETRACT;
-        }else{
-            ;
         }
     }
 
