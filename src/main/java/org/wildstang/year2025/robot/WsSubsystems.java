@@ -23,9 +23,9 @@ public enum WsSubsystems implements Subsystems {
     ARMLIFT("Arm Lift", ArmLift.class),
     SWERVE_DRIVE("Swerve Drive", SwerveDrive.class),
     CLAW("Claw", Claw.class),
-    CLIMB("Climb", Climb.class),
+    // CLIMB("Climb", Climb.class),
+    AUTOMATECLIMB("Automate Climb", AutomateClimb.class),
     LED("LED", LedSubsystem.class),
-    // AUTOMATECLIMB("Automate Climb", AutomateClimb.class)
     ;
 
     ;

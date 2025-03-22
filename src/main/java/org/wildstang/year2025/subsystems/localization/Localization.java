@@ -223,12 +223,23 @@ public class Localization implements Subsystem {
 
     // return closest direction to face for scoring in the net
     public boolean getNearestBargeDirection() {
-        double xTarget = (currentPose.getX() < LocalizationConstants.MID_FIELD_X) ? LocalizationConstants.BLUE_NET_X : LocalizationConstants.RED_NET_X;
+        double xTarget; 
         double rTarget = 0.0;
-        boolean isFront = true;
-        if (Math.abs(MathUtil.angleModulus(currentPose.getRotation().getRadians())) > Math.PI / 2.0) {
-            rTarget = Math.PI;
+        boolean isFront;
+        if (currentPose.getX() < LocalizationConstants.MID_FIELD_X) {
+            xTarget = LocalizationConstants.BLUE_NET_X;
+            isFront = true;
+            if (Math.abs(MathUtil.angleModulus(currentPose.getRotation().getRadians())) > Math.PI / 2.0) {
+                rTarget = Math.PI;
+                isFront = false;
+            }
+        } else {
+            xTarget = LocalizationConstants.RED_NET_X;
             isFront = false;
+            if (Math.abs(MathUtil.angleModulus(currentPose.getRotation().getRadians())) > Math.PI / 2.0) {
+                rTarget = Math.PI;
+                isFront = true;
+            }
         }
         bestPose = new Pose2d(xTarget, currentPose.getY(), new Rotation2d(rTarget));
 

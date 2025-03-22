@@ -1,16 +1,12 @@
 package org.wildstang.year2025.subsystems.climb;
 
 import org.wildstang.framework.core.Core;
-import org.wildstang.framework.io.inputs.AnalogInput;
 import org.wildstang.framework.io.inputs.DigitalInput;
 import org.wildstang.framework.io.inputs.Input;
 import org.wildstang.framework.subsystems.Subsystem;
-import org.wildstang.hardware.roborio.inputs.WsAbsoluteEncoder;
 import org.wildstang.hardware.roborio.outputs.WsSpark;
 import org.wildstang.year2025.robot.WsInputs;
 import org.wildstang.year2025.robot.WsOutputs;
-// import org.wildstang.year2025.robot.WsSubsystems;
-import org.wildstang.year2025.subsystems.arm_lift.ArmLift.GameStates;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -22,13 +18,12 @@ public class AutomateClimb implements Subsystem {
     private double climbMotorSpeed;
     private enum ClimbState{EXTEND, RETRACT, INIT}
     private ClimbState climbState;
-    private WsAbsoluteEncoder absoluteEncoder;
     private double climbGearRatio = 195.3125;
     private double motorPos;
 
-    private final double retractedPosition = Math.PI;
-    private final double extendedPosition = Math.PI / 2;
-    private final double startPos = Math.PI / 6;
+    private final double retractedPosition = 18.75;
+    private final double extendedPosition = 9.38;
+    private final double startPos = 0.46;
 
     @Override
     public void inputUpdate(Input source) {
@@ -82,7 +77,7 @@ public class AutomateClimb implements Subsystem {
         }
        
        SmartDashboard.putNumber("climb speed", climbMotorSpeed);
-       SmartDashboard.putNumber("Climb Position (Radians): ", motorPos);
+       SmartDashboard.putNumber("Climb Position", motorPos);
     }
 
     public void setClimbState(){
@@ -103,7 +98,7 @@ public class AutomateClimb implements Subsystem {
 
     @Override
     public String getName() {
-        return "Climb";
+        return "Automate Climb";
     }
     
 }

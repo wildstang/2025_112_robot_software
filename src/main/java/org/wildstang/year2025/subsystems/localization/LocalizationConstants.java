@@ -30,18 +30,18 @@ public class LocalizationConstants {
     /* Goal Poses */
     public static final double MID_FIELD_X = 8.77;
     
-    public static final Pose2d BLUE_PROCESSOR = new Pose2d(6.07, 1.02, Rotation2d.fromDegrees(-90.0));
+    public static final Pose2d BLUE_PROCESSOR = new Pose2d(5.89, 0.97, Rotation2d.fromDegrees(-90.0));
     public static final Pose2d RED_PROCESSOR = new Pose2d(11.30, 7.50, Rotation2d.fromDegrees(90.0));
     
-    public static final double BLUE_NET_X = 7.57;
+    public static final double BLUE_NET_X = 7.79;
     public static final double RED_NET_X = 9.95;
 
-    public static final Pose2d BLUE_REEF_AB = new Pose2d(3.06,4.23,Rotation2d.fromDegrees(0.0));
-    public static final Pose2d BLUE_REEF_CD = new Pose2d(3.57,2.88,Rotation2d.fromDegrees(60.0));
-    public static final Pose2d BLUE_REEF_EF = new Pose2d(5.02, 2.69, Rotation2d.fromDegrees(120.0));
-    public static final Pose2d BLUE_REEF_GH = new Pose2d(5.93, 3.84, Rotation2d.kPi);
-    public static final Pose2d BLUE_REEF_IJ = new Pose2d(5.38,5.21, Rotation2d.fromDegrees(-120.0));
-    public static final Pose2d BLUE_REEF_KL = new Pose2d(3.92,5.38, Rotation2d.fromDegrees(-60.0));
+    public static final Pose2d BLUE_REEF_AB = new Pose2d(2.55,4.09,Rotation2d.fromDegrees(0.0));
+    public static final Pose2d BLUE_REEF_CD = new Pose2d(3.50,2.38,Rotation2d.fromDegrees(60.0));
+    public static final Pose2d BLUE_REEF_EF = new Pose2d(5.42, 2.29, Rotation2d.fromDegrees(120.0));
+    public static final Pose2d BLUE_REEF_GH = new Pose2d(6.46, 3.99, Rotation2d.kPi);
+    public static final Pose2d BLUE_REEF_IJ = new Pose2d(5.48,5.55, Rotation2d.fromDegrees(-120.0));
+    public static final Pose2d BLUE_REEF_KL = new Pose2d(3.47,5.77, Rotation2d.fromDegrees(-60.0));
 
     public static final Pose2d RED_REEF_AB = new Pose2d();
     public static final Pose2d RED_REEF_CD = new Pose2d();

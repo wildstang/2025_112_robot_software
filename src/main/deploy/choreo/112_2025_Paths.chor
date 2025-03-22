@@ -10,6 +10,13 @@
      "exp":"1 m",
      "val":1.0
     }
+   },
+   "MaxVel":{
+    "dimension":"LinVel",
+    "var":{
+     "exp":"0.75 m / s",
+     "val":0.75
+    }
    }
   },
   "poses":{
@@ -23,8 +30,8 @@
      "val":2.78
     },
     "heading":{
-     "exp":"-1.05 rad",
-     "val":-1.05
+     "exp":"(-1.05 + PI) rad",
+     "val":2.0915926535897933
     }
    },
    "AlgaeGH":{
@@ -43,12 +50,12 @@
    },
    "AlgaeIJ":{
     "x":{
-     "exp":"5.18 m",
-     "val":5.18
+     "exp":"5.2 m",
+     "val":5.2
     },
     "y":{
-     "exp":"5.28 m",
-     "val":5.28
+     "exp":"5.3 m",
+     "val":5.3
     },
     "heading":{
      "exp":"4.19 rad",
@@ -107,8 +114,8 @@
      "val":2.78
     },
     "heading":{
-     "exp":"0 rad",
-     "val":0.0
+     "exp":"PI rad",
+     "val":3.141592653589793
     }
    },
    "IJStart":{
@@ -118,7 +125,7 @@
     },
     "y":{
      "exp":"AlgaeIJ.y",
-     "val":5.28
+     "val":5.3
     },
     "heading":{
      "exp":"PI rad",
