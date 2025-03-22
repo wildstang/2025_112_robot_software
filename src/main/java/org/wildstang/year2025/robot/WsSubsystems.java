@@ -25,7 +25,7 @@ public enum WsSubsystems implements Subsystems {
     CLAW("Claw", Claw.class),
     CLIMB("Climb", Climb.class),
     LED("LED", LedSubsystem.class),
-    AUTOMATECLIMB("Automate Climb", AutomateClimb.class)
+    // AUTOMATECLIMB("Automate Climb", AutomateClimb.class)
     ;
 
     ;
