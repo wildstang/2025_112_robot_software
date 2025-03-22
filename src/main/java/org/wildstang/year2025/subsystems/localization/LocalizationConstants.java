@@ -17,8 +17,8 @@ import edu.wpi.first.math.numbers.N3;
 public class LocalizationConstants {
     public static final String kFrontCam = "FrontCam";
     public static final String kRearCam = "RearCam";
-    public static final Transform3d kBotToFrontCam = new Transform3d(new Translation3d(0.18, 0.07, 0.17), new Rotation3d(0, 0.459, 0));
-    public static final Transform3d kBotToRearCam = new Transform3d(new Translation3d(-0.18, 0.07, 0.17), new Rotation3d(0, 0.459, Math.PI));
+    public static final Transform3d kBotToFrontCam = new Transform3d(new Translation3d(0.184, 0.161, 0.170), new Rotation3d(0, -0.367, 0));
+    public static final Transform3d kBotToRearCam = new Transform3d(new Translation3d(-0.184, 0.161, 0.170), new Rotation3d(0, -0.367, Math.PI));
 
     // The layout of the AprilTags on the field
     public static final AprilTagFieldLayout kTagLayout = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);

@@ -122,7 +122,7 @@ public class SwerveDrive extends SwerveDriveTemplate {
         rightStickButton = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_RIGHT_JOYSTICK_BUTTON);
         rightStickButton.addInputListener(this);
 
-        WsSpark clawMotor = (WsSpark) Core.getOutputManager().getOutput(WsOutputs.CLAWMOTOR);
+        WsSpark clawMotor = (WsSpark) Core.getOutputManager().getOutput(WsOutputs.CLAWMOTOR2);
         pixyDigital = clawMotor.getController().getForwardLimitSwitch();
         pixyAnalog = clawMotor.getController().getAnalog();
     }
@@ -202,7 +202,7 @@ public class SwerveDrive extends SwerveDriveTemplate {
                             xOutput = xInput;
                             yOutput = yInput;
                             if (algaeInView() && armLift.isAtSetpoint() && rInput == 0) {
-                                rOutput = (1.0 - pixyAnalog.getVoltage()) * 0.40;  // TODO: tune these values
+                                rOutput = -(2.0 - pixyAnalog.getVoltage()) * 0.20;  // TODO: tune these values
                             } else {
                                 rOutput = rInput;
                             }
