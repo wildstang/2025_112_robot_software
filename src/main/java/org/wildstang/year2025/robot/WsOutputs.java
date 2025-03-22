@@ -6,6 +6,7 @@ import org.wildstang.framework.core.Outputs;
 import org.wildstang.framework.hardware.OutputConfig;
 import org.wildstang.framework.io.outputs.Output;
 import org.wildstang.hardware.roborio.outputs.config.WsMotorControllers;
+import org.wildstang.hardware.roborio.outputs.config.WsServoConfig;
 import org.wildstang.hardware.roborio.outputs.config.WsSparkConfig;
 
 /**
@@ -35,7 +36,7 @@ public enum WsOutputs implements Outputs {
     ARMMOTOR("Arm Motor", new WsSparkConfig(CANConstants.ARMMOTOR, WsMotorControllers.SPARK_MAX_BRUSHLESS)),
     CLAWMOTOR("Claw Motor", new WsSparkConfig(CANConstants.CLAW, WsMotorControllers.SPARK_MAX_BRUSHLESS)),
     CLAWMOTOR2("Claw Motor 2", new WsSparkConfig(CANConstants.CLAW2, WsMotorControllers.SPARK_MAX_BRUSHLESS)),
-    CLIMBMOTOR("Climb", new WsSparkConfig(CANConstants.CLIMBMOTOR, WsMotorControllers.SPARK_MAX_BRUSHLESS));
+    CLIMBMOTOR("Climb", new WsSparkConfig(CANConstants.CLIMBMOTOR, WsMotorControllers.SPARK_MAX_BRUSHLESS)),
 
     // ---------------------------------
     // Solenoids
@@ -44,6 +45,8 @@ public enum WsOutputs implements Outputs {
     // ---------------------------------
     // Other
     // ---------------------------------
+    TROLLGATEFRONT("Front Toll Gate", new WsServoConfig(1,0)),
+    TROLLGATEBACK("Back Troll Gate", new WsServoConfig(2,0)),
 
     ; // end of enum
 

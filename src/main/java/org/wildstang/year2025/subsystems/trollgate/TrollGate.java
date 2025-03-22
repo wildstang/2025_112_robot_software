@@ -2,27 +2,22 @@ package org.wildstang.year2025.subsystems.trollgate;
 
 import org.wildstang.framework.core.Core;
 import org.wildstang.framework.io.inputs.AnalogInput;
-import org.wildstang.framework.io.inputs.DigitalInput;
 import org.wildstang.framework.io.inputs.Input;
 import org.wildstang.framework.subsystems.Subsystem;
 import org.wildstang.hardware.roborio.outputs.WsServo;
-import org.wildstang.hardware.roborio.outputs.WsSpark;
 import org.wildstang.year2025.robot.WsOutputs;
 import org.wildstang.year2025.robot.WsInputs;
-
-import edu.wpi.first.wpilibj.PWM;
 
 
 public class TrollGate implements Subsystem {
 
     
     // Output
-    private PWM trollGate1;
-    private PWM trollGate2;
+    private WsServo frontGate, backGate;
     private double trollGateSpeed;
 
     // Types of States
-    public enum TollgateStates {CONTRACT, DETRACT}
+    public enum TollgateStates {EXTEND, RETRACT}
     public TollgateStates currentState;
     private AnalogInput rightTrigger;
 
@@ -34,9 +29,9 @@ public class TrollGate implements Subsystem {
 
     @Override
     public void init() {
-        trollGate1 = new PWM(TrollGateConstants.TROLLGATE1CHANNEL);
-        trollGate2 = new PWM(TrollGateConstants.TROLLGATE2CHANNEL);
-        currentState = TollgateStates.DETRACT;
+        frontGate = (WsServo) Core.getOutputManager().getOutput(WsOutputs.TROLLGATEFRONT);
+        backGate = (WsServo) Core.getOutputManager().getOutput(WsOutputs.TROLLGATEBACK);
+        currentState = TollgateStates.RETRACT;
         rightTrigger = (AnalogInput) Core.getInputManager().getInput(WsInputs.DRIVER_RIGHT_TRIGGER);
         rightTrigger.addInputListener(this);
         trollGateSpeed = 0;
@@ -50,8 +45,8 @@ public class TrollGate implements Subsystem {
 
     @Override
     public void update() { // every 20 ms
-                trollGate1.setPosition(trollGateSpeed);
-                trollGate2.setPosition(trollGateSpeed);
+        frontGate.setValue(trollGateSpeed);
+        backGate.setValue(trollGateSpeed);
     }
 
     public void setTrollGateState(TollgateStates newState){
@@ -62,7 +57,7 @@ public class TrollGate implements Subsystem {
 
     @Override
     public void resetState() {
-        currentState = TollgateStates.DETRACT;
+        currentState = TollgateStates.RETRACT;
     }
 
     @Override
@@ -72,6 +67,6 @@ public class TrollGate implements Subsystem {
 
     @Override
     public String getName() {
-        return "Tollgate Subsystem"; // Return the name of the subsystem
+        return "TrollGate"; // Return the name of the subsystem, must match WsSubsystems
     }
 }

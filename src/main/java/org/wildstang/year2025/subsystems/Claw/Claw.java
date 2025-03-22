@@ -7,7 +7,6 @@ import org.wildstang.framework.io.inputs.DigitalInput;
 import org.wildstang.framework.io.inputs.Input;
 import org.wildstang.framework.subsystems.Subsystem;
 import org.wildstang.hardware.roborio.outputs.WsSpark;
-import org.wildstang.sample.subsystems.Tollgate.tollgate;
 import org.wildstang.year2025.robot.WsInputs;
 import org.wildstang.year2025.robot.WsOutputs;
 import org.wildstang.year2025.robot.WsSubsystems;
