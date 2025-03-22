@@ -5,6 +5,7 @@ import org.wildstang.year2025.subsystems.Claw.Claw;
 // import org.wildstang.year2025.subsystems.LED.LedController;
 import org.wildstang.year2025.subsystems.LED.LedSubsystem;
 import org.wildstang.year2025.subsystems.arm_lift.ArmLift;
+import org.wildstang.year2025.subsystems.climb.AutomateClimb;
 import org.wildstang.year2025.subsystems.climb.Climb;
 import org.wildstang.year2025.subsystems.localization.Localization;
 import org.wildstang.year2025.subsystems.swerve.SwerveDrive;
@@ -24,6 +25,7 @@ public enum WsSubsystems implements Subsystems {
     CLAW("Claw", Claw.class),
     CLIMB("Climb", Climb.class),
     LED("LED", LedSubsystem.class),
+    AUTOMATECLIMB("Automate Climb", AutomateClimb.class)
     ;
 
     ;
