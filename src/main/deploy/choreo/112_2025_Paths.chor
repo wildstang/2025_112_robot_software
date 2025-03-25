@@ -14,8 +14,8 @@
    "MaxVel":{
     "dimension":"LinVel",
     "var":{
-     "exp":"0.75 m / s",
-     "val":0.75
+     "exp":"1.4 m / s",
+     "val":1.4
     }
    }
   },
@@ -36,8 +36,8 @@
    },
    "AlgaeGH":{
     "x":{
-     "exp":"5.9 m",
-     "val":5.9
+     "exp":"5.98 m",
+     "val":5.98
     },
     "y":{
      "exp":"4.026 m",

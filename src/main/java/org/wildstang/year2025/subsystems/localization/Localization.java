@@ -178,7 +178,7 @@ public class Localization implements Subsystem {
         else newState = GameStates.L3_ALGAE_REEF;
 
         if (Math.abs(MathUtil.angleModulus(currentPose.getRotation().getRadians() - bestPose.getRotation().getRadians())) > Math.PI / 2.0) {
-            bestPose = new Pose2d(bestPose.getTranslation(), bestPose.getRotation().plus(Rotation2d.kPi));
+            bestPose = new Pose2d(bestPose.getTranslation(), bestPose.getRotation().plus(Rotation2d.kPi)).plus(LocalizationConstants.CLAW_OFFSET);
             isFront = false;
         }
 

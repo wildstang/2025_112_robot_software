@@ -4,7 +4,7 @@ public class ClawConstants{
     public static final double CLAW_HOLD_SPEED = 0.01;
     public static final double CLAW_INTAKE_SPEED = 0.6;
     public static final double CLAW_OUTTAKE_SPEED = -1.0;
-    public static final double OUTTAKE_TIME = 1;
+    public static final double OUTTAKE_TIME = 0.5;
 
     public static final double CLAW_CURRENT_HOLD = 25;
     public static final double CLAW_CURRENT_VEL = 1.0;

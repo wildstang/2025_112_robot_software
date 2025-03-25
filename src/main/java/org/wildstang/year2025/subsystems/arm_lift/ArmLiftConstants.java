@@ -16,14 +16,14 @@ public final class ArmLiftConstants {
     public static final double ARM_VEL_P_GAIN = 0.2;
     public static final double ARM_TOL = 0.09;
 
-    public static final double LIFT_POS_P_GAIN = 8.0;
+    public static final double LIFT_POS_P_GAIN = 10.0;
     public static final double LIFT_POS_I_GAIN = 4.0;
     public static final double LIFT_VEL_P_GAIN = 0.5;
     public static final double LIFT_TOL = 0.02;
     /* ------------------------------------------------------- */
 
     /* -------------------- Game Positions -------------------------------*/
-    public static final double MAX_LIFT_HEIGHT = 0.650;  // meters
+    public static final double MAX_LIFT_HEIGHT = 0.63;  // meters
     public static final double MIN_LIFT_HEIGHT = 0;  // meters
     public static final double MIN_ARM_ANGLE = 0;
     public static final double MAX_ARM_ANGLE = 5.5;
@@ -53,16 +53,16 @@ public final class ArmLiftConstants {
     public static final double SHOOT_NET_LIFT_HEIGHT = MAX_LIFT_HEIGHT;
 
     public static final double STORAGE_ANGLE = Math.PI;
-    public static final double STORAGE_LIFT_HEIGHT = 0.10;
+    public static final double STORAGE_LIFT_HEIGHT = 0.0;
 
     public static final double START_ANGLE = Math.PI;
-    public static final double START_LIFT_HEIGHT = 0.27;
+    public static final double START_LIFT_HEIGHT = 0.26;
 
     public static final double DEFENSE_ANGLE = Math.PI;
     public static final double DEFENSE_LIFT_HEIGHT = 0;
 
-    public static final double LOLIPOP_ANGLE = 1.55;
-    public static final double LOLIPOP_HEIGHT = 0.3;
+    public static final double LOLIPOP_ANGLE = 1.2;
+    public static final double LOLIPOP_HEIGHT = 0.2;
 
     //Intaking
     public static final double GROUND_INTAKE_RIGHT_ANGLE = 1.0;  // radians

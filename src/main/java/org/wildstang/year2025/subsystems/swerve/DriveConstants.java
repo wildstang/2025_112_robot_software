@@ -37,7 +37,7 @@ public final class DriveConstants {
     /**PID values for drive F coefficient of inertia */
     public static final double DRIVE_F_I = 0.0;//
     /**PID values for path tracking position error */
-    public static final double POS_P = 3.0;
+    public static final double POS_P = 2.0;
     /**PID values for path tracking rotation error */
     public static final double ROT_P = 0.55;
     public static final double ROT_D = 2.0;
