@@ -35,15 +35,13 @@ public class ArmLift implements Subsystem {
     MotionProfile liftProfile;
 
     /*Input Variables*/
-    private DigitalInput faceDown; // Ground Intake Button
+    private DigitalInput faceDown; // Storage
     private DigitalInput faceLeft; // L2 Algae Reef Intake
     private DigitalInput faceRight; // L3 Algae Reef Intake
     private DigitalInput faceUp; // Shoot Net
-    private DigitalInput dpadDown, dpadUp;
-    private DigitalInput dpadLeft, dpadRight;
+    private DigitalInput dpadDown, dpadUp;  // Manual arm angle adjustment
+    private DigitalInput dpadLeft, dpadRight;  // Lollipop intake, processor score
     private DigitalInput leftJoyStickButton;
-    // private AnalogInput leftJoyStickY;
-    // private AnalogInput rightJoyStickX;
     private AnalogInput leftTrigger;
     private RelativeEncoder armEnc;
     
@@ -51,9 +49,9 @@ public class ArmLift implements Subsystem {
     private WsSpark liftMotor1;
     private WsSpark liftMotor2;
     private double currentLiftHeight, currentLiftVel;
-    public enum GameStates {START, GROUND_INTAKE, L2_ALGAE_REEF, L3_ALGAE_REEF, STORAGE, SHOOT_NET, LOLIPOP, PROCESSOR, CLIMB}; // Our Arm/Lift States
-    public GameStates gameState = GameStates.START;
-    public GameStates newState = GameStates.START;
+    public enum GameStates {GROUND_INTAKE, L2_ALGAE_REEF, L3_ALGAE_REEF, STORAGE, SHOOT_NET, LOLIPOP, PROCESSOR, CLIMB}; // Our Arm/Lift States
+    public GameStates gameState = GameStates.CLIMB;
+    public GameStates newState = GameStates.CLIMB;
     
     /* Arm Variables */
     private double currentArmAngle, currentArmVel;
@@ -74,12 +72,18 @@ public class ArmLift implements Subsystem {
 
     private LedSubsystem led;
 
-     @Override
+    @Override
     public void init(){
         initOutput();
         initInputs();
         currentArmAngle = getArmAngle();
+        armSetpoint = currentArmAngle;
+        validArmAngle = currentArmAngle;
+        armOut = 0;
         currentLiftHeight = getLiftHeight();
+        liftSetpoint = currentLiftHeight;
+        validLiftHeight = currentLiftHeight;
+        liftOut = 0;
         liftRecalculateFlag = false;
         armRecalculateFlag = false;
         armProfile = new MotionProfile(ArmLiftConstants.MAX_ARM_ACCELERATION
@@ -101,6 +105,7 @@ public class ArmLift implements Subsystem {
         liftMotor2.setBrake();
        
         armMotor = (WsSpark) Core.getOutputManager().getOutput(WsOutputs.ARMMOTOR);
+        armMotor.setBrake();
         
         armEnc = ((SparkMax) armMotor.getController()).getAlternateEncoder();
     }
@@ -116,10 +121,6 @@ public class ArmLift implements Subsystem {
         faceDown.addInputListener(this);
         leftTrigger = (AnalogInput) Core.getInputManager().getInput(WsInputs.DRIVER_LEFT_TRIGGER);
         leftTrigger.addInputListener(this);
-        // leftJoyStickY = (AnalogInput) Core.getInputManager().getInput(WsInputs.DRIVER_LEFT_JOYSTICK_Y);
-        // leftJoyStickY.addInputListener(this);
-        // rightJoyStickX = (AnalogInput) Core.getInputManager().getInput(WsInputs.DRIVER_RIGHT_JOYSTICK_X);
-        // rightJoyStickX.addInputListener(this);
         dpadDown = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_DPAD_DOWN);
         dpadDown.addInputListener(this);
         dpadLeft = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_DPAD_LEFT);
@@ -143,6 +144,7 @@ public class ArmLift implements Subsystem {
     public void inputUpdate(Input source){
         if (faceDown.getValue()) {
            setGameState(GameStates.STORAGE);
+           led.ledState = LEDstates.NORMAL;  // if we manually go into storage mode, reset LEDs to normal
         } else if (faceLeft.getValue()) {
             if (swerve.visionOverride){
                 setGameState(GameStates.L2_ALGAE_REEF, true);
@@ -262,6 +264,7 @@ public class ArmLift implements Subsystem {
         SmartDashboard.putNumber("Manual Arm Adjust", manualArmAdjust);
         SmartDashboard.putBoolean("Arm Profile Done", armProfile.profileDone);
         SmartDashboard.putBoolean("Lift Profile Done", liftProfile.profileDone);
+        SmartDashboard.putNumber("Arm alt enc", armEnc.getPosition());
     }
 
     //calculating lift height from a function of voltage
@@ -330,6 +333,8 @@ public class ArmLift implements Subsystem {
                 validLiftHeight = ArmLiftConstants.POWER_CHAIN_LIFT_HEIGHT;
                 if (curLiftPos < ArmLiftConstants.POWER_CHAIN_LIFT_HEIGHT_MIN || curLiftPos > ArmLiftConstants.POWER_CHAIN_LIFT_HEIGHT_MAX){
                     validArmAngle = curArmAngle;
+                } else {
+                    validArmAngle = ArmLiftConstants.MIN_LOW_ARM_ANGLE;
                 }
             }
             return new double[]{validArmAngle, validLiftHeight};
@@ -413,7 +418,6 @@ public class ArmLift implements Subsystem {
                 claw.setGameState(clawStates.INTAKE);
                 armSetpoint = ArmLiftConstants.GROUND_INTAKE_RIGHT_ANGLE;
                 liftSetpoint = ArmLiftConstants.GROUND_INTAKE_LIFT_HEIGHT;
-                led.ledState = LEDstates.GROUND_INTAKE;
                 break;
             case STORAGE:
                 armSetpoint = ArmLiftConstants.STORAGE_ANGLE;
@@ -423,11 +427,13 @@ public class ArmLift implements Subsystem {
                 claw.setGameState(clawStates.INTAKE);
                 armSetpoint = this.isFront ? ArmLiftConstants.L2_INTAKE_ANGLE : 2.0 * Math.PI - ArmLiftConstants.L2_INTAKE_ANGLE;
                 liftSetpoint = ArmLiftConstants.L2_INTAKE_LIFT_HEIGHT;
+                led.ledState = LEDstates.L2;
                 break;
             case L3_ALGAE_REEF:
                 claw.setGameState(clawStates.INTAKE);
                 armSetpoint = this.isFront ? ArmLiftConstants.L3_INTAKE_ANGLE : 2.0 * Math.PI - ArmLiftConstants.L3_INTAKE_ANGLE;
                 liftSetpoint = ArmLiftConstants.L3_INTAKE_LIFT_HEIGHT;
+                led.ledState = LEDstates.L3;
                 break;
             case SHOOT_NET:
                 armSetpoint = this.isFront ? ArmLiftConstants.SHOOT_NET_ANGLE : 2.0 * Math.PI - ArmLiftConstants.SHOOT_NET_ANGLE;

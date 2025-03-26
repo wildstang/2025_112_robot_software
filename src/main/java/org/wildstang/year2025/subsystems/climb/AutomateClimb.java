@@ -63,10 +63,10 @@ public class AutomateClimb implements Subsystem {
                 }
                 break;
             case EXTEND:
+                armLift.setGameState(GameStates.CLIMB);
                 if(motorPos < extendedPosition){
                     climbMotor.setSpeed(climbMotorSpeed);
                 } else {
-                    armLift.setGameState(GameStates.CLIMB);
                     climbMotor.setSpeed(0.0);
                 }
                 break;
@@ -77,7 +77,6 @@ public class AutomateClimb implements Subsystem {
                     climbMotor.setSpeed(0.0);
                 }
                 break;
-
         }
        
        SmartDashboard.putNumber("climb speed", climbMotorSpeed);

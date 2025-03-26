@@ -2,11 +2,9 @@ package org.wildstang.year2025.robot;
 
 import org.wildstang.framework.core.Subsystems;
 import org.wildstang.year2025.subsystems.Claw.Claw;
-// import org.wildstang.year2025.subsystems.LED.LedController;
 import org.wildstang.year2025.subsystems.LED.LedSubsystem;
 import org.wildstang.year2025.subsystems.arm_lift.ArmLift;
 import org.wildstang.year2025.subsystems.climb.AutomateClimb;
-import org.wildstang.year2025.subsystems.climb.Climb;
 import org.wildstang.year2025.subsystems.localization.Localization;
 import org.wildstang.year2025.subsystems.swerve.SwerveDrive;
 
@@ -23,7 +21,6 @@ public enum WsSubsystems implements Subsystems {
     ARMLIFT("Arm Lift", ArmLift.class),
     SWERVE_DRIVE("Swerve Drive", SwerveDrive.class),
     CLAW("Claw", Claw.class),
-    // CLIMB("Climb", Climb.class),
     AUTOMATECLIMB("Automate Climb", AutomateClimb.class),
     LED("LED", LedSubsystem.class),
     ;

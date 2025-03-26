@@ -44,6 +44,7 @@ public class Localization implements Subsystem {
     Optional<EstimatedRobotPose> visionEst;
     List<PhotonTrackedTarget> targets;
     Pose2d[] visTargets;
+    public boolean frontHasEst, rearHasEst = false;
 
     private static enum TargetType {REEF, PROCESSOR, BARGE};
     private TargetType target = null;
@@ -88,8 +89,8 @@ public class Localization implements Subsystem {
         odoAngPublisher.set(drive.getOdoAngle());
 
         // Update pose estimator with vision estimates
-        processPVResults(frontCam, frontEstimator, frontVisTargetPublisher, frontCamPublisher);
-        processPVResults(rearCam, rearEstimator, rearVisTargetPublisher, rearCamPublisher);
+        frontHasEst = processPVResults(frontCam, frontEstimator, frontVisTargetPublisher, frontCamPublisher);
+        rearHasEst = processPVResults(rearCam, rearEstimator, rearVisTargetPublisher, rearCamPublisher);
 
         // Get current pose estimate after all updates
         currentPose = estimator.getEstimatedPosition();
@@ -97,7 +98,7 @@ public class Localization implements Subsystem {
         if (currentPose.getX() > 18 || currentPose.getX() < -0.5 || currentPose.getY() > 8.5 || currentPose.getY() < -0.5) setCurrentPose(Pose2d.kZero);
     }
 
-    private void processPVResults(PhotonCamera cam, PhotonPoseEstimator camEstimator, StructArrayPublisher<Pose2d> visTargetPublisher, StructPublisher<Pose2d> camPosePublisher){
+    private boolean processPVResults(PhotonCamera cam, PhotonPoseEstimator camEstimator, StructArrayPublisher<Pose2d> visTargetPublisher, StructPublisher<Pose2d> camPosePublisher){
         // Update pose estimator with camera
         for (var change : cam.getAllUnreadResults()) {
             // create List of targets to publish
@@ -118,11 +119,11 @@ public class Localization implements Subsystem {
                 camPosePublisher.set(null, (long) (1_000_000 * change.getTimestampSeconds()));
             }
         }
+        return visionEst.isPresent();
     }
 
     private void putDashboard () {
         posePublisher.set(currentPose);
-        // bestPosePublisher.set(getNearestReefPose());
     }
 
     private void updateEstimationStdDevs(Optional<EstimatedRobotPose> estimatedPose, List<PhotonTrackedTarget> targets) {
@@ -166,6 +167,10 @@ public class Localization implements Subsystem {
 
     public void setCurrentPose(Pose2d newPose){
         estimator.resetPosition(drive.getOdoAngle(), drive.getOdoPosition(), newPose);
+        frontEstimator.setLastPose(newPose);
+        rearEstimator.setLastPose(newPose);
+        frontHasEst = false;
+        rearHasEst = false;
     }
 
     // returns the nearest reef pose to align for intaking

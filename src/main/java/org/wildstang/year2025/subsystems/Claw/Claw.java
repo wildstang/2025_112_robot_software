@@ -42,9 +42,11 @@ public class Claw implements Subsystem{
     @Override
     //Called everytime an input/buttons is pressed
     public void inputUpdate(Input source) {
-        if (leftTrigger.getValue() != 0 || leftBumper.getValue()) {
+        if (leftTrigger.getValue() != 0) {
             setGameState(clawStates.INTAKE);
             led.ledState = LEDstates.ALGAE_DETECT;
+        } else if (leftBumper.getValue()) {
+            setGameState(clawStates.INTAKE);
         } else if (rightBumper.getValue()) {
             setGameState(clawStates.OUTTAKE);
         }
@@ -101,15 +103,15 @@ public class Claw implements Subsystem{
                 break;
 
             case OUTTAKE:
-                // clawMotor.setCurrentLimit(10, 15, 3);
                 if(timer.get() > ClawConstants.OUTTAKE_TIME){
                     // if we are in scoring position and finished outtaking, go to storage
-                    if (armLift.gameState == GameStates.SHOOT_NET) {
+                    if (armLift.gameState == GameStates.SHOOT_NET || armLift.gameState == GameStates.PROCESSOR) {
                         armLift.setGameState(GameStates.STORAGE);
                     }
                     setGameState(clawStates.IDLE);
                     timer.reset();
                     algaeInClaw = false;
+                    led.ledState = LEDstates.SHOOT;
                 }
                 if (armLift.gameState == GameStates.PROCESSOR){
                     clawMotor.setSpeed(ClawConstants.CLAW_PROCESSOR_SPEED);
