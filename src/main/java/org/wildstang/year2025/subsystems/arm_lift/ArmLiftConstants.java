@@ -3,7 +3,7 @@ package org.wildstang.year2025.subsystems.arm_lift;
 public final class ArmLiftConstants {
     /* -------------------- Motion Profile -------------------*/
     public static final double MAX_ARM_ACCELERATION = 24;//20.18;
-    public static final double MAX_ARM_VELOCITY = 3.0; //1.94;
+    public static final double MAX_ARM_VELOCITY = 2.0; //1.94;
     public static final double MAX_LIFT_ACCELERATION = 5.0; // 1.51;
     public static final double MAX_LIFT_VELOCITY = 2.0; //1.42;
     public static final double ARM_SMALL_DELTA_P = 0.1; //small number that deltaP can be under that defaults motion profile to have 0 acceleration and velocity
@@ -16,35 +16,24 @@ public final class ArmLiftConstants {
     public static final double ARM_VEL_P_GAIN = 0.2;
     public static final double ARM_TOL = 0.09;
 
-    public static final double LIFT_POS_P_GAIN = 10.0;
-    public static final double LIFT_POS_I_GAIN = 4.0;
-    public static final double LIFT_VEL_P_GAIN = 0.5;
+    public static final double LIFT_POS_P_GAIN = 12.0;
+    public static final double LIFT_POS_I_GAIN = 6.0;
+    public static final double LIFT_VEL_P_GAIN = 0.4;
     public static final double LIFT_TOL = 0.02;
     /* ------------------------------------------------------- */
 
     /* -------------------- Game Positions -------------------------------*/
     public static final double MAX_LIFT_HEIGHT = 0.63;  // meters
     public static final double MIN_LIFT_HEIGHT = 0;  // meters
+    public static final double LIFT_START_HEIGHT = 0.26;
     public static final double MIN_ARM_ANGLE = 0;
     public static final double MAX_ARM_ANGLE = 5.5;
-
-    public static final double L2_SCORE_ANGLE = 1.03;
-    public static final double L2_SCORE_LIFT_HEIGHT = 0.317;
-
-    public static final double L3_SCORE_ANGLE = 1.03;
-    public static final double L3_SCORE_LIFT_HEIGHT = MAX_LIFT_HEIGHT;
-
-    public static final double L4_SCORE_ANGLE = 3.42;
-    public static final double L4_SCORE_LIFT_HEIGHT = MAX_LIFT_HEIGHT;
 
     public static final double L2_INTAKE_ANGLE = 1.55;
     public static final double L2_INTAKE_LIFT_HEIGHT = 0.42;
 
     public static final double L3_INTAKE_ANGLE = 1.65;
     public static final double L3_INTAKE_LIFT_HEIGHT = MAX_LIFT_HEIGHT;
-    
-    public static final double CORAL_STATION_ANGLE = 4.17;
-    public static final double CORAL_STATION_HEIGHT = 0.31;
 
     public static final double PROCESSOR_ANGLE = 1.2;
     public static final double PROCESSOR_HEIGHT = 0.06;
@@ -55,18 +44,14 @@ public final class ArmLiftConstants {
     public static final double STORAGE_ANGLE = Math.PI;
     public static final double STORAGE_LIFT_HEIGHT = 0.0;
 
-    public static final double START_ANGLE = Math.PI;
-    public static final double START_LIFT_HEIGHT = 0.26;
-
-    public static final double DEFENSE_ANGLE = Math.PI;
-    public static final double DEFENSE_LIFT_HEIGHT = 0;
-
     public static final double LOLIPOP_ANGLE = 1.2;
     public static final double LOLIPOP_HEIGHT = 0.2;
 
-    //Intaking
     public static final double GROUND_INTAKE_RIGHT_ANGLE = 1.0;  // radians
     public static final double GROUND_INTAKE_LIFT_HEIGHT = 0.0;  // meters
+
+    public static final double CLIMB_ANGLE = 0.0;
+    public static final double CLIMB_HEIGHT = LIFT_START_HEIGHT;
 /* ------------------------------------------------------------------- */
 
 /* ---------------ARM AND LIFT BOUND CHECKING -------------*/
@@ -86,7 +71,7 @@ public final class ArmLiftConstants {
     public static final double MAX_LOW_ARM_ANGLE = 5.0;
     public static final double MIN_LOW_ARM_ANGLE = 1.0;
 
-    public static final double POWER_CHAIN_LIFT_HEIGHT = 0.59;
+    public static final double POWER_CHAIN_LIFT_HEIGHT = 0.56;
     public static final double POWER_CHAIN_LIFT_HEIGHT_MIN = 0.55;
     public static final double POWER_CHAIN_LIFT_HEIGHT_MAX = 0.60;
     public static final double ARM_POWER_CHAIN_LOW_LIMIT = 0;

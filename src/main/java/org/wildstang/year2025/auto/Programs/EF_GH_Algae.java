@@ -27,17 +27,39 @@ public class EF_GH_Algae extends AutoProgram {
         group2.addStep(new SwervePathFollowerStep("EFToBarge", swerve));
         group2.addStep(new SetArmLiftStateStep(GameStates.SHOOT_NET, false));
         addStep(group2);
+        
+        addStep(new SetClawStateStep(clawStates.OUTTAKE));
 
         AutoParallelStepGroup group3 = new AutoParallelStepGroup();
-        group3.addStep(new SetArmLiftStateStep(GameStates.L3_ALGAE_REEF, true));
+        group3.addStep(new SetArmLiftStateStep(GameStates.L2_ALGAE_REEF, true));
         group3.addStep(new SwervePathFollowerStep("BargeToGH", swerve));
         group3.addStep(new SetClawStateStep(clawStates.INTAKE));
         addStep(group3);
+
+        AutoParallelStepGroup group4 = new AutoParallelStepGroup();
+        group4.addStep(new SwervePathFollowerStep("GHToBarge", swerve));
+        group4.addStep(new SetArmLiftStateStep(GameStates.SHOOT_NET, false));
+        addStep(group4);
+
+        addStep(new SetClawStateStep(clawStates.OUTTAKE));
+
+        AutoParallelStepGroup group5 = new AutoParallelStepGroup();
+        group5.addStep(new SetArmLiftStateStep(GameStates.L3_ALGAE_REEF, true));
+        group5.addStep(new SwervePathFollowerStep("BargeToIJ", swerve));
+        group5.addStep(new SetClawStateStep(clawStates.INTAKE));
+        addStep(group5);
+
+        AutoParallelStepGroup group6 = new AutoParallelStepGroup();
+        group6.addStep(new SwervePathFollowerStep("IJToBarge", swerve));
+        group6.addStep(new SetArmLiftStateStep(GameStates.SHOOT_NET, false));
+        addStep(group6);
+
+        addStep(new SetClawStateStep(clawStates.OUTTAKE));
     }
 
     @Override
     public String toString() {
-        return "EL algae";
+        return "EF GH Algae";
     }
     
 }

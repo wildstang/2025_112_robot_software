@@ -47,7 +47,7 @@ public class SwerveDrive extends SwerveDriveTemplate {
     private AnalogInput rightStickX;  // rot joystick
     private AnalogInput leftTrigger;  //speed derate 
     private DigitalInput select;  // gyro reset
-    private DigitalInput rightStickButton;
+    private DigitalInput rightStickButton, leftStickButton;
 
     private SparkLimitSwitch pixyDigital;
     private SparkAnalogSensor pixyAnalog;
@@ -84,7 +84,8 @@ public class SwerveDrive extends SwerveDriveTemplate {
 
     private static final double DEG_TO_RAD = Math.PI / 180.0;
     private static final double RAD_TO_DEG = 180.0 / Math.PI;
-    private Boolean rotHelperOverride = false;
+    public boolean visionOverride = false;
+    public boolean pixyOverride = false;
 
     public final Field2d m_field = new Field2d();
     private SwerveModuleState[] moduleStates;
@@ -121,6 +122,8 @@ public class SwerveDrive extends SwerveDriveTemplate {
         select.addInputListener(this);
         rightStickButton = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_RIGHT_JOYSTICK_BUTTON);
         rightStickButton.addInputListener(this);
+        leftStickButton = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_LEFT_JOYSTICK_BUTTON);
+        leftStickButton.addInputListener(this);
 
         WsSpark clawMotor = (WsSpark) Core.getOutputManager().getOutput(WsOutputs.CLAWMOTOR2);
         pixyDigital = clawMotor.getController().getForwardLimitSwitch();
@@ -153,9 +156,11 @@ public class SwerveDrive extends SwerveDriveTemplate {
 
     @Override
     public void inputUpdate(Input source) {
-        if (source == rightStickButton && rightStickButton.getValue()) rotHelperOverride = !rotHelperOverride;
+        if (source == rightStickButton && rightStickButton.getValue()) visionOverride = !visionOverride;
+        if (source == leftStickButton && leftStickButton.getValue()) pixyOverride = !pixyOverride;
         // reset gyro when facing away from alliance station
         if (source == select && select.getValue()) {
+            loc.setCurrentPose(Pose2d.kZero);
             if (Core.isBlueAlliance()) {
                 setGyro(0);
             } else {
@@ -196,12 +201,12 @@ public class SwerveDrive extends SwerveDriveTemplate {
                 break;
 
             case TELEOP:
-                if (!rotHelperOverride) {
+                if (!visionOverride) {
                     switch (armLift.gameState) {
                         case GROUND_INTAKE:
                             xOutput = xInput;
                             yOutput = yInput;
-                            if (algaeInView() && armLift.isAtSetpoint() && rInput == 0) {
+                            if (!pixyOverride && algaeInView() && armLift.isAtSetpoint() && rInput == 0) {
                                 rOutput = (1.2 - pixyAnalog.getVoltage()) * 0.30;  // TODO: tune these values
                             } else {
                                 rOutput = rInput;
@@ -235,9 +240,22 @@ public class SwerveDrive extends SwerveDriveTemplate {
                             break;
                     }
                 } else {
-                    xOutput = xInput;
-                    yOutput = yInput;
-                    rOutput = rInput;
+                    switch (armLift.gameState) {
+                        case GROUND_INTAKE:
+                            xOutput = xInput;
+                            yOutput = yInput;
+                            if (!pixyOverride && algaeInView() && armLift.isAtSetpoint() && rInput == 0) {
+                                rOutput = (1.2 - pixyAnalog.getVoltage()) * 0.30;  // TODO: tune these values
+                            } else {
+                                rOutput = rInput;
+                            }
+                            break;
+                        default:
+                            xOutput = xInput;
+                            yOutput = yInput;
+                            rOutput = rInput;
+                            break;
+                    }
                 }
                 break;
         }
@@ -265,7 +283,8 @@ public class SwerveDrive extends SwerveDriveTemplate {
         SmartDashboard.putBoolean("Blue Alliance", Core.isBlueAlliance());
         SmartDashboard.putNumber("Pixy Voltage", pixyAnalog.getVoltage());
         SmartDashboard.putBoolean("Pixy Obj Det", pixyDigital.isPressed());
-        SmartDashboard.putBoolean("Rot Control Override", rotHelperOverride);
+        SmartDashboard.putBoolean("Pose Estimator Override", visionOverride);
+        SmartDashboard.putBoolean("Pixy Override", pixyOverride);
         moduleStates = new SwerveModuleState[] {modules[0].getModuleState(),modules[1].getModuleState(),modules[2].getModuleState(),modules[3].getModuleState()};
         moduleStatePublisher.set(moduleStates);
         chassisSpeedPublisher.set(swerveKinematics.toChassisSpeeds(moduleStates));
@@ -331,6 +350,7 @@ public class SwerveDrive extends SwerveDriveTemplate {
      * @param radians the current value the gyro should read
      */
     public void setGyro(double radians) {
+        Log.warn("New gyro value: " + radians);
         StatusCode code = gyro.setYaw(radians * RAD_TO_DEG);
         Log.warn("Gyro Status Code: " + code.getName());
     }

@@ -7,6 +7,7 @@ import org.wildstang.framework.io.inputs.AnalogInput;
 import org.wildstang.framework.io.inputs.DigitalInput;
 
 import org.wildstang.hardware.roborio.outputs.WsSpark;
+
 import org.wildstang.framework.core.Core;
 
 import org.wildstang.framework.subsystems.Subsystem;
@@ -14,9 +15,11 @@ import org.wildstang.year2025.robot.WsInputs;
 import org.wildstang.year2025.robot.WsOutputs;
 import org.wildstang.year2025.robot.WsSubsystems;
 import org.wildstang.year2025.subsystems.Claw.Claw;
+import org.wildstang.year2025.subsystems.Claw.Claw.clawStates;
 import org.wildstang.year2025.subsystems.LED.LedSubsystem;
 import org.wildstang.year2025.subsystems.LED.LedSubsystem.LEDstates;
 import org.wildstang.year2025.subsystems.localization.Localization;
+import org.wildstang.year2025.subsystems.swerve.SwerveDrive;
 
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkMax;
@@ -48,7 +51,7 @@ public class ArmLift implements Subsystem {
     private WsSpark liftMotor1;
     private WsSpark liftMotor2;
     private double currentLiftHeight, currentLiftVel;
-    public enum GameStates {GROUND_INTAKE, L2_ALGAE_REEF, L3_ALGAE_REEF, STORAGE, SCORE_PRELOAD, SHOOT_NET, START, CORAL_INTAKE, CORAL_L2, CORAL_L3, LOLIPOP, PROCESSOR, DEFENSE}; // Our Arm/Lift States
+    public enum GameStates {START, GROUND_INTAKE, L2_ALGAE_REEF, L3_ALGAE_REEF, STORAGE, SHOOT_NET, LOLIPOP, PROCESSOR, CLIMB}; // Our Arm/Lift States
     public GameStates gameState = GameStates.START;
     public GameStates newState = GameStates.START;
     
@@ -64,6 +67,7 @@ public class ArmLift implements Subsystem {
     private double validLiftHeight;
     private Claw claw;
     private Localization loc;
+    private SwerveDrive swerve;
     private boolean isFront;
     private double manualArmAdjust;
     private double armOut, liftOut;
@@ -133,29 +137,46 @@ public class ArmLift implements Subsystem {
         led = (LedSubsystem) Core.getSubsystemManager().getSubsystem(WsSubsystems.LED);
         claw = (Claw) Core.getSubsystemManager().getSubsystem(WsSubsystems.CLAW);
         loc = (Localization) Core.getSubsystemManager().getSubsystem(WsSubsystems.LOCALIZATION);
+        swerve = (SwerveDrive) Core.getSubsystemManager().getSubsystem(WsSubsystems.SWERVE_DRIVE);
     }
 
     public void inputUpdate(Input source){
         if (faceDown.getValue()) {
            setGameState(GameStates.STORAGE);
         } else if (faceLeft.getValue()) {
-           getArmReefHeight();
+            if (swerve.visionOverride){
+                setGameState(GameStates.L2_ALGAE_REEF, true);
+            } else {
+                getArmReefHeight();
+            }
+        } else if (faceRight.getValue()) {
+            if (swerve.visionOverride){
+                setGameState(GameStates.L3_ALGAE_REEF, true);
+            } else {
+                getArmReefHeight();
+            }
         } else if (faceUp.getValue()) {
-          isFront = loc.getNearestBargeDirection();
-          setGameState(GameStates.SHOOT_NET, isFront);
-        } else if(faceRight.getValue()){
-          setGameState(GameStates.LOLIPOP);
+            if (swerve.visionOverride){
+                isFront = false;
+            } else {
+                isFront = loc.getNearestBargeDirection();
+            }
+            setGameState(GameStates.SHOOT_NET, isFront);
+        } else if(dpadLeft.getValue()){
+            setGameState(GameStates.LOLIPOP);
         } else if (leftTrigger.getValue() != 0) {
-           setGameState(GameStates.GROUND_INTAKE);
+            setGameState(GameStates.GROUND_INTAKE);
         } else if (dpadDown.getValue()) {
             manualArmAdjust -= 0.05;
         } else if(dpadUp.getValue()){
             manualArmAdjust += 0.05;
         } else if (dpadRight.getValue()) {
-           isFront = loc.getNearestProcessorDirection();
-           setGameState(GameStates.PROCESSOR, isFront);
-        } else if(leftJoyStickButton.getValue()){
-           setGameState(GameStates.DEFENSE);
+            if (swerve.visionOverride){
+                isFront = false;
+            } else {
+                isFront = loc.getNearestProcessorDirection();
+            }
+            setGameState(GameStates.PROCESSOR, isFront);
         }
     }
 
@@ -166,7 +187,7 @@ public class ArmLift implements Subsystem {
         currentLiftHeight = getLiftHeight();
         currentLiftVel = getLiftVel();
 
-        if(gameState.equals(GameStates.L2_ALGAE_REEF) || gameState.equals(GameStates.L3_ALGAE_REEF)){
+        if(!swerve.visionOverride && (gameState.equals(GameStates.L2_ALGAE_REEF) || gameState.equals(GameStates.L3_ALGAE_REEF))){
             getArmReefHeight();
         }
 
@@ -247,7 +268,7 @@ public class ArmLift implements Subsystem {
     private double getLiftHeight(){
         // double slope = (ArmLiftConstants.MAX_LIFT_HEIGHT-ArmLiftConstants.MIN_LIFT_HEIGHT) / (ArmLiftConstants.MAX_POTENTIOMETER_VOLTAGE - ArmLiftConstants.MIN_POTENTIOMETER_VOLTAGE);
         // return (liftMotor1.getController().getAnalog().getVoltage() - ArmLiftConstants.MIN_POTENTIOMETER_VOLTAGE) * slope + ArmLiftConstants.MIN_LIFT_HEIGHT;
-        return liftMotor1.getPosition() / ArmLiftConstants.LIFT_GEAR_RATIO * 2.0 * Math.PI * ArmLiftConstants.LIFT_PULLEY_RADIUS + ArmLiftConstants.START_LIFT_HEIGHT;
+        return liftMotor1.getPosition() / ArmLiftConstants.LIFT_GEAR_RATIO * 2.0 * Math.PI * ArmLiftConstants.LIFT_PULLEY_RADIUS + ArmLiftConstants.LIFT_START_HEIGHT;
     }
 
     private double getLiftVel() {
@@ -303,16 +324,25 @@ public class ArmLift implements Subsystem {
     public double[] getValidSeptpoints(double goalLiftPos, double curLiftPos, double goalArmAngle, double curArmAngle){
         double validArmAngle = Math.min(Math.max(goalArmAngle, ArmLiftConstants.MIN_ARM_ANGLE), ArmLiftConstants.MAX_ARM_ANGLE);
         double validLiftHeight = Math.min(Math.max(goalLiftPos, ArmLiftConstants.MIN_LIFT_HEIGHT), ArmLiftConstants.MAX_LIFT_HEIGHT);
+        
+        if (gameState == GameStates.CLIMB) {
+            if (curArmAngle > ArmLiftConstants.ARM_POWER_CHAIN_LOW_ANGLE) {
+                validLiftHeight = ArmLiftConstants.POWER_CHAIN_LIFT_HEIGHT;
+                if (curLiftPos < ArmLiftConstants.POWER_CHAIN_LIFT_HEIGHT_MIN || curLiftPos > ArmLiftConstants.POWER_CHAIN_LIFT_HEIGHT_MAX){
+                    validArmAngle = curArmAngle;
+                }
+            }
+            return new double[]{validArmAngle, validLiftHeight};
+        }
+
         if (curArmAngle < ArmLiftConstants.ARM_POWER_CHAIN_LOW_ANGLE || curArmAngle > ArmLiftConstants.ARM_POWER_CHAIN_HIGH_ANGLE) {
             if (curLiftPos < ArmLiftConstants.POWER_CHAIN_LIFT_HEIGHT_MIN || curLiftPos > ArmLiftConstants.POWER_CHAIN_LIFT_HEIGHT_MAX){
                 validArmAngle = curArmAngle;
-                validLiftHeight = ArmLiftConstants.POWER_CHAIN_LIFT_HEIGHT;
-                return new double[]{validArmAngle, validLiftHeight};
-            } else {
-                validLiftHeight = ArmLiftConstants.POWER_CHAIN_LIFT_HEIGHT;
-                return new double[]{validArmAngle, validLiftHeight};
             }
+            validLiftHeight = ArmLiftConstants.POWER_CHAIN_LIFT_HEIGHT;
+            return new double[]{validArmAngle, validLiftHeight};
         }
+
         //If Lift is at a low position, make sure arm angle is within a threshold so claw doesn't hit bumpers on both sides
         if (curLiftPos < ArmLiftConstants.LOW_LIFT_HEIGHT){
             validArmAngle = Math.max(Math.min(validArmAngle, ArmLiftConstants.MAX_LOW_ARM_ANGLE), ArmLiftConstants.MIN_LOW_ARM_ANGLE);
@@ -345,6 +375,7 @@ public class ArmLift implements Subsystem {
     // Get the force of the 12 volt motor curve
     private double getMaxLiftForce(double goalVel){
         //mx + b where b is stall force and slope is change in force over angular velocity
+        goalVel = Math.min(goalVel, ArmLiftConstants.MAX_LIFT_VELOCITY);
         return ArmLiftConstants.LIFT_STALL_FORCE * (1 - goalVel/ArmLiftConstants.LIFT_FREE_SPEED);
     }
 
@@ -355,6 +386,7 @@ public class ArmLift implements Subsystem {
 
     private double getMaxArmTorque(double goalVel){
          //mx + b where b is stall torque and slope is change in torque over angular velocity
+        goalVel = Math.min(goalVel, ArmLiftConstants.MAX_ARM_VELOCITY);
         return ArmLiftConstants.ARM_STALL * (1 - goalVel/ArmLiftConstants.ARM_FREE_SPEED);
     }
 
@@ -373,66 +405,47 @@ public class ArmLift implements Subsystem {
         if(newState.equals(gameState) && isFront == this.isFront){
             return;
         }
+        this.gameState = newState;
         this.isFront = isFront;
         switch (newState) {
             case GROUND_INTAKE:
                 this.isFront = true;
-                gameState = GameStates.GROUND_INTAKE;
+                claw.setGameState(clawStates.INTAKE);
                 armSetpoint = ArmLiftConstants.GROUND_INTAKE_RIGHT_ANGLE;
                 liftSetpoint = ArmLiftConstants.GROUND_INTAKE_LIFT_HEIGHT;
                 led.ledState = LEDstates.GROUND_INTAKE;
                 break;
             case STORAGE:
-                gameState = GameStates.STORAGE;
                 armSetpoint = ArmLiftConstants.STORAGE_ANGLE;
                 liftSetpoint = ArmLiftConstants.STORAGE_LIFT_HEIGHT;
                 break;
             case L2_ALGAE_REEF:
-                gameState = GameStates.L2_ALGAE_REEF;
+                claw.setGameState(clawStates.INTAKE);
                 armSetpoint = this.isFront ? ArmLiftConstants.L2_INTAKE_ANGLE : 2.0 * Math.PI - ArmLiftConstants.L2_INTAKE_ANGLE;
                 liftSetpoint = ArmLiftConstants.L2_INTAKE_LIFT_HEIGHT;
                 break;
             case L3_ALGAE_REEF:
-                gameState = GameStates.L3_ALGAE_REEF;
+                claw.setGameState(clawStates.INTAKE);
                 armSetpoint = this.isFront ? ArmLiftConstants.L3_INTAKE_ANGLE : 2.0 * Math.PI - ArmLiftConstants.L3_INTAKE_ANGLE;
                 liftSetpoint = ArmLiftConstants.L3_INTAKE_LIFT_HEIGHT;
                 break;
             case SHOOT_NET:
-                gameState = GameStates.SHOOT_NET;
                 armSetpoint = this.isFront ? ArmLiftConstants.SHOOT_NET_ANGLE : 2.0 * Math.PI - ArmLiftConstants.SHOOT_NET_ANGLE;
                 liftSetpoint = ArmLiftConstants.SHOOT_NET_LIFT_HEIGHT;
                 break;
-            case CORAL_INTAKE:
-                gameState = GameStates.CORAL_INTAKE;
-                armSetpoint = ArmLiftConstants.CORAL_STATION_ANGLE;
-                liftSetpoint = ArmLiftConstants.CORAL_STATION_HEIGHT;
-                break;
-            case CORAL_L2:
-                gameState = GameStates.CORAL_L2;
-                armSetpoint = ArmLiftConstants.L2_SCORE_ANGLE;
-                liftSetpoint = ArmLiftConstants.L2_SCORE_LIFT_HEIGHT;
-                break;
-            case CORAL_L3:
-                gameState = GameStates.CORAL_L3;
-                armSetpoint = ArmLiftConstants.L3_SCORE_ANGLE;
-                liftSetpoint = ArmLiftConstants.L3_SCORE_LIFT_HEIGHT;
-                break;
             case PROCESSOR:
-                gameState = GameStates.PROCESSOR;
                 armSetpoint = this.isFront ? ArmLiftConstants.PROCESSOR_ANGLE : 2.0 * Math.PI - ArmLiftConstants.PROCESSOR_ANGLE;;
                 liftSetpoint = ArmLiftConstants.PROCESSOR_HEIGHT;
                 break;
-            case DEFENSE:
-                gameState = GameStates.DEFENSE;
-                armSetpoint = ArmLiftConstants.DEFENSE_ANGLE;
-                liftSetpoint = ArmLiftConstants.DEFENSE_LIFT_HEIGHT;
-                break;
             case LOLIPOP:
-                gameState = GameStates.LOLIPOP;
+                claw.setGameState(clawStates.INTAKE);
                 armSetpoint = ArmLiftConstants.LOLIPOP_ANGLE;
                 liftSetpoint = ArmLiftConstants.LOLIPOP_HEIGHT; 
-                break; 
-            default:
+                break;
+            case CLIMB:
+                claw.setGameState(clawStates.IDLE);
+                armSetpoint = ArmLiftConstants.CLIMB_ANGLE;
+                liftSetpoint = ArmLiftConstants.CLIMB_HEIGHT;
                 break;
         }
         calculateValidProfile();

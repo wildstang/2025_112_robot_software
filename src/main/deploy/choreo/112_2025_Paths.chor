@@ -14,20 +14,20 @@
    "MaxVel":{
     "dimension":"LinVel",
     "var":{
-     "exp":"1.4 m / s",
-     "val":1.4
+     "exp":"1.6 m / s",
+     "val":1.6
     }
    }
   },
   "poses":{
    "AlgaeEF":{
     "x":{
-     "exp":"5.25 m",
-     "val":5.25
+     "exp":"5.29 m",
+     "val":5.29
     },
     "y":{
-     "exp":"2.78 m",
-     "val":2.78
+     "exp":"2.8 m",
+     "val":2.8
     },
     "heading":{
      "exp":"(-1.05 + PI) rad",
@@ -36,8 +36,8 @@
    },
    "AlgaeGH":{
     "x":{
-     "exp":"5.98 m",
-     "val":5.98
+     "exp":"5.85 m",
+     "val":5.85
     },
     "y":{
      "exp":"4.026 m",
@@ -50,8 +50,8 @@
    },
    "AlgaeIJ":{
     "x":{
-     "exp":"5.2 m",
-     "val":5.2
+     "exp":"5.16 m",
+     "val":5.16
     },
     "y":{
      "exp":"5.3 m",
@@ -78,8 +78,8 @@
    },
    "BargeScore":{
     "x":{
-     "exp":"7.6 m",
-     "val":7.6
+     "exp":"7.52 m",
+     "val":7.52
     },
     "y":{
      "exp":"5.62 m",
@@ -111,7 +111,7 @@
     },
     "y":{
      "exp":"AlgaeEF.y",
-     "val":2.78
+     "val":2.8
     },
     "heading":{
      "exp":"PI rad",

@@ -27,12 +27,13 @@ public class CenterAlgae extends AutoProgram {
         group1.addStep(new SetClawStateStep(clawStates.INTAKE));
         addStep(group1);
 
+        addStep(new AutoStepDelay(250));
+
         AutoParallelStepGroup group2 = new AutoParallelStepGroup();
         group2.addStep(new SwervePathFollowerStep("GHToBarge", swerve));
         group2.addStep(new SetArmLiftStateStep(GameStates.SHOOT_NET, false));
         addStep(group2);
 
-        // addStep(new AutoStepDelay(200));
         addStep(new SetClawStateStep(clawStates.OUTTAKE));
 
         AutoParallelStepGroup group3 = new AutoParallelStepGroup();
@@ -46,17 +47,21 @@ public class CenterAlgae extends AutoProgram {
         group4.addStep(new SetArmLiftStateStep(GameStates.SHOOT_NET, false));
         addStep(group4);
 
-        // addStep(new AutoStepDelay(200));
         addStep(new SetClawStateStep(clawStates.OUTTAKE));
 
         AutoParallelStepGroup group5 = new AutoParallelStepGroup();
-        AutoSerialStepGroup group5A = new AutoSerialStepGroup();
-        group5A.addStep(new AutoStepDelay(2000));
-        group5A.addStep(new SetArmLiftStateStep(GameStates.L2_ALGAE_REEF, true));
-        group5.addStep(group5A);
+        group5.addStep(new SetArmLiftStateStep(GameStates.L2_ALGAE_REEF, true));
         group5.addStep(new SwervePathFollowerStep("BargeToKL", swerve));
         group5.addStep(new SetClawStateStep(clawStates.INTAKE));
         addStep(group5);
+
+        AutoParallelStepGroup group6 = new AutoParallelStepGroup();
+        group6.addStep(new SwervePathFollowerStep("KLToBarge", swerve));
+        group6.addStep(new SetArmLiftStateStep(GameStates.SHOOT_NET, false));
+        addStep(group6);
+
+        addStep(new AutoStepDelay(500));
+        addStep(new SetClawStateStep(clawStates.OUTTAKE));
 
     }
 

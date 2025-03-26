@@ -94,6 +94,7 @@ public class Localization implements Subsystem {
         // Get current pose estimate after all updates
         currentPose = estimator.getEstimatedPosition();
         putDashboard();
+        if (currentPose.getX() > 18 || currentPose.getX() < -0.5 || currentPose.getY() > 8.5 || currentPose.getY() < -0.5) setCurrentPose(Pose2d.kZero);
     }
 
     private void processPVResults(PhotonCamera cam, PhotonPoseEstimator camEstimator, StructArrayPublisher<Pose2d> visTargetPublisher, StructPublisher<Pose2d> camPosePublisher){

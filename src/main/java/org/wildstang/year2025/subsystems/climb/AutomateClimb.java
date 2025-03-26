@@ -7,6 +7,9 @@ import org.wildstang.framework.subsystems.Subsystem;
 import org.wildstang.hardware.roborio.outputs.WsSpark;
 import org.wildstang.year2025.robot.WsInputs;
 import org.wildstang.year2025.robot.WsOutputs;
+import org.wildstang.year2025.robot.WsSubsystems;
+import org.wildstang.year2025.subsystems.arm_lift.ArmLift;
+import org.wildstang.year2025.subsystems.arm_lift.ArmLift.GameStates;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -25,6 +28,8 @@ public class AutomateClimb implements Subsystem {
     private final double extendedPosition = 9.38;
     private final double startPos = 0.46;
 
+    private ArmLift armLift;
+
     @Override
     public void inputUpdate(Input source) {
         if(source == driverStart && driverStart.getValue()){
@@ -40,8 +45,6 @@ public class AutomateClimb implements Subsystem {
         climbMotorSpeed = 1;
         climbState = ClimbState.INIT;
     }
-
-    
 
     @Override
     public void selfTest() {
@@ -63,6 +66,7 @@ public class AutomateClimb implements Subsystem {
                 if(motorPos < extendedPosition){
                     climbMotor.setSpeed(climbMotorSpeed);
                 } else {
+                    armLift.setGameState(GameStates.CLIMB);
                     climbMotor.setSpeed(0.0);
                 }
                 break;
@@ -94,6 +98,7 @@ public class AutomateClimb implements Subsystem {
 
     @Override
     public void initSubsystems() {
+        armLift = (ArmLift) Core.getSubsystemManager().getSubsystem(WsSubsystems.ARMLIFT);
     }
 
     @Override
