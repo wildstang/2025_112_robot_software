@@ -186,7 +186,9 @@ public class AutoManager {
      * Do not change that.
      */
     private void defineDefaultPrograms() {
-        addProgram(new Sleeper());
+        AutoProgram sleeper = new Sleeper();
+        programs.add(sleeper);
+        chooser.setDefaultOption(sleeper.toString(), sleeper);
     }
 
     /**

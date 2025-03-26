@@ -124,7 +124,8 @@ public class Robot extends TimedRobot {
      */
     @Override
     public void robotPeriodic() {
-        core.executeUpdate();
+        // core.executeUpdate();
+        update();
     }
 
     /**
@@ -140,7 +141,7 @@ public class Robot extends TimedRobot {
      */
     @Override
     public void autonomousPeriodic() {
-        update();
+        // update();
     }
 
     /**
@@ -149,7 +150,7 @@ public class Robot extends TimedRobot {
      */
     @Override
     public void teleopPeriodic() {
-        update();
+        // update();
     }
 
     /**
@@ -165,7 +166,7 @@ public class Robot extends TimedRobot {
             long end = System.currentTimeMillis();
             SmartDashboard.putNumber("Cycle Time", (end - start));
         } catch (Throwable e) {
-            SmartDashboard.putString("Last error", "Exception thrown during teleopPeriodic");
+            SmartDashboard.putString("Last error", "Exception thrown during robotPeriodic");
             SmartDashboard.putString("Exception thrown", e.toString());
             throw e;
         } finally {

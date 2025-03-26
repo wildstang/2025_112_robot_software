@@ -10,27 +10,34 @@
      "exp":"1 m",
      "val":1.0
     }
+   },
+   "MaxVel":{
+    "dimension":"LinVel",
+    "var":{
+     "exp":"1.6 m / s",
+     "val":1.6
+    }
    }
   },
   "poses":{
    "AlgaeEF":{
     "x":{
-     "exp":"5.25 m",
-     "val":5.25
+     "exp":"5.29 m",
+     "val":5.29
     },
     "y":{
-     "exp":"2.78 m",
-     "val":2.78
+     "exp":"2.8 m",
+     "val":2.8
     },
     "heading":{
-     "exp":"-1.05 rad",
-     "val":-1.05
+     "exp":"(-1.05 + PI) rad",
+     "val":2.0915926535897933
     }
    },
    "AlgaeGH":{
     "x":{
-     "exp":"5.9 m",
-     "val":5.9
+     "exp":"5.85 m",
+     "val":5.85
     },
     "y":{
      "exp":"4.026 m",
@@ -47,8 +54,8 @@
      "val":5.16
     },
     "y":{
-     "exp":"5.22 m",
-     "val":5.22
+     "exp":"5.3 m",
+     "val":5.3
     },
     "heading":{
      "exp":"4.19 rad",
@@ -71,8 +78,8 @@
    },
    "BargeScore":{
     "x":{
-     "exp":"7.6 m",
-     "val":7.6
+     "exp":"7.52 m",
+     "val":7.52
     },
     "y":{
      "exp":"5.62 m",
@@ -104,11 +111,11 @@
     },
     "y":{
      "exp":"AlgaeEF.y",
-     "val":2.78
+     "val":2.8
     },
     "heading":{
-     "exp":"0 rad",
-     "val":0.0
+     "exp":"PI rad",
+     "val":3.141592653589793
     }
    },
    "IJStart":{
@@ -118,7 +125,7 @@
     },
     "y":{
      "exp":"AlgaeIJ.y",
-     "val":5.22
+     "val":5.3
     },
     "heading":{
      "exp":"PI rad",

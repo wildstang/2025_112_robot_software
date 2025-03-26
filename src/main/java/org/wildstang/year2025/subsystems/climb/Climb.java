@@ -20,7 +20,7 @@ public class Climb implements Subsystem {
 
     @Override
     public void inputUpdate(Input source) {
-        climbMotorSpeed = rightTrigger.getValue();
+        climbMotorSpeed = -rightTrigger.getValue();
     }
 
     @Override
@@ -39,6 +39,7 @@ public class Climb implements Subsystem {
     public void update() {
        climbMotor.setSpeed(climbMotorSpeed);
        SmartDashboard.putNumber("climb speed", climbMotorSpeed);
+       SmartDashboard.putNumber("climb angle", climbMotor.getPosition()/195.3125*2.0/Math.PI);
     }
 
     @Override

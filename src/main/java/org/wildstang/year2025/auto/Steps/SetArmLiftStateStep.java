@@ -4,15 +4,15 @@ import org.wildstang.framework.auto.AutoStep;
 import org.wildstang.framework.core.Core;
 import org.wildstang.year2025.robot.WsSubsystems;
 import org.wildstang.year2025.subsystems.arm_lift.ArmLift;
-import org.wildstang.year2025.subsystems.arm_lift.ArmLift.gameStates;
+import org.wildstang.year2025.subsystems.arm_lift.ArmLift.GameStates;
 
 public class SetArmLiftStateStep extends AutoStep {
 
     private ArmLift armLift;
-    private gameStates newState;
+    private GameStates newState;
     private boolean isFront;
 
-    public SetArmLiftStateStep(gameStates newState, boolean isFront){
+    public SetArmLiftStateStep(GameStates newState, boolean isFront){
         this.newState = newState;
         this.isFront = isFront;
     }

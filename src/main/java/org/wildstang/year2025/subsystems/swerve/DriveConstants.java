@@ -19,7 +19,7 @@ public final class DriveConstants {
     /**offset of module 3, the rear left module, in radians */
     public static final double REAR_LEFT_OFFSET = Math.PI;
     /**offset of module 4, the rear right module, in radians */
-    public static final double REAR_RIGHT_OFFSET = 3.0 * Math.PI / 2.0;
+    public static final double REAR_RIGHT_OFFSET = -Math.PI / 2.0;
     /**deadband of the controller's joysticks */
     public static final double DEADBAND = 0.07;
     /**factor of thrust for the drive trigger */
@@ -37,7 +37,7 @@ public final class DriveConstants {
     /**PID values for drive F coefficient of inertia */
     public static final double DRIVE_F_I = 0.0;//
     /**PID values for path tracking position error */
-    public static final double POS_P = 3.0;
+    public static final double POS_P = 2.0;
     /**PID values for path tracking rotation error */
     public static final double ROT_P = 0.55;
     public static final double ROT_D = 2.0;

@@ -4,6 +4,7 @@ import com.revrobotics.spark.SparkAbsoluteEncoder;
 
 import org.wildstang.hardware.roborio.outputs.WsSpark;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -49,7 +50,7 @@ public class SwerveModule {
      * @return double for cancoder value (radians)
     */
     public double getAngle() {
-        return (((absEncoder.getPosition() + chassisOffset) % (2.0 * Math.PI)) + 2.0 * Math.PI) % (2.0 * Math.PI);
+        return MathUtil.angleModulus(absEncoder.getPosition() + chassisOffset);
     }
 
     /** displays module information, needs the module name from super 
@@ -59,7 +60,7 @@ public class SwerveModule {
         SmartDashboard.putNumber(name + " true angle", getAngle());
         SmartDashboard.putNumber(name + " true target", target);
         SmartDashboard.putNumber(name + " raw angle", absEncoder.getPosition());
-        SmartDashboard.putNumber(name + " raw target", (2.0 * Math.PI + (target - chassisOffset)) % (2.0 * Math.PI));
+        SmartDashboard.putNumber(name + " raw target", MathUtil.angleModulus(target - chassisOffset));
         SmartDashboard.putNumber(name + " NEO drive power", drivePower);
         SmartDashboard.putNumber(name + " NEO drive position", driveMotor.getPosition());
         SmartDashboard.putBoolean(name + " Drive Direction", getDirection(target));
@@ -110,7 +111,7 @@ public class SwerveModule {
     //         runAtAngle(angle);
     //     }
     //     else {
-    //         runAtAngle((angle + Math.PI) % (2.0 * Math.PI));
+    //         runAtAngle(MathUtil.angleModulus(angle + Math.PI));
     //     }
     // }
 
@@ -118,7 +119,7 @@ public class SwerveModule {
      * @param angle angle to run the module at
     */
     private void runAtAngle(double angle) {
-        angleMotor.setPosition((2.0 * Math.PI + (angle - chassisOffset)) % (2.0 * Math.PI));
+        angleMotor.setPosition(MathUtil.angleModulus(angle - chassisOffset));
     }
 
     /**runs module drive at specified power [-1, 1] 
@@ -147,8 +148,8 @@ public class SwerveModule {
      * @return boolean whether you should move towards that angle or the opposite
     */
     public boolean getDirection(double angle) {
-        double angleErr = ((angle - getAngle()) % (2.0 * Math.PI) + 2.0 * Math.PI) % (2.0 * Math.PI);
-        return angleErr < (Math.PI / 2.0) || angleErr > (3.0 * Math.PI / 2.0);
+        double angleErr = Math.abs(MathUtil.angleModulus(angle - getAngle()));
+        return Math.abs(angleErr) <= (Math.PI / 2.0);
     }
 
     public WsSpark getDriveMotor() {

@@ -297,14 +297,14 @@ public class WsSpark extends WsMotorController {
      */
     public void initClosedLoop(double P, double I, double D, double FF, boolean isEncoderFlipped){
         config.closedLoop.pidf(P, I, D, FF, ClosedLoopSlot.kSlot0);
-        absEncoderConfig.positionConversionFactor(360.0);
-        absEncoderConfig.velocityConversionFactor(360.0/60.0);
+        absEncoderConfig.positionConversionFactor(2.0 * Math.PI);
+        absEncoderConfig.velocityConversionFactor(2.0 * Math.PI / 60.0);
         absEncoderConfig.inverted(isEncoderFlipped);
         config.apply(absEncoderConfig);
         config.closedLoop.feedbackSensor(FeedbackSensor.kAbsoluteEncoder);
         config.closedLoop.positionWrappingEnabled(true);
-        config.closedLoop.positionWrappingMaxInput(360.0);
-        config.closedLoop.positionWrappingMinInput(0.0);
+        config.closedLoop.positionWrappingMaxInput(Math.PI);
+        config.closedLoop.positionWrappingMinInput(-Math.PI);
         isUsingController = true;
     }
     /**
@@ -318,14 +318,14 @@ public class WsSpark extends WsMotorController {
      */
     public void initClosedLoop(double P, double I, double D, double FF, boolean isEncoderFlipped, boolean isWrapped){
         config.closedLoop.pidf(P, I, D, FF, ClosedLoopSlot.kSlot0);
-        absEncoderConfig.positionConversionFactor(360.0);
-        absEncoderConfig.velocityConversionFactor(360.0/60.0);
+        absEncoderConfig.positionConversionFactor(2.0 * Math.PI);
+        absEncoderConfig.velocityConversionFactor(2.0 * Math.PI / 60.0);
         absEncoderConfig.inverted(isEncoderFlipped);
         config.apply(absEncoderConfig);
         config.closedLoop.feedbackSensor(FeedbackSensor.kAbsoluteEncoder);
         config.closedLoop.positionWrappingEnabled(isWrapped);
-        config.closedLoop.positionWrappingMaxInput(360.0);
-        config.closedLoop.positionWrappingMinInput(0.0);
+        config.closedLoop.positionWrappingMaxInput(Math.PI);
+        config.closedLoop.positionWrappingMinInput(-Math.PI);
         isUsingController = true;
         isUsingController = true;
     }

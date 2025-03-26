@@ -5,8 +5,9 @@ import org.wildstang.year2025.subsystems.Claw.Claw;
 // import org.wildstang.year2025.subsystems.LED.LedController;
 import org.wildstang.year2025.subsystems.LED.LedSubsystem;
 import org.wildstang.year2025.subsystems.arm_lift.ArmLift;
+import org.wildstang.year2025.subsystems.climb.AutomateClimb;
 import org.wildstang.year2025.subsystems.climb.Climb;
-import org.wildstang.year2025.subsystems.localization.WsVision;
+import org.wildstang.year2025.subsystems.localization.Localization;
 import org.wildstang.year2025.subsystems.swerve.SwerveDrive;
 
 /**
@@ -16,13 +17,15 @@ import org.wildstang.year2025.subsystems.swerve.SwerveDrive;
 public enum WsSubsystems implements Subsystems {
 
     // enumerate subsystems
+    // IMPORTANT: DO NOT REORDER WITHOUT VERIFYING WITH ZACH
+    // To ensure proper behavior, Localization needs to update first, followed by ArmLift, and LED needs to update last
+    LOCALIZATION("Localization", Localization.class),
     ARMLIFT("Arm Lift", ArmLift.class),
-    WS_VISION("Ws Vision", WsVision.class),
     SWERVE_DRIVE("Swerve Drive", SwerveDrive.class),
-    // LED("Led Controller", LedController.class),
     CLAW("Claw", Claw.class),
+    // CLIMB("Climb", Climb.class),
+    AUTOMATECLIMB("Automate Climb", AutomateClimb.class),
     LED("LED", LedSubsystem.class),
-    CLIMB("Climb", Climb.class),
     ;
 
     ;
