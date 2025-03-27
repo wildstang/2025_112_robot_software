@@ -27,6 +27,7 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructPublisher;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.networktables.StructArrayPublisher;
 
 public class Localization implements Subsystem {
@@ -89,8 +90,8 @@ public class Localization implements Subsystem {
         odoAngPublisher.set(drive.getOdoAngle());
 
         // Update pose estimator with vision estimates
-        frontHasEst = processPVResults(frontCam, frontEstimator, frontVisTargetPublisher, frontCamPublisher);
-        rearHasEst = processPVResults(rearCam, rearEstimator, rearVisTargetPublisher, rearCamPublisher);
+        frontHasEst |= processPVResults(frontCam, frontEstimator, frontVisTargetPublisher, frontCamPublisher);
+        rearHasEst |= processPVResults(rearCam, rearEstimator, rearVisTargetPublisher, rearCamPublisher);
 
         // Get current pose estimate after all updates
         currentPose = estimator.getEstimatedPosition();
@@ -124,6 +125,8 @@ public class Localization implements Subsystem {
 
     private void putDashboard () {
         posePublisher.set(currentPose);
+        SmartDashboard.putBoolean("front cam has est", frontHasEst);
+        SmartDashboard.putBoolean("rear cam has est", rearHasEst);
     }
 
     private void updateEstimationStdDevs(Optional<EstimatedRobotPose> estimatedPose, List<PhotonTrackedTarget> targets) {

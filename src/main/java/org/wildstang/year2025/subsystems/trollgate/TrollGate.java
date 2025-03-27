@@ -6,6 +6,9 @@ import org.wildstang.framework.io.inputs.Input;
 import org.wildstang.framework.subsystems.Subsystem;
 import org.wildstang.hardware.roborio.outputs.WsServo;
 import org.wildstang.year2025.robot.WsOutputs;
+
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 import org.wildstang.year2025.robot.WsInputs;
 
 
@@ -24,7 +27,7 @@ public class TrollGate implements Subsystem {
     
     @Override
     public void inputUpdate(Input source) {
-        trollGateSpeed = rightTrigger.getValue();
+        trollGateSpeed = rightTrigger.getValue() * -180.0;
     }
 
     @Override
@@ -35,18 +38,13 @@ public class TrollGate implements Subsystem {
         rightTrigger = (AnalogInput) Core.getInputManager().getInput(WsInputs.DRIVER_RIGHT_TRIGGER);
         rightTrigger.addInputListener(this);
         trollGateSpeed = 0;
-
-    }
-
-    @Override
-    public void selfTest() {
-       
     }
 
     @Override
     public void update() { // every 20 ms
         frontGate.setValue(trollGateSpeed);
         backGate.setValue(trollGateSpeed);
+        SmartDashboard.putNumber("troll gate value", trollGateSpeed);
     }
 
     public void setTrollGateState(TollgateStates newState){
@@ -62,7 +60,10 @@ public class TrollGate implements Subsystem {
 
     @Override
     public void initSubsystems() {
-        // what goes here?
+    }
+
+    @Override
+    public void selfTest() {
     }
 
     @Override

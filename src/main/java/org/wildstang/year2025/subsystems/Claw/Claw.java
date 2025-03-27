@@ -15,7 +15,6 @@ import org.wildstang.year2025.subsystems.LED.LedSubsystem.LEDstates;
 import org.wildstang.year2025.subsystems.arm_lift.ArmLift;
 import org.wildstang.year2025.subsystems.arm_lift.ArmLift.GameStates;
 import org.wildstang.year2025.subsystems.trollgate.TrollGate;
-import org.wildstang.year2025.subsystems.trollgate.TrollGate.TollgateStates;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;

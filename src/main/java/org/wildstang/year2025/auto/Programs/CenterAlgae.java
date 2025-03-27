@@ -59,8 +59,9 @@ public class CenterAlgae extends AutoProgram {
         group6.addStep(new SetArmLiftStateStep(GameStates.SHOOT_NET, false));
         addStep(group6);
 
-        addStep(new AutoStepDelay(500));
+        addStep(new AutoStepDelay(200));
         addStep(new SetClawStateStep(clawStates.OUTTAKE));
+        addStep(new SwervePathFollowerStep("MoveOffLine", swerve));
 
     }
 
