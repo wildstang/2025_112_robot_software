@@ -93,12 +93,12 @@ public class MotionProfile {
       int dir = (int) Math.signum(desPos - curPos);
 
       for(int i = 0; i < profileArray.length - 1; i++){
-         if (i < (int) (profileArray.length - 1) / 2.0) {
+         if (i < (int) (profileArray.length) / 2.0) {
             accel = maxAccel * dir;
             velocity = accel * sampleTime * i;
          } else {
             accel = -maxAccel * dir;
-            velocity = -accel * sampleTime * (profileArray.length - i);
+            velocity = -accel * sampleTime * (profileArray.length - 1 - i);
          }
 
          // Integrate velocity to get position

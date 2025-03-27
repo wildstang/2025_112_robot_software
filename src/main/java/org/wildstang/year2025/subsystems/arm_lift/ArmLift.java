@@ -231,20 +231,22 @@ public class ArmLift implements Subsystem {
         if (armSetpoint != validArmAngle) {
             armRecalculateFlag = true;
         }
-        armPIDC.resetIVal();
-        liftPIDC.resetIVal();
 
         if (armProfile.profileDone){
         //generate a motion profile for the arm and the lift
             armProfile.calculate(currentArmAngle,validArmAngle);
-        } else {
-            armRecalculateFlag = true;
-        }
+            armPIDC.resetIVal();
+        } 
+        // else {
+        //     armRecalculateFlag = true;
+        // }
         if (liftProfile.profileDone) {
             liftProfile.calculate(currentLiftHeight, validLiftHeight);
-        } else {
-            liftRecalculateFlag = true;
-        }
+            liftPIDC.resetIVal();
+        } 
+        // else {
+        //     liftRecalculateFlag = true;
+        // }
     }
 
     private void putDashboard(){
@@ -332,8 +334,6 @@ public class ArmLift implements Subsystem {
             if (curArmAngle > ArmLiftConstants.ARM_POWER_CHAIN_LOW_ANGLE) {
                 validLiftHeight = ArmLiftConstants.POWER_CHAIN_LIFT_HEIGHT;
                 if (curLiftPos < ArmLiftConstants.POWER_CHAIN_LIFT_HEIGHT_MIN || curLiftPos > ArmLiftConstants.POWER_CHAIN_LIFT_HEIGHT_MAX){
-                    validArmAngle = curArmAngle;
-                } else {
                     validArmAngle = ArmLiftConstants.MIN_LOW_ARM_ANGLE;
                 }
             }

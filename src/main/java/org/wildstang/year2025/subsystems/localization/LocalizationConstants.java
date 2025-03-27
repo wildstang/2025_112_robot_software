@@ -35,7 +35,7 @@ public class LocalizationConstants {
     public static final Pose2d BLUE_PROCESSOR = new Pose2d(6.00, 0.81, Rotation2d.fromDegrees(-90.0));
     public static final Pose2d RED_PROCESSOR = new Pose2d(11.50, 7.27, Rotation2d.fromDegrees(90.0));
     
-    public static final double BLUE_NET_X = 7.60;
+    public static final double BLUE_NET_X = 7.50;
     public static final double RED_NET_X = 10.00;
 
     public static final Pose2d BLUE_REEF_AB = new Pose2d(2.82,3.98, Rotation2d.kZero);

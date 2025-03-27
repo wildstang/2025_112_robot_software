@@ -19,10 +19,10 @@ public enum WsSubsystems implements Subsystems {
     // IMPORTANT: DO NOT REORDER WITHOUT VERIFYING WITH ZACH
     // To ensure proper behavior, Localization needs to update first, followed by ArmLift, and LED needs to update last
     LOCALIZATION("Localization", Localization.class),
+    AUTOMATECLIMB("Automate Climb", AutomateClimb.class),
     ARMLIFT("Arm Lift", ArmLift.class),
     SWERVE_DRIVE("Swerve Drive", SwerveDrive.class),
     CLAW("Claw", Claw.class),
-    AUTOMATECLIMB("Automate Climb", AutomateClimb.class),
     TROLLGATE("TrollGate", TrollGate.class),
     LED("LED", LedSubsystem.class),
 
