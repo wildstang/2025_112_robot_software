@@ -45,8 +45,8 @@ public enum WsOutputs implements Outputs {
     // ---------------------------------
     // Other
     // ---------------------------------
-
-    TROLLGATE_FRONT("Front Troll Gate", new WsServoConfig(1, 0)),
+    TROLLGATEFRONT("Front Toll Gate", new WsServoConfig(1,0)),
+    TROLLGATEBACK("Back Troll Gate", new WsServoConfig(2,0)),
 
     ; // end of enum
 

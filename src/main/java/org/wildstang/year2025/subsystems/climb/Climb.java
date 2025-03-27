@@ -20,15 +20,15 @@ public class Climb implements Subsystem {
 
     @Override
     public void inputUpdate(Input source) {
-        climbMotorSpeed = -rightTrigger.getValue();
+        //climbMotorSpeed = -rightTrigger.getValue();
     }
 
     @Override
     public void init() {
-        rightTrigger = (AnalogInput) Core.getInputManager().getInput(WsInputs.DRIVER_RIGHT_TRIGGER);
-        rightTrigger.addInputListener(this);
-        climbMotor = (WsSpark) Core.getOutputManager().getOutput(WsOutputs.CLIMBMOTOR); 
-        climbMotorSpeed = 0.0;
+        // rightTrigger = (AnalogInput) Core.getInputManager().getInput(WsInputs.DRIVER_RIGHT_TRIGGER);
+        // rightTrigger.addInputListener(this);
+        // climbMotor = (WsSpark) Core.getOutputManager().getOutput(WsOutputs.CLIMBMOTOR); 
+        // climbMotorSpeed = 0.0;
     }
 
     @Override
