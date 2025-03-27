@@ -26,7 +26,7 @@ public class CenterAlgae extends AutoProgram {
         group1.addStep(new SetClawStateStep(clawStates.INTAKE));
         addStep(group1);
 
-        addStep(new AutoStepDelay(250));
+        // addStep(new AutoStepDelay(250));
 
         AutoParallelStepGroup group2 = new AutoParallelStepGroup();
         group2.addStep(new SwervePathFollowerStep("GHToBarge", swerve));

@@ -16,7 +16,7 @@ public final class ArmLiftConstants {
     public static final double ARM_VEL_P_GAIN = 0.2;
     public static final double ARM_TOL = 0.09;
 
-    public static final double LIFT_POS_P_GAIN = 14.0;
+    public static final double LIFT_POS_P_GAIN = 16.0;
     public static final double LIFT_POS_I_GAIN = 8.0;
     public static final double LIFT_VEL_P_GAIN = 0.4;
     public static final double LIFT_TOL = 0.02;
