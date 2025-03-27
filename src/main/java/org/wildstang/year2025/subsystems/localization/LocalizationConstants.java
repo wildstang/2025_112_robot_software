@@ -46,7 +46,7 @@ public class LocalizationConstants {
     public static final Pose2d BLUE_REEF_KL = new Pose2d(3.63,5.44, Rotation2d.fromDegrees(-60.0));
 
     public static final Pose2d RED_REEF_AB = new Pose2d(14.70, 4.06, Rotation2d.kPi);
-    public static final Pose2d RED_REEF_CD = new Pose2d(13.46, 5.48, Rotation2d.fromDegrees(-120.0));
+    public static final Pose2d RED_REEF_CD = new Pose2d(13.84, 5.51, Rotation2d.fromDegrees(-120.0));
     public static final Pose2d RED_REEF_EF = new Pose2d(12.22, 5.47, Rotation2d.fromDegrees(-60.0));
     public static final Pose2d RED_REEF_GH = new Pose2d(11.42, 3.99, Rotation2d.kZero);
     public static final Pose2d RED_REEF_IJ = new Pose2d(12.26, 2.62, Rotation2d.fromDegrees(60.0));
