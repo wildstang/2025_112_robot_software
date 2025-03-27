@@ -195,17 +195,21 @@ public class ArmLift implements Subsystem {
 
         if (armRecalculateFlag && armProfile.profileDone) {
             double[] validSetpoints = getValidSeptpoints(liftSetpoint, currentLiftHeight, armSetpoint, currentArmAngle);
-            validArmAngle = validSetpoints[0];
-            armRecalculateFlag = validArmAngle != armSetpoint;
-            armPIDC.resetIVal();
-            armProfile.calculate(currentArmAngle, validArmAngle);
+            if (validArmAngle != validSetpoints[0]) {
+                validArmAngle = validSetpoints[0];
+                armRecalculateFlag = validArmAngle != armSetpoint;
+                armPIDC.resetIVal();
+                armProfile.calculate(currentArmAngle, validArmAngle);
+            }
         }
         if(liftRecalculateFlag && liftProfile.profileDone) {
             double[] validSetpoints = getValidSeptpoints(liftSetpoint, currentLiftHeight, armSetpoint, currentArmAngle);
-            validLiftHeight = validSetpoints[1];
-            liftRecalculateFlag = validLiftHeight != liftSetpoint;
-            liftPIDC.resetIVal();
-            liftProfile.calculate(currentLiftHeight, validLiftHeight);
+            if (validLiftHeight != validSetpoints[1]) {
+                validLiftHeight = validSetpoints[1];
+                liftRecalculateFlag = validLiftHeight != liftSetpoint;
+                liftPIDC.resetIVal();
+                liftProfile.calculate(currentLiftHeight, validLiftHeight);
+            }
         }
 
         armOut = armControlOutput(currentArmAngle, currentArmVel);
@@ -267,6 +271,8 @@ public class ArmLift implements Subsystem {
         SmartDashboard.putBoolean("Arm Profile Done", armProfile.profileDone);
         SmartDashboard.putBoolean("Lift Profile Done", liftProfile.profileDone);
         SmartDashboard.putNumber("Arm alt enc", armEnc.getPosition());
+        SmartDashboard.putBoolean("Arm Recalculate Flag", armRecalculateFlag);
+        SmartDashboard.putBoolean("Lift Recalculate Flag", liftRecalculateFlag);
     }
 
     //calculating lift height from a function of voltage
