@@ -197,20 +197,20 @@ public class ArmLift implements Subsystem {
             double[] validSetpoints = getValidSeptpoints(liftSetpoint, currentLiftHeight, armSetpoint, currentArmAngle);
             if (validArmAngle != validSetpoints[0]) {
                 validArmAngle = validSetpoints[0];
-                armRecalculateFlag = validArmAngle != armSetpoint;
                 armPIDC.resetIVal();
                 armProfile.calculate(currentArmAngle, validArmAngle);
             }
         }
+        armRecalculateFlag = validArmAngle != armSetpoint;
         if(liftRecalculateFlag && liftProfile.profileDone) {
             double[] validSetpoints = getValidSeptpoints(liftSetpoint, currentLiftHeight, armSetpoint, currentArmAngle);
             if (validLiftHeight != validSetpoints[1]) {
                 validLiftHeight = validSetpoints[1];
-                liftRecalculateFlag = validLiftHeight != liftSetpoint;
                 liftPIDC.resetIVal();
                 liftProfile.calculate(currentLiftHeight, validLiftHeight);
             }
         }
+        liftRecalculateFlag = validLiftHeight != liftSetpoint;
 
         armOut = armControlOutput(currentArmAngle, currentArmVel);
         liftOut = liftControlOutput(currentLiftHeight, currentLiftVel);

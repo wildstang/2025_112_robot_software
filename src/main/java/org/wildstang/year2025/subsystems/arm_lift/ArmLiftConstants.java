@@ -16,8 +16,8 @@ public final class ArmLiftConstants {
     public static final double ARM_VEL_P_GAIN = 0.2;
     public static final double ARM_TOL = 0.09;
 
-    public static final double LIFT_POS_P_GAIN = 12.0;
-    public static final double LIFT_POS_I_GAIN = 6.0;
+    public static final double LIFT_POS_P_GAIN = 14.0;
+    public static final double LIFT_POS_I_GAIN = 8.0;
     public static final double LIFT_VEL_P_GAIN = 0.4;
     public static final double LIFT_TOL = 0.02;
     /* ------------------------------------------------------- */
@@ -93,7 +93,7 @@ public final class ArmLiftConstants {
     public static final double LIFT_GEAR_RATIO = 62.0 / 14.0 * 58.0 / 40.0;
     public static final double LIFT_FREE_SPEED = 5676.0 / LIFT_GEAR_RATIO * 2.0 * Math.PI * LIFT_PULLEY_RADIUS / 60.0; // meters per second
     public static final double LIFT_STALL_FORCE = 2.6 * LIFT_GEAR_RATIO * 2 / LIFT_PULLEY_RADIUS; // Newton
-    public static final double LIFT_ARM_MASS = 3.5; // in kilograms
+    public static final double LIFT_ARM_MASS = 4.0; // in kilograms
 
     public static final double ARM_GEAR_RATO = 68.0 / 12.0 * 68.0 / 22.0 * 68.0 / 22.0 * 68.0 / 16.0;
     public static final double ARM_FREE_SPEED = 5676.0 / ARM_GEAR_RATO * 2.0 * Math.PI / 60.0; // Radians per second
