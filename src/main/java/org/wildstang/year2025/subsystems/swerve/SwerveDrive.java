@@ -223,14 +223,22 @@ public class SwerveDrive extends SwerveDriveTemplate {
                         case PROCESSOR:
                             targetPose = loc.getNearestProcessorPose();
                             targetPose = new Pose2d(targetPose.getX() + xInput, targetPose.getY() + yInput, targetPose.getRotation());
-                            setAutoDriveValues(kZeroSpeed, targetPose);
+                            // setAutoDriveValues(kZeroSpeed, targetPose);
+                            
+                            xOutput = xInput;
+                            yOutput = yInput;
+                            rOutput = rInput;
                             break;
 
                         case SHOOT_NET:
                             targetPose = loc.getNearestBargePose();
                             targetPose = new Pose2d(targetPose.getX() + xInput, targetPose.getY() + yInput, targetPose.getRotation());
-                            setAutoDriveValues(kZeroSpeed, targetPose);
-                            yOutput = yInput;  // override yOutput to allow driver to align to clear spot on the barge
+                            // setAutoDriveValues(kZeroSpeed, targetPose);
+                            // yOutput = yInput;  // override yOutput to allow driver to align to clear spot on the barge
+                            
+                            xOutput = xInput;
+                            yOutput = yInput;
+                            rOutput = rInput;
                             break;
                         
                         default:

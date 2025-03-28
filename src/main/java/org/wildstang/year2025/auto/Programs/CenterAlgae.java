@@ -33,6 +33,7 @@ public class CenterAlgae extends AutoProgram {
         group2.addStep(new SetArmLiftStateStep(GameStates.SHOOT_NET, false));
         addStep(group2);
 
+        addStep(new AutoStepDelay(200));
         addStep(new SetClawStateStep(clawStates.OUTTAKE));
 
         AutoParallelStepGroup group3 = new AutoParallelStepGroup();
@@ -46,6 +47,7 @@ public class CenterAlgae extends AutoProgram {
         group4.addStep(new SetArmLiftStateStep(GameStates.SHOOT_NET, false));
         addStep(group4);
 
+        addStep(new AutoStepDelay(200));
         addStep(new SetClawStateStep(clawStates.OUTTAKE));
 
         AutoParallelStepGroup group5 = new AutoParallelStepGroup();

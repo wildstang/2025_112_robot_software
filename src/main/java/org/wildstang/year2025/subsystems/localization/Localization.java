@@ -41,10 +41,12 @@ public class Localization implements Subsystem {
     StructPublisher<Pose2d> posePublisher, bestPosePublisher, frontCamPublisher, rearCamPublisher;
     StructArrayPublisher<Pose2d> frontVisTargetPublisher, rearVisTargetPublisher;
     StructArrayPublisher<SwerveModulePosition> modulePosPublisher;
+    // StructArrayPublisher<Double> frontAmbiguityPublisher, rearAmbiguityPublisher;
     StructPublisher<Rotation2d> odoAngPublisher;
     Optional<EstimatedRobotPose> visionEst;
     List<PhotonTrackedTarget> targets;
     Pose2d[] visTargets;
+    Double[] targetAmbiguity;
     public boolean frontHasEst, rearHasEst = false;
 
     private static enum TargetType {REEF, PROCESSOR, BARGE};
@@ -64,6 +66,7 @@ public class Localization implements Subsystem {
         frontEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
         frontCamPublisher = NetworkTableInstance.getDefault().getStructTopic("Front Cam Pose Estimator", Pose2d.struct).publish();
         frontVisTargetPublisher = NetworkTableInstance.getDefault().getStructArrayTopic("Front Vision Targets", Pose2d.struct).publish();
+        // frontAmbiguityPublisher = NetworkTableInstance.getDefault().getStructArrayTopic("Front Vision Targets", Double).publish();
 
         rearCam = new PhotonCamera(LocalizationConstants.kRearCam);
         rearEstimator = new PhotonPoseEstimator(LocalizationConstants.kTagLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, LocalizationConstants.kBotToRearCam);
@@ -96,7 +99,7 @@ public class Localization implements Subsystem {
         // Get current pose estimate after all updates
         currentPose = estimator.getEstimatedPosition();
         putDashboard();
-        if (currentPose.getX() > 18 || currentPose.getX() < -0.5 || currentPose.getY() > 8.5 || currentPose.getY() < -0.5) setCurrentPose(Pose2d.kZero);
+        // if (currentPose.getX() > 18 || currentPose.getX() < -0.5 || currentPose.getY() > 8.5 || currentPose.getY() < -0.5) setCurrentPose(Pose2d.kZero);
     }
 
     private boolean processPVResults(PhotonCamera cam, PhotonPoseEstimator camEstimator, StructArrayPublisher<Pose2d> visTargetPublisher, StructPublisher<Pose2d> camPosePublisher){
@@ -105,10 +108,13 @@ public class Localization implements Subsystem {
             // create List of targets to publish
             targets = change.getTargets();
             visTargets = new Pose2d[targets.size()];
+            targetAmbiguity = new Double[targets.size()];
             for (int i = 0; i < targets.size(); i++){
                 visTargets[i] = LocalizationConstants.kTagLayout.getTagPose(targets.get(i).getFiducialId()).get().toPose2d();
+                targetAmbiguity[i] = targets.get(i).getPoseAmbiguity();
             }
             visTargetPublisher.set(visTargets, (long) (1_000_000 * change.getTimestampSeconds()));
+            // ambPublisher.set(targetAmbiguity);
 
             // update pose estimator
             visionEst = camEstimator.update(change);
@@ -141,7 +147,18 @@ public class Localization implements Subsystem {
 
             // Precalculation - see how many tags we found, and calculate an average-distance metric
             for (var tgt : targets) {
-                var tagPose = LocalizationConstants.kTagLayout.getTagPose(tgt.getFiducialId());
+                int tID = tgt.getFiducialId();
+                // filter out any poses using barge tags
+                if (tID == 4 || tID == 5 || tID == 14 || tID == 15) {
+                    curStdDevs = LocalizationConstants.kMaxStdDevs;
+                    return;
+                }
+                // reject any poses with high ambiguity
+                if (tgt.getPoseAmbiguity() > 0.2) {
+                    curStdDevs = LocalizationConstants.kMaxStdDevs;
+                    return;
+                }
+                var tagPose = LocalizationConstants.kTagLayout.getTagPose(tID);
                 if (tagPose.isEmpty()) continue;
                 numTags++;
                 avgDist += tagPose.get().toPose2d().getTranslation().getDistance(estimatedPose.get().estimatedPose.toPose2d().getTranslation());
@@ -156,8 +173,8 @@ public class Localization implements Subsystem {
                 // Decrease std devs if multiple targets are visible
                 estStdDevs = estStdDevs.times(1.0 / numTags);
                 // Increase std devs based on (average) distance
-                if (numTags == 1 && avgDist > 4) estStdDevs = LocalizationConstants.kMaxStdDevs;
-                else estStdDevs = estStdDevs.times(1 + (avgDist * avgDist / 30));  // TODO: tune std devs
+                if (numTags == 1 && avgDist > 7) estStdDevs = LocalizationConstants.kMaxStdDevs;
+                else estStdDevs = estStdDevs.times(1 + (avgDist * avgDist / 25));  // TODO: tune std devs
                 // TODO: possibly add logic to reject or greatly increase std devs if the new estimate is far from the previous estimate
                 curStdDevs = estStdDevs;
             }

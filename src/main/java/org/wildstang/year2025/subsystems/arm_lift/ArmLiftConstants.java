@@ -13,17 +13,21 @@ public final class ArmLiftConstants {
     /* -------------------- PID -------------------------------*/
     public static final double ARM_POS_P_GAIN = 10.0;
     public static final double ARM_POS_I_GAIN = 0.1;
-    public static final double ARM_VEL_P_GAIN = 0.2;
+    public static final double ARM_VEL_P_GAIN = 0.15;
     public static final double ARM_TOL = 0.09;
+    // public static final double ARM_POS_P_GAIN = 4.0;
+    // public static final double ARM_POS_I_GAIN = 0.0;
+    // public static final double ARM_VEL_P_GAIN = 0.2;
+    // public static final double ARM_TOL = 0.09;
 
     public static final double LIFT_POS_P_GAIN = 16.0;
     public static final double LIFT_POS_I_GAIN = 8.0;
-    public static final double LIFT_VEL_P_GAIN = 0.4;
+    public static final double LIFT_VEL_P_GAIN = 0.3;
     public static final double LIFT_TOL = 0.02;
     /* ------------------------------------------------------- */
 
     /* -------------------- Game Positions -------------------------------*/
-    public static final double MAX_LIFT_HEIGHT = 0.63;  // meters
+    public static final double MAX_LIFT_HEIGHT = 0.60;  // meters
     public static final double MIN_LIFT_HEIGHT = 0;  // meters
     public static final double LIFT_START_HEIGHT = 0.26;
     public static final double MIN_ARM_ANGLE = 0;
@@ -76,7 +80,7 @@ public final class ArmLiftConstants {
     public static final double POWER_CHAIN_LIFT_HEIGHT_MAX = 0.60;
     public static final double ARM_POWER_CHAIN_LOW_LIMIT = 0;
     public static final double ARM_POWER_CHAIN_HIGH_ANGLE = 5.4;
-    public static final double ARM_POWER_CHAIN_LOW_ANGLE = 0.36;
+    public static final double ARM_POWER_CHAIN_LOW_ANGLE = 0.26;
 
     public static final double MIN_CLAW_POWER_CHAIN_ANGLE = 0.37; //minimum claw angle that the claw can be within without hitting energy chain
     public static final double MAX_CLAW_POWER_CHAIN_ANGLE = 5.0 * Math.PI / 6.0; //max claw angle that the claw can be within without hitting energy chain

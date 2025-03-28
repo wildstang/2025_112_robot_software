@@ -143,8 +143,13 @@ public class ArmLift implements Subsystem {
 
     public void inputUpdate(Input source){
         if (faceDown.getValue()) {
-           setGameState(GameStates.STORAGE);
-           led.ledState = LEDstates.NORMAL;  // if we manually go into storage mode, reset LEDs to normal
+            if (leftJoyStickButton.getValue()) {
+                setGameState(GameStates.CLIMB);
+                led.ledState = LEDstates.DEFENSE;
+            } else if (source == faceDown) {
+                setGameState(GameStates.STORAGE);
+                led.ledState = LEDstates.NORMAL;  // if we manually go into storage mode, reset LEDs to normal
+            }
         } else if (faceLeft.getValue()) {
             if (swerve.visionOverride){
                 setGameState(GameStates.L2_ALGAE_REEF, true);
@@ -223,34 +228,36 @@ public class ArmLift implements Subsystem {
     }
 
     private void calculateValidProfile(){
-        //getting setpoints within proper bounds
-        double[] validSetpoints = getValidSeptpoints(liftSetpoint, currentLiftHeight, armSetpoint, currentArmAngle);
-        validArmAngle = validSetpoints[0];
-        validLiftHeight = validSetpoints[1];
-
-        //multiple stage profile 
-        if (liftSetpoint != validLiftHeight) {
-            liftRecalculateFlag = true;
-        }
-        if (armSetpoint != validArmAngle) {
-            armRecalculateFlag = true;
-        }
-
         if (armProfile.profileDone){
+            //getting setpoints within proper bounds
+            double[] validSetpoints = getValidSeptpoints(liftSetpoint, currentLiftHeight, armSetpoint, currentArmAngle);
+            validArmAngle = validSetpoints[0];
+            if (armSetpoint != validArmAngle) {
+                armRecalculateFlag = true;
+            }
         //generate a motion profile for the arm and the lift
             armProfile.calculate(currentArmAngle,validArmAngle);
             armPIDC.resetIVal();
         } 
-        // else {
-        //     armRecalculateFlag = true;
-        // }
+        else {
+            armRecalculateFlag = true;
+        }
         if (liftProfile.profileDone) {
+            //getting setpoints within proper bounds
+            double[] validSetpoints = getValidSeptpoints(liftSetpoint, currentLiftHeight, armSetpoint, currentArmAngle);
+            validArmAngle = validSetpoints[0];
+            validLiftHeight = validSetpoints[1];
+    
+            //multiple stage profile 
+            if (liftSetpoint != validLiftHeight) {
+                liftRecalculateFlag = true;
+            }
             liftProfile.calculate(currentLiftHeight, validLiftHeight);
             liftPIDC.resetIVal();
         } 
-        // else {
-        //     liftRecalculateFlag = true;
-        // }
+        else {
+            liftRecalculateFlag = true;
+        }
     }
 
     private void putDashboard(){
@@ -287,12 +294,12 @@ public class ArmLift implements Subsystem {
     }
 
     private double getArmAngle() {
-        // return (armEnc.getPosition() * 2.0 * Math.PI / ArmLiftConstants.ARM_ENC_RATIO) - manualArmAdjust;
+        // return (-armEnc.getPosition() * 2.0 * Math.PI / ArmLiftConstants.ARM_ENC_RATIO) - manualArmAdjust;
         return (armMotor.getPosition() / ArmLiftConstants.ARM_GEAR_RATO * 2.0 * Math.PI) - manualArmAdjust;
     }
 
     private double getArmVel() {
-        // return(armEnc.getVelocity() / ArmLiftConstants.ARM_ENC_RATIO * 2.0 * Math.PI / 60.0 );
+        // return(-armEnc.getVelocity() / ArmLiftConstants.ARM_ENC_RATIO * 2.0 * Math.PI / 60.0 );
         return(armMotor.getVelocity() / ArmLiftConstants.ARM_GEAR_RATO * 2.0 * Math.PI / 60.0 );
     }
 
@@ -312,6 +319,7 @@ public class ArmLift implements Subsystem {
         SmartDashboard.putNumber("Arm GoalAcc", goalAcc);
         double FF = Math.max(Math.min(getCurrentArmTorque(goalAcc, currentAngle) / getMaxArmTorque(goalVel), 1), -1);
         SmartDashboard.putNumber("Arm FF", FF);
+        if (armProfile.profileDone && goalPos != armSetpoint) armRecalculateFlag = true;
         return armPIDC.velocityPController(goalVel, curVel) + FF;
     }
 
@@ -326,6 +334,7 @@ public class ArmLift implements Subsystem {
         SmartDashboard.putNumber("Lift GoalAcc", goalAcc);
         double FF = Math.max(Math.min(getCurrentLiftForce(goalAcc) / getMaxLiftForce(goalVel), 1), -1);
         SmartDashboard.putNumber("Lift FF", FF);
+        if (liftProfile.profileDone && goalPos != liftSetpoint) liftRecalculateFlag = true;
         return liftPIDC.velocityPController(goalVel, curVel) + FF;
     }
 
@@ -460,7 +469,9 @@ public class ArmLift implements Subsystem {
                 liftSetpoint = ArmLiftConstants.CLIMB_HEIGHT;
                 break;
         }
-        calculateValidProfile();
+        // calculateValidProfile();
+        liftRecalculateFlag = true;
+        armRecalculateFlag = true;
     }
 
     public boolean isAtSetpoint() {

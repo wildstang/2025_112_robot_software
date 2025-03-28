@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class LedSubsystem implements Subsystem {
 
@@ -21,7 +22,7 @@ public class LedSubsystem implements Subsystem {
     private Timer rumbleTimer =  new Timer();
     private Timer patternClock = new Timer();
 
-    public static enum LEDstates {NORMAL, INTAKE, SHOOT, ALGAE_DETECT, L2, L3};
+    public static enum LEDstates {NORMAL, INTAKE, SHOOT, ALGAE_DETECT, L2, L3, DEFENSE};
     public LEDstates ledState = LEDstates.NORMAL;
 
     private int port = 0;  //port
@@ -90,19 +91,27 @@ public class LedSubsystem implements Subsystem {
                 break;
             case ALGAE_DETECT:
                 if (drive.algaeInView()) {
-                    setGreen();
+                    setRGB(61,255,179);
                 } else {
-                    flash();
+                    setRGB(194, 0, 76);
                 }
+                led.setData(ledBuffer);
                 break;
             case L2:
-                setSectionColor(13, 25, new int[]{0, 0, 250});
+                setSectionColor(13, 25, new int[]{61,255,179});
+                break;
             case L3:
-                setSectionColor(26, 38, new int[]{250, 0, 0});
-            default:
+                setSectionColor(26, 38, new int[]{61,255,179});
+                break;
+            case DEFENSE:
+                setRGB(255, 0, 0);
+                led.setData(ledBuffer);
+                break;
+            case NORMAL:
                 normalBlue();
                 break;
         }
+        SmartDashboard.putString("LED state", ledState.toString());
     }
 
     public void setSectionColor(int start, int end, int[] color) {
@@ -150,6 +159,7 @@ public class LedSubsystem implements Subsystem {
     }
 
     public void setGreen() {
+        setRGB(0, 0, 0);
         for (int i = 0; i < 13; i++) {
             ledBuffer.setRGB(i, 61,255,179);
         }
@@ -215,7 +225,7 @@ public class LedSubsystem implements Subsystem {
                     }
                 }
             } else {
-                setRGB(127, 255, 223);
+                setSectionColor(0, 13, new int[]{127, 255, 223});
                 flashHalf = 2;
                 k = 0;
             }
@@ -233,7 +243,7 @@ public class LedSubsystem implements Subsystem {
                     }
                 }
             } else {
-                setRGB(0, 0, 0);
+                setSectionColor(0, 13, new int[]{0, 0, 0});
                 flashHalf = 1;
                 k = 0;
             }

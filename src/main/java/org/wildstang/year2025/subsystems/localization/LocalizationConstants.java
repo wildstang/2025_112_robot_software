@@ -25,7 +25,7 @@ public class LocalizationConstants {
     public static final AprilTagFieldLayout kTagLayout = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
 
     // The standard deviations of our vision estimated poses, which affect correction rate
-    public static final Matrix<N3, N1> kSingleTagStdDevs = VecBuilder.fill(1, 1, Double.MAX_VALUE);  // TODO: tune these values
+    public static final Matrix<N3, N1> kSingleTagStdDevs = VecBuilder.fill(0.5, 0.5, Double.MAX_VALUE);  // TODO: tune these values
     public static final Matrix<N3, N1> kMaxStdDevs = VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
 
     public static final Transform2d CLAW_OFFSET = new Transform2d(0, -0.07, Rotation2d.kZero);
