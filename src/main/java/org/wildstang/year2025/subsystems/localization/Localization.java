@@ -173,9 +173,8 @@ public class Localization implements Subsystem {
                 // Decrease std devs if multiple targets are visible
                 estStdDevs = estStdDevs.times(1.0 / numTags);
                 // Increase std devs based on (average) distance
-                if (numTags == 1 && avgDist > 7) estStdDevs = LocalizationConstants.kMaxStdDevs;
-                else estStdDevs = estStdDevs.times(1 + (avgDist * avgDist / 25));  // TODO: tune std devs
-                // TODO: possibly add logic to reject or greatly increase std devs if the new estimate is far from the previous estimate
+                if (numTags == 1 && avgDist > 4) estStdDevs = LocalizationConstants.kMaxStdDevs;
+                else estStdDevs = estStdDevs.times(1 + (avgDist * avgDist / 30));  // TODO: tune std devs
                 curStdDevs = estStdDevs;
             }
         }

@@ -1,6 +1,7 @@
 package org.wildstang.year2025.subsystems.climb;
 
 import org.wildstang.framework.core.Core;
+import org.wildstang.framework.io.inputs.AnalogInput;
 import org.wildstang.framework.io.inputs.DigitalInput;
 import org.wildstang.framework.io.inputs.Input;
 import org.wildstang.framework.subsystems.Subsystem;
@@ -19,10 +20,11 @@ public class AutomateClimb implements Subsystem {
     private DigitalInput driverStart;
     private WsSpark climbMotor;
     private double climbMotorSpeed;
-    private enum ClimbState{EXTEND, RETRACT, INIT}
+    private enum ClimbState{EXTEND, RETRACT, INIT, MANUAL}
     private ClimbState climbState;
     private double climbGearRatio = 195.3125;
     private double motorPos;
+    private AnalogInput rightTrigger;
 
     private final double retractedPosition = 18.75;
     private final double extendedPosition = 9.38;
@@ -35,12 +37,16 @@ public class AutomateClimb implements Subsystem {
         if(source == driverStart && driverStart.getValue()){
             setClimbState();
         }
+        if (climbState == ClimbState.MANUAL) climbMotorSpeed = -rightTrigger.getValue();
+
     }
 
     @Override
     public void init() {
         driverStart = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_START);
         driverStart.addInputListener(this);
+        rightTrigger = (AnalogInput) Core.getInputManager().getInput(WsInputs.DRIVER_RIGHT_TRIGGER);
+        rightTrigger.addInputListener(this);
         climbMotor = (WsSpark) Core.getOutputManager().getOutput(WsOutputs.CLIMBMOTOR); 
         climbMotorSpeed = 1;
         climbState = ClimbState.INIT;
@@ -75,7 +81,11 @@ public class AutomateClimb implements Subsystem {
                     climbMotor.setSpeed(climbMotorSpeed);
                 } else {
                     climbMotor.setSpeed(0.0);
+                    setClimbState();
                 }
+                break;
+            case MANUAL:
+                climbMotor.setSpeed(climbMotorSpeed);
                 break;
         }
        
@@ -88,6 +98,8 @@ public class AutomateClimb implements Subsystem {
             climbState = ClimbState.EXTEND;
         }else if(climbState == ClimbState.EXTEND){
             climbState = ClimbState.RETRACT;
+        } else if(climbState == ClimbState.RETRACT){
+            climbState = ClimbState.MANUAL;
         }
     }
 

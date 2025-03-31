@@ -25,9 +25,9 @@ public class SetArmLiftStateStep extends AutoStep {
 
     @Override
     public void update() {
-        if (armLift.isAtSetpoint()){
+        // if (armLift.isAtSetpoint() || armLift.gameState == GameStates.STORAGE){
             setFinished();
-        }
+        // }
     }
 
     @Override

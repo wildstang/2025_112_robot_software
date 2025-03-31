@@ -357,7 +357,7 @@ public class ArmLift implements Subsystem {
 
         if (curArmAngle < ArmLiftConstants.ARM_POWER_CHAIN_LOW_ANGLE || curArmAngle > ArmLiftConstants.ARM_POWER_CHAIN_HIGH_ANGLE) {
             if (curLiftPos < ArmLiftConstants.POWER_CHAIN_LIFT_HEIGHT_MIN || curLiftPos > ArmLiftConstants.POWER_CHAIN_LIFT_HEIGHT_MAX){
-                validArmAngle = curArmAngle;
+                validArmAngle = 0.0;
             }
             validLiftHeight = ArmLiftConstants.POWER_CHAIN_LIFT_HEIGHT;
             return new double[]{validArmAngle, validLiftHeight};
@@ -367,28 +367,28 @@ public class ArmLift implements Subsystem {
         if (curLiftPos < ArmLiftConstants.LOW_LIFT_HEIGHT){
             validArmAngle = Math.max(Math.min(validArmAngle, ArmLiftConstants.MAX_LOW_ARM_ANGLE), ArmLiftConstants.MIN_LOW_ARM_ANGLE);
         }
-        if(claw.algaeInClaw){
-            //if lift is at a high position, ensure arm angle doesn't go too low so that claw w/ algae hits the lift
-            if (curLiftPos > ArmLiftConstants.HIGH_LIFT_HEIGHT){
-                validArmAngle = Math.max(Math.min(validArmAngle, ArmLiftConstants.ARM_POWER_CHAIN_HIGH_ANGLE),ArmLiftConstants.MIN_HIGH_ARM_ANGLE);
-            }
-            //if claw is angled up above the lift, make sure not to bring the lift down too low or it will hit the algae
-            if(curArmAngle  < ArmLiftConstants.MAX_LIFT_DOWN_ANGLE && curArmAngle > ArmLiftConstants.MIN_LIFT_DOWN_ANGLE){
-                validLiftHeight = Math.max(validLiftHeight, ArmLiftConstants.ALGAE_TOP_CLEARANCE);
-            }
-            if (curLiftPos < ArmLiftConstants.ALGAE_TOP_CLEARANCE){
-                if (curArmAngle < ArmLiftConstants.MIN_LIFT_DOWN_ANGLE){
-                    validArmAngle = Math.min(validArmAngle, ArmLiftConstants.MIN_LIFT_DOWN_ANGLE);
-                } else if (curArmAngle > ArmLiftConstants.MAX_LIFT_DOWN_ANGLE){
-                    validArmAngle = Math.max(validArmAngle, ArmLiftConstants.MAX_LIFT_DOWN_ANGLE);
-                }
-            }
-        } else {
-            //if lift is at a low position, ensure arm doesn't move out of a threshold where it might hit the power chain
-            if(curLiftPos > ArmLiftConstants.POWER_CHAIN_LIFT_HEIGHT_MAX) {
-                validArmAngle = Math.max(Math.min(validArmAngle, ArmLiftConstants.ARM_POWER_CHAIN_HIGH_ANGLE), ArmLiftConstants.ARM_POWER_CHAIN_LOW_ANGLE);
-            }
-        }
+        // if(claw.algaeInClaw){
+        //     //if lift is at a high position, ensure arm angle doesn't go too low so that claw w/ algae hits the lift
+        //     if (curLiftPos > ArmLiftConstants.HIGH_LIFT_HEIGHT){
+        //         validArmAngle = Math.max(Math.min(validArmAngle, ArmLiftConstants.ARM_POWER_CHAIN_HIGH_ANGLE),ArmLiftConstants.MIN_HIGH_ARM_ANGLE);
+        //     }
+        //     //if claw is angled up above the lift, make sure not to bring the lift down too low or it will hit the algae
+        //     if(curArmAngle  < ArmLiftConstants.MAX_LIFT_DOWN_ANGLE && curArmAngle > ArmLiftConstants.MIN_LIFT_DOWN_ANGLE){
+        //         validLiftHeight = Math.max(validLiftHeight, ArmLiftConstants.ALGAE_TOP_CLEARANCE);
+        //     }
+        //     if (curLiftPos < ArmLiftConstants.ALGAE_TOP_CLEARANCE){
+        //         if (curArmAngle < ArmLiftConstants.MIN_LIFT_DOWN_ANGLE){
+        //             validArmAngle = Math.min(validArmAngle, ArmLiftConstants.MIN_LIFT_DOWN_ANGLE);
+        //         } else if (curArmAngle > ArmLiftConstants.MAX_LIFT_DOWN_ANGLE){
+        //             validArmAngle = Math.max(validArmAngle, ArmLiftConstants.MAX_LIFT_DOWN_ANGLE);
+        //         }
+        //     }
+        // } else {
+        //     //if lift is at a low position, ensure arm doesn't move out of a threshold where it might hit the power chain
+        //     if(curLiftPos > ArmLiftConstants.POWER_CHAIN_LIFT_HEIGHT_MAX) {
+        //         validArmAngle = Math.max(Math.min(validArmAngle, ArmLiftConstants.ARM_POWER_CHAIN_HIGH_ANGLE), ArmLiftConstants.ARM_POWER_CHAIN_LOW_ANGLE);
+        //     }
+        // }
         return new double[]{validArmAngle, validLiftHeight};
     }
 
@@ -430,9 +430,10 @@ public class ArmLift implements Subsystem {
         switch (newState) {
             case GROUND_INTAKE:
                 this.isFront = true;
-                claw.setGameState(clawStates.INTAKE);
+                // claw.setGameState(clawStates.INTAKE);
                 armSetpoint = ArmLiftConstants.GROUND_INTAKE_RIGHT_ANGLE;
                 liftSetpoint = ArmLiftConstants.GROUND_INTAKE_LIFT_HEIGHT;
+                led.ledState = LEDstates.ALGAE_DETECT;
                 break;
             case STORAGE:
                 armSetpoint = ArmLiftConstants.STORAGE_ANGLE;

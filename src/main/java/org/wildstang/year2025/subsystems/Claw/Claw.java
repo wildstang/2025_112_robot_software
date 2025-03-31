@@ -44,10 +44,10 @@ public class Claw implements Subsystem{
     @Override
     //Called everytime an input/buttons is pressed
     public void inputUpdate(Input source) {
-        if (leftTrigger.getValue() != 0) {
-            setGameState(clawStates.INTAKE);
-            led.ledState = LEDstates.ALGAE_DETECT;
-        } else if (leftBumper.getValue()) {
+        // if (leftTrigger.getValue() != 0) {
+        //     setGameState(clawStates.INTAKE);
+        // } else
+         if (leftBumper.getValue()) {
             setGameState(clawStates.INTAKE);
         } else if (rightBumper.getValue()) {
             setGameState(clawStates.OUTTAKE);
@@ -80,28 +80,25 @@ public class Claw implements Subsystem{
         SmartDashboard.putNumber("claw current", clawMotor.getOutputCurrent());
         switch(currentState){
             case INTAKE:
-                if ( clawMotor.getOutputCurrent() > ClawConstants.CLAW_CURRENT_HOLD) { //Math.abs(clawMotor.getVelocity()) < ClawConstants.CLAW_CURRENT_VEL &&
+                if (clawMotor.getOutputCurrent() > ClawConstants.CLAW_CURRENT_HOLD) { //Math.abs(clawMotor.getVelocity()) < ClawConstants.CLAW_CURRENT_VEL &&
                     algaeHoldCount++;
                     if (algaeHoldCount >= ClawConstants.CLAW_HOLD_COUNT){
                         algaeInClaw = true;
+                        led.ledState = LEDstates.INTAKE;
+                        armLift.setGameState(GameStates.STORAGE);
+                        setGameState(clawStates.HOLD);
                     }
                 } else {
                     algaeHoldCount = 0;
                 }
-                if (algaeInClaw) {
-                    led.ledState = LEDstates.INTAKE;
-                    armLift.setGameState(GameStates.STORAGE);
-                    setGameState(clawStates.HOLD);
-                } else {
-                    clawMotor.setSpeed(ClawConstants.CLAW_INTAKE_SPEED);
-                    clawMotor2.setSpeed(-ClawConstants.CLAW_INTAKE_SPEED);
-                }
+                clawMotor.setSpeed(ClawConstants.CLAW_INTAKE_SPEED);
+                clawMotor2.setSpeed(-ClawConstants.CLAW_INTAKE_SPEED);
                 break;
 
             case HOLD:
                 clawMotor.setSpeed(ClawConstants.CLAW_HOLD_SPEED);
                 clawMotor2.setSpeed(-ClawConstants.CLAW_HOLD_SPEED);
-                algaeInClaw = false;
+                // algaeInClaw = false;
                 break;
 
             case OUTTAKE:
@@ -119,6 +116,9 @@ public class Claw implements Subsystem{
                 if (armLift.gameState == GameStates.PROCESSOR){
                     clawMotor.setSpeed(ClawConstants.CLAW_PROCESSOR_SPEED);
                     clawMotor2.setSpeed(-ClawConstants.CLAW_PROCESSOR_SPEED);
+                } else if (armLift.gameState == GameStates.GROUND_INTAKE) {
+                    clawMotor.setSpeed(-0.2);
+                    clawMotor2.setSpeed(0.2);
                 } else {
                     clawMotor.setSpeed(ClawConstants.CLAW_OUTTAKE_SPEED);
                     clawMotor2.setSpeed(-ClawConstants.CLAW_OUTTAKE_SPEED);
@@ -126,11 +126,6 @@ public class Claw implements Subsystem{
                 break;
 
             case IDLE:
-                clawMotor.setSpeed(0.0);
-                clawMotor2.setSpeed(0.0);
-                break;
-
-            default:
                 clawMotor.setSpeed(0.0);
                 clawMotor2.setSpeed(0.0);
                 break;

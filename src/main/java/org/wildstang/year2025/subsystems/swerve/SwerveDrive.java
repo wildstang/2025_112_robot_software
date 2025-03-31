@@ -207,7 +207,7 @@ public class SwerveDrive extends SwerveDriveTemplate {
                             xOutput = xInput;
                             yOutput = yInput;
                             if (!pixyOverride && algaeInView() && armLift.isAtSetpoint() && rInput == 0) {
-                                rOutput = (1.2 - pixyAnalog.getVoltage()) * 0.30;  // TODO: tune these values
+                                rOutput = (1.4 - pixyAnalog.getVoltage()) * 0.30;  // TODO: tune these values
                             } else {
                                 rOutput = rInput;
                             }

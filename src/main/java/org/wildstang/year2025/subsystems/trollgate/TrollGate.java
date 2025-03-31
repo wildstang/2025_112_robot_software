@@ -27,7 +27,7 @@ public class TrollGate implements Subsystem {
     
     @Override
     public void inputUpdate(Input source) {
-        trollGateSpeed = rightTrigger.getValue() * -180.0;
+        // trollGateSpeed = rightTrigger.getValue() * -180.0;
     }
 
     @Override
