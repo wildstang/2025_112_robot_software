@@ -14,7 +14,6 @@ import org.wildstang.year2025.auto.Programs.IJ_KL_Algae;
 public enum WsAutoPrograms implements AutoPrograms {
 
     // enumerate programs
-    //SAMPLE_PROGRAM("Sample", SampleAutoProgram.class),
     CENTER_ALGAE("Center Algae", CenterAlgae.class),
     IJ_KL_ALGAE("IJ KL Algae", IJ_KL_Algae.class),
     EF_GH_ALGAE("EF GH Algae", EF_GH_Algae.class),

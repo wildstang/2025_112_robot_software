@@ -4,8 +4,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 
 public final class DriveConstants {
-    public static final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(new Translation2d(0.2794, 0.33), new Translation2d(0.2794, -0.33),
-            new Translation2d(-0.2794, 0.33), new Translation2d(-0.2794, -0.33));
+    public static final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(new Translation2d(0.2794, 0.33), new Translation2d(0.2794, -0.33), new Translation2d(-0.2794, 0.33), new Translation2d(-0.2794, -0.33));
     /** robot length from swerve pod to swerve pod, in meters */
     public static final double ROBOT_LENGTH = 0.5715;
     /** robot width from swerve pod to swerve pod, in meters */

@@ -1,17 +1,10 @@
 package org.wildstang.year2025.robot;
 
-// import java.util.Map;
-// import java.util.HashMap;
-
 import org.wildstang.framework.core.Core;
-// import org.wildstang.framework.io.outputs.Output;
 import org.wildstang.framework.logger.Log;
 import org.wildstang.framework.logger.Log.LogLevel;
 import org.wildstang.hardware.roborio.RoboRIOInputFactory;
 import org.wildstang.hardware.roborio.RoboRIOOutputFactory;
-// import org.wildstang.hardware.roborio.outputs.config.WsSparkConfig;
-// import org.wildstang.hardware.roborio.outputs.config.WsSparkFollowerConfig;
-// import org.wildstang.year2025.robot.WsOutputs;
 
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -61,12 +54,6 @@ public class Robot extends TimedRobot {
         DataLogManager.start();
         // Record both DS control and joystick data
         DriverStation.startDataLog(DataLogManager.getLog());
-        // Map<Integer,String> revDeviceMap = new HashMap<>();
-        // for (WsOutputs o : WsOutputs.values()){
-        //     if (o.getConfig() instanceof WsSparkConfig || o.getConfig() instanceof WsSparkFollowerConfig){
-        //         revDeviceMap.put(o.getConfig().getChannel(), o.getName());
-        //     }
-        // }
         URCL.start();
 
     }
@@ -124,7 +111,6 @@ public class Robot extends TimedRobot {
      */
     @Override
     public void robotPeriodic() {
-        // core.executeUpdate();
         update();
     }
 
@@ -141,7 +127,6 @@ public class Robot extends TimedRobot {
      */
     @Override
     public void autonomousPeriodic() {
-        // update();
     }
 
     /**
@@ -150,7 +135,6 @@ public class Robot extends TimedRobot {
      */
     @Override
     public void teleopPeriodic() {
-        // update();
     }
 
     /**

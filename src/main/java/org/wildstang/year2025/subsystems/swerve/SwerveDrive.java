@@ -60,13 +60,6 @@ public class SwerveDrive extends SwerveDriveTemplate {
     private double yInput;
     private double rInput;
 
-    // private double xSpeed;
-    // private double ySpeed;
-    // private double wSpeed;
-    // private boolean rotLocked;
-    // private double rotTarget;
-    // private double pathXTarget;
-    // private double pathYTarget;
     private Pose2d targetPose;
     private ChassisSpeeds targetSpeed;
 
@@ -207,7 +200,7 @@ public class SwerveDrive extends SwerveDriveTemplate {
                             xOutput = xInput;
                             yOutput = yInput;
                             if (!pixyOverride && algaeInView() && armLift.isAtSetpoint() && rInput == 0) {
-                                rOutput = (1.4 - pixyAnalog.getVoltage()) * 0.30;  // TODO: tune these values
+                                rOutput = (1.4 - pixyAnalog.getVoltage()) * 0.30;
                             } else {
                                 rOutput = rInput;
                             }
@@ -253,7 +246,7 @@ public class SwerveDrive extends SwerveDriveTemplate {
                             xOutput = xInput;
                             yOutput = yInput;
                             if (!pixyOverride && algaeInView() && armLift.isAtSetpoint() && rInput == 0) {
-                                rOutput = (1.2 - pixyAnalog.getVoltage()) * 0.30;  // TODO: tune these values
+                                rOutput = (1.2 - pixyAnalog.getVoltage()) * 0.30;
                             } else {
                                 rOutput = rInput;
                             }

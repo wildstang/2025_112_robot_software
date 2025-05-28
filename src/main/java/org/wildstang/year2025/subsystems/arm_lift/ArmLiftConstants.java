@@ -6,8 +6,6 @@ public final class ArmLiftConstants {
     public static final double MAX_ARM_VELOCITY = 2.0; //1.94;
     public static final double MAX_LIFT_ACCELERATION = 5.0; // 1.51;
     public static final double MAX_LIFT_VELOCITY = 2.0; //1.42;
-    public static final double ARM_SMALL_DELTA_P = 0.1; //small number that deltaP can be under that defaults motion profile to have 0 acceleration and velocity
-    public static final double LIFT_SMALL_DELTA_P = 0.02; //small number that deltaP can be under that defaults motion profile to have 0 acceleration and velocity
     /* ------------------------------------------------------- */
 
     /* -------------------- PID -------------------------------*/
@@ -15,10 +13,6 @@ public final class ArmLiftConstants {
     public static final double ARM_POS_I_GAIN = 0.1;
     public static final double ARM_VEL_P_GAIN = 0.15;
     public static final double ARM_TOL = 0.12;
-    // public static final double ARM_POS_P_GAIN = 4.0;
-    // public static final double ARM_POS_I_GAIN = 0.0;
-    // public static final double ARM_VEL_P_GAIN = 0.2;
-    // public static final double ARM_TOL = 0.09;
 
     public static final double LIFT_POS_P_GAIN = 16.0;
     public static final double LIFT_POS_I_GAIN = 8.0;
@@ -68,7 +62,6 @@ public final class ArmLiftConstants {
 
     //angle bounds without hitting the lift (when the lift is at a high position)
     public final static double MIN_HIGH_ARM_ANGLE = 0.72;
-    // public final static double MAX_HIGH_ARM_ANGLE = 
     public static final double ALGAE_TOP_CLEARANCE = 0.06;
 
     //bounds  when the lift is at a low position so the arm doesn't hit bumpers or lift

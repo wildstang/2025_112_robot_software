@@ -51,13 +51,6 @@ public class WsSwerveHelper {
             new double[]{getDirection(xCoords[0], yCoords[0]), getDirection(xCoords[1], yCoords[1]), getDirection(xCoords[2], yCoords[2]), getDirection(xCoords[3], yCoords[3])});
         swerveSignal.normalize();
         return swerveSignal;
-        //slew rate limit
-        // if (swerveSignal.isNotZeroed()) {
-        //     return swerveSignal;
-        // }
-        // else {
-        //     return this.setDrive(i_tx, i_ty, i_rot * 0.8, i_gyro);
-        // }
     }
 
     /**automatically creates a rotational joystick value to rotate the robot towards a specific target

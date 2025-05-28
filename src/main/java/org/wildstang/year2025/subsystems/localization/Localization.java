@@ -13,6 +13,7 @@ import org.wildstang.framework.core.Core;
 import org.wildstang.framework.io.inputs.Input;
 import org.wildstang.framework.logger.Log;
 import org.wildstang.framework.subsystems.Subsystem;
+
 import org.wildstang.year2025.robot.WsSubsystems;
 import org.wildstang.year2025.subsystems.arm_lift.ArmLift.GameStates;
 import org.wildstang.year2025.subsystems.swerve.SwerveDrive;
@@ -41,7 +42,6 @@ public class Localization implements Subsystem {
     StructPublisher<Pose2d> posePublisher, bestPosePublisher, frontCamPublisher, rearCamPublisher;
     StructArrayPublisher<Pose2d> frontVisTargetPublisher, rearVisTargetPublisher;
     StructArrayPublisher<SwerveModulePosition> modulePosPublisher;
-    // StructArrayPublisher<Double> frontAmbiguityPublisher, rearAmbiguityPublisher;
     StructPublisher<Rotation2d> odoAngPublisher;
     Optional<EstimatedRobotPose> visionEst;
     List<PhotonTrackedTarget> targets;
@@ -66,7 +66,6 @@ public class Localization implements Subsystem {
         frontEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
         frontCamPublisher = NetworkTableInstance.getDefault().getStructTopic("Front Cam Pose Estimator", Pose2d.struct).publish();
         frontVisTargetPublisher = NetworkTableInstance.getDefault().getStructArrayTopic("Front Vision Targets", Pose2d.struct).publish();
-        // frontAmbiguityPublisher = NetworkTableInstance.getDefault().getStructArrayTopic("Front Vision Targets", Double).publish();
 
         rearCam = new PhotonCamera(LocalizationConstants.kRearCam);
         rearEstimator = new PhotonPoseEstimator(LocalizationConstants.kTagLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, LocalizationConstants.kBotToRearCam);
@@ -99,7 +98,6 @@ public class Localization implements Subsystem {
         // Get current pose estimate after all updates
         currentPose = estimator.getEstimatedPosition();
         putDashboard();
-        // if (currentPose.getX() > 18 || currentPose.getX() < -0.5 || currentPose.getY() > 8.5 || currentPose.getY() < -0.5) setCurrentPose(Pose2d.kZero);
     }
 
     private boolean processPVResults(PhotonCamera cam, PhotonPoseEstimator camEstimator, StructArrayPublisher<Pose2d> visTargetPublisher, StructPublisher<Pose2d> camPosePublisher){
@@ -114,7 +112,6 @@ public class Localization implements Subsystem {
                 targetAmbiguity[i] = targets.get(i).getPoseAmbiguity();
             }
             visTargetPublisher.set(visTargets, (long) (1_000_000 * change.getTimestampSeconds()));
-            // ambPublisher.set(targetAmbiguity);
 
             // update pose estimator
             visionEst = camEstimator.update(change);

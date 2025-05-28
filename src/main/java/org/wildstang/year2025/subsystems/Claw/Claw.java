@@ -6,7 +6,9 @@ import org.wildstang.framework.io.inputs.AnalogInput;
 import org.wildstang.framework.io.inputs.DigitalInput;
 import org.wildstang.framework.io.inputs.Input;
 import org.wildstang.framework.subsystems.Subsystem;
+
 import org.wildstang.hardware.roborio.outputs.WsSpark;
+
 import org.wildstang.year2025.robot.WsInputs;
 import org.wildstang.year2025.robot.WsOutputs;
 import org.wildstang.year2025.robot.WsSubsystems;
@@ -44,9 +46,6 @@ public class Claw implements Subsystem{
     @Override
     //Called everytime an input/buttons is pressed
     public void inputUpdate(Input source) {
-        // if (leftTrigger.getValue() != 0) {
-        //     setGameState(clawStates.INTAKE);
-        // } else
          if (leftBumper.getValue()) {
             setGameState(clawStates.INTAKE);
         } else if (rightBumper.getValue()) {
@@ -98,7 +97,6 @@ public class Claw implements Subsystem{
             case HOLD:
                 clawMotor.setSpeed(ClawConstants.CLAW_HOLD_SPEED);
                 clawMotor2.setSpeed(-ClawConstants.CLAW_HOLD_SPEED);
-                // algaeInClaw = false;
                 break;
 
             case OUTTAKE:
@@ -106,7 +104,6 @@ public class Claw implements Subsystem{
                     // if we are in scoring position and finished outtaking, go to storage
                     if (armLift.gameState == GameStates.SHOOT_NET || armLift.gameState == GameStates.PROCESSOR) {
                         armLift.setGameState(GameStates.STORAGE);
-                      //  trollgate.setTrollGateState(TollgateStates.DETRACT);
                     }
                     setGameState(clawStates.IDLE);
                     timer.reset();

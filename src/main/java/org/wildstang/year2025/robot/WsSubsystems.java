@@ -16,7 +16,7 @@ import org.wildstang.year2025.subsystems.trollgate.TrollGate;
 public enum WsSubsystems implements Subsystems {
 
     // enumerate subsystems
-    // IMPORTANT: DO NOT REORDER WITHOUT VERIFYING WITH ZACH
+    // IMPORTANT: DO NOT REORDER WITHOUT VERIFYING
     // To ensure proper behavior, Localization needs to update first, followed by ArmLift, and LED needs to update last
     LOCALIZATION("Localization", Localization.class),
     AUTOMATECLIMB("Automate Climb", AutomateClimb.class),
