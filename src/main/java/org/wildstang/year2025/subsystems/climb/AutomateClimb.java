@@ -26,7 +26,7 @@ public class AutomateClimb implements Subsystem {
     private double motorPos;
     private AnalogInput rightTrigger;
 
-    private final double retractedPosition = 18.75;
+    private final double retractedPosition = 19.25;
     private final double extendedPosition = 9.38;
     private final double startPos = 0.46;
 
@@ -81,6 +81,7 @@ public class AutomateClimb implements Subsystem {
                     climbMotor.setSpeed(climbMotorSpeed);
                 } else {
                     climbMotor.setSpeed(0.0);
+                    climbMotorSpeed = 0.0;
                     setClimbState();
                 }
                 break;
@@ -90,6 +91,7 @@ public class AutomateClimb implements Subsystem {
         }
        
        SmartDashboard.putNumber("climb speed", climbMotorSpeed);
+       SmartDashboard.putString("climb state", climbState.toString());
        SmartDashboard.putNumber("Climb Position", motorPos);
     }
 

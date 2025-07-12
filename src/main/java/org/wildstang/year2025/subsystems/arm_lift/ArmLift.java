@@ -294,13 +294,13 @@ public class ArmLift implements Subsystem {
     }
 
     private double getArmAngle() {
-        // return (-armEnc.getPosition() * 2.0 * Math.PI / ArmLiftConstants.ARM_ENC_RATIO) - manualArmAdjust;
-        return (armMotor.getPosition() / ArmLiftConstants.ARM_GEAR_RATO * 2.0 * Math.PI) - manualArmAdjust;
+        return (-armEnc.getPosition() * 2.0 * Math.PI / ArmLiftConstants.ARM_ENC_RATIO) - manualArmAdjust;
+        // return (armMotor.getPosition() / ArmLiftConstants.ARM_GEAR_RATO * 2.0 * Math.PI) - manualArmAdjust;
     }
 
     private double getArmVel() {
-        // return(-armEnc.getVelocity() / ArmLiftConstants.ARM_ENC_RATIO * 2.0 * Math.PI / 60.0 );
-        return(armMotor.getVelocity() / ArmLiftConstants.ARM_GEAR_RATO * 2.0 * Math.PI / 60.0 );
+        return(-armEnc.getVelocity() / ArmLiftConstants.ARM_ENC_RATIO * 2.0 * Math.PI / 60.0 );
+        // return(armMotor.getVelocity() / ArmLiftConstants.ARM_GEAR_RATO * 2.0 * Math.PI / 60.0 );
     }
 
     public void getArmReefHeight(){
@@ -317,10 +317,12 @@ public class ArmLift implements Subsystem {
         SmartDashboard.putNumber("Arm GoalPos", goalPos);
         SmartDashboard.putNumber("Arm GoalVel", goalVel);
         SmartDashboard.putNumber("Arm GoalAcc", goalAcc);
-        double FF = Math.max(Math.min(getCurrentArmTorque(goalAcc, currentAngle) / getMaxArmTorque(goalVel), 1), -1);
-        SmartDashboard.putNumber("Arm FF", FF);
+        // double FF = Math.max(Math.min(getCurrentArmTorque(goalAcc, currentAngle) / getMaxArmTorque(goalVel), 1), -1);
+        // SmartDashboard.putNumber("Arm FF", FF);
         if (armProfile.profileDone && goalPos != armSetpoint) armRecalculateFlag = true;
-        return armPIDC.velocityPController(goalVel, curVel) + FF;
+        // return armPIDC.velocityPController(goalVel, curVel) + FF;
+        return (goalPos - currentAngle) * ArmLiftConstants.ARM_POS_P_GAIN;
+
     }
 
     //generates an output for the motor with an acceleration feedforward, position feedforward, and PID
