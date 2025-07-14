@@ -5,6 +5,7 @@ import org.wildstang.year2025.auto.Programs.CenterAlgae;
 import org.wildstang.year2025.auto.Programs.CenterAlgaePush;
 import org.wildstang.year2025.auto.Programs.EF_GH_Algae;
 import org.wildstang.year2025.auto.Programs.IJ_KL_Algae;
+import org.wildstang.year2025.auto.Programs.IRI;
 
 
 /**
@@ -18,6 +19,7 @@ public enum WsAutoPrograms implements AutoPrograms {
     IJ_KL_ALGAE("IJ KL Algae", IJ_KL_Algae.class),
     EF_GH_ALGAE("EF GH Algae", EF_GH_Algae.class),
     CENTER_ALGAE_PUSH("Center Algae Push", CenterAlgaePush.class),
+    IRI("IRI", IRI.class),
     ;
 
     /**

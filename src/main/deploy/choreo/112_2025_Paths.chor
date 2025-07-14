@@ -50,12 +50,12 @@
    },
    "AlgaeIJ":{
     "x":{
-     "exp":"5.13 m",
-     "val":5.13
+     "exp":"5.08 m",
+     "val":5.08
     },
     "y":{
-     "exp":"5.3 m",
-     "val":5.3
+     "exp":"5.32 m",
+     "val":5.32
     },
     "heading":{
      "exp":"4.19 rad",
@@ -125,7 +125,7 @@
     },
     "y":{
      "exp":"AlgaeIJ.y",
-     "val":5.3
+     "val":5.32
     },
     "heading":{
      "exp":"PI rad",

@@ -2,15 +2,15 @@ package org.wildstang.year2025.subsystems.arm_lift;
 
 public final class ArmLiftConstants {
     /* -------------------- Motion Profile -------------------*/
-    public static final double MAX_ARM_ACCELERATION = 24;//20.18;
-    public static final double MAX_ARM_VELOCITY = 2.0; //1.94;
+    public static final double MAX_ARM_ACCELERATION = 20;//20.18;
+    public static final double MAX_ARM_VELOCITY = 3.0; //1.94;
     public static final double MAX_LIFT_ACCELERATION = 5.0; // 1.51;
     public static final double MAX_LIFT_VELOCITY = 2.0; //1.42;
     /* ------------------------------------------------------- */
 
     /* -------------------- PID -------------------------------*/
-    public static final double ARM_POS_P_GAIN = 12.0;
-    public static final double ARM_POS_I_GAIN = 0.1;
+    public static final double ARM_POS_P_GAIN = 1.0;
+    public static final double ARM_POS_I_GAIN = 0.2;
     public static final double ARM_VEL_P_GAIN = 0.15;
     public static final double ARM_TOL = 0.12;
 
