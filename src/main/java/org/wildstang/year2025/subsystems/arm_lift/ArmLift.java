@@ -41,12 +41,13 @@ public class ArmLift implements Subsystem {
     private DigitalInput dpadDown, dpadUp;  // Manual arm angle adjustment
     private DigitalInput dpadLeft, dpadRight;  // Lollipop intake, processor score
     private DigitalInput leftJoyStickButton;
+    private DigitalInput rightBumper;
     private AnalogInput leftTrigger;
     private RelativeEncoder armEnc;
     private double manualArmAdjust;
 
     /* State Machine Variables */
-    public enum GameStates {GROUND_INTAKE, L2_ALGAE_REEF, L3_ALGAE_REEF, STORAGE, SHOOT_NET, LOLIPOP, PROCESSOR, CLIMB}; // Our Arm/Lift States
+    public enum GameStates {GROUND_INTAKE, L2_ALGAE_REEF, L3_ALGAE_REEF, STORAGE, SHOOT_NET, LOLIPOP, PROCESSOR, CLIMB, PRE_SHOOT_NET}; // Our Arm/Lift States
     public GameStates gameState = GameStates.CLIMB;
     public GameStates newState = GameStates.CLIMB;
     private boolean isFront;
@@ -131,6 +132,8 @@ public class ArmLift implements Subsystem {
         dpadUp.addInputListener(this);
         leftJoyStickButton = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_LEFT_JOYSTICK_BUTTON);
         leftJoyStickButton.addInputListener(this);
+        rightBumper = (DigitalInput) Core.getInputManager().getInput(WsInputs.DRIVER_RIGHT_SHOULDER);
+        rightBumper.addInputListener(this);
     }
 
     @Override
@@ -163,13 +166,20 @@ public class ArmLift implements Subsystem {
                 getArmReefHeight();
             }
         } else if (faceUp.getValue()) {
+        //     if (swerve.visionOverride){
+        //         isFront = false;
+        //     } else {
+        //         isFront = loc.getNearestBargeDirection();
+        //     }
+        //     setGameState(GameStates.PRE_SHOOT_NET);
+        // } else if (rightBumper.getValue()) {
             if (swerve.visionOverride){
                 isFront = false;
             } else {
                 isFront = loc.getNearestBargeDirection();
             }
             setGameState(GameStates.SHOOT_NET, isFront);
-        } else if(dpadLeft.getValue()){
+        }else if(dpadLeft.getValue()){
             setGameState(GameStates.LOLIPOP);
         } else if (leftTrigger.getValue() != 0) {
             setGameState(GameStates.GROUND_INTAKE);
@@ -223,7 +233,7 @@ public class ArmLift implements Subsystem {
 
         armMotor.setSpeed(armOut);
         liftMotor1.setSpeed(liftOut);
-        liftMotor2.setSpeed(liftOut);
+        liftMotor2.setSpeed(-liftOut);
 
         putDashboard();
     }
@@ -401,6 +411,11 @@ public class ArmLift implements Subsystem {
                 armSetpoint = this.isFront ? ArmLiftConstants.L3_INTAKE_ANGLE : 2.0 * Math.PI - ArmLiftConstants.L3_INTAKE_ANGLE;
                 liftSetpoint = ArmLiftConstants.L3_INTAKE_LIFT_HEIGHT;
                 led.ledState = LEDstates.L3;
+                break;
+
+            case PRE_SHOOT_NET:
+                armSetpoint = Math.PI;
+                liftSetpoint = ArmLiftConstants.SHOOT_NET_LIFT_HEIGHT;
                 break;
 
             case SHOOT_NET:

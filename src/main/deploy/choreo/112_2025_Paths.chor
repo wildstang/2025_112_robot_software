@@ -14,8 +14,8 @@
    "MaxVel":{
     "dimension":"LinVel",
     "var":{
-     "exp":"1.6 m / s",
-     "val":1.6
+     "exp":"2 m / s",
+     "val":2.0
     }
    }
   },
@@ -78,8 +78,8 @@
    },
    "BargeScore":{
     "x":{
-     "exp":"7.52 m",
-     "val":7.52
+     "exp":"7.57 m",
+     "val":7.57
     },
     "y":{
      "exp":"5.62 m",
